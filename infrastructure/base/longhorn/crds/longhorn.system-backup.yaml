@@ -1,0 +1,14 @@
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: longhorn-system-backup
+  namespace: longhorn-system
+spec:
+  task: system-backup
+  cron: '0 */4 * * *'
+  retain: 10
+  concurrency: 10
+  parameters:
+    volume-backup-policy: always
+  groups:
+    - default
