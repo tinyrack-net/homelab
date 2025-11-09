@@ -11,3 +11,12 @@ sh -s - server \
   --disable traefik \
   --disable servicelb
 ```
+
+```bash
+flux bootstrap github \
+  --owner=tinyrack94 \
+  --repository=homelab \
+  --branch=main \
+  --path=./clusters/production \
+  --owner=tinyrack-net
+```
