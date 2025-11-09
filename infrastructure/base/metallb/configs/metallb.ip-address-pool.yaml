@@ -1,9 +1,9 @@
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: metallb-public-ip-pool
+  name: metallb-ip-pool
   namespace: metallb-system
 spec:
   autoAssign: false
   addresses:
-    - 91.99.254.187-91.99.254.190
+    - 10.132.246.1-10.132.246.254

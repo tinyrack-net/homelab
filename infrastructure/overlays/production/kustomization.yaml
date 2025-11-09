@@ -7,6 +7,6 @@ resources:
   - configs.yaml
   - longhorn.yaml
   - cert-manager.yaml
-  # - metallb.yaml
+  - metallb.yaml
   # - traefik.yaml
   # - cloudnative-pg.yaml

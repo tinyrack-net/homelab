@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: ./flux/infrastructure/base/metallb/configs
+  path: ./infrastructure/base/metallb/configs
   prune: true
   timeout: 2m
   wait: true
