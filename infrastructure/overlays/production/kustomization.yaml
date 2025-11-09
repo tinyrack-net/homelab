@@ -10,3 +10,4 @@ resources:
   - metallb.yaml
   - traefik.yaml
   - cloudnative-pg.yaml
+  - mariadb-operator.yaml
