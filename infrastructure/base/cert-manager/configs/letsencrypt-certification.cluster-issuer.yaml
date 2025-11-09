@@ -7,11 +7,13 @@ spec:
     email: admin@tinyrack.net
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: tinyrack-letsencrypt
+      name: tinyrack-homelab-letsencrypt
     solvers:
     - selector:
         dnsZones:
           - "tinyrack.net"
+          - "winetree94.com"
+          - "winetree94.click"
       dns01:
         cloudflare:
           email: winetree94@gmail.com
