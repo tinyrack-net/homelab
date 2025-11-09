@@ -8,5 +8,5 @@ resources:
   - longhorn.yaml
   - cert-manager.yaml
   - metallb.yaml
-  # - traefik.yaml
+  - traefik.yaml
   # - cloudnative-pg.yaml
