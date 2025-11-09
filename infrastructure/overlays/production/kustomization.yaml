@@ -9,4 +9,4 @@ resources:
   - cert-manager.yaml
   - metallb.yaml
   - traefik.yaml
-  # - cloudnative-pg.yaml
+  - cloudnative-pg.yaml
