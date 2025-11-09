@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - repositories.yaml
   - sealed-secrets.yaml
-  # - reflector.yaml
+  - reflector.yaml
   # - configs.yaml
   # - longhorn.yaml
   # - cert-manager.yaml
