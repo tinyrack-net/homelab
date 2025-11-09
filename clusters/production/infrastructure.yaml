@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./flux/infrastructure/overlays/production
+  path: ./infrastructure/overlays/production
   prune: true
   wait: true
   sourceRef:

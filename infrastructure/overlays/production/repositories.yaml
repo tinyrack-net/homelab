@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: ./flux/infrastructure/base/repositories
+  path: ./infrastructure/base/repositories
   prune: true
   wait: true
   timeout: 2m

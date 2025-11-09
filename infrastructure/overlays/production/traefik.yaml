@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: ./flux/infrastructure/base/traefik
+  path: ./infrastructure/base/traefik
   prune: true
   timeout: 5m
   sourceRef:
