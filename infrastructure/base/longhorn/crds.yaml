@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: ./flux/infrastructure/base/longhorn/crds
+  path: ./infrastructure/base/longhorn/crds
   prune: true
   timeout: 2m
   sourceRef:

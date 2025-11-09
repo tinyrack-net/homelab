@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: longhorn
-      version: "1.9.1"
+      version: "1.10.0"
       sourceRef:
         kind: HelmRepository
         name: longhorn
@@ -21,8 +21,8 @@ spec:
     longhornUI:
       replicas: 1
     defaultBackupStore:
-      backupTarget: s3://tinyrack-prod@hetzner/clusters/public/longhorn
-      backupTargetCredentialSecret: tinyrack-s3-secret
+      backupTarget: s3://tinyrack-homelab@us-east-1/clusters/tinyrack-homelab/longhorn
+      backupTargetCredentialSecret: tinyrack-homelab-s3-secret
 #    ingress:
 #      enabled: true
 #      host: longhorn.internal.tinyrack.net

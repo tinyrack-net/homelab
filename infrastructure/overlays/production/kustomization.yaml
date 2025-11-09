@@ -5,7 +5,7 @@ resources:
   - sealed-secrets.yaml
   - reflector.yaml
   - configs.yaml
-  # - longhorn.yaml
+  - longhorn.yaml
   # - cert-manager.yaml
   # - metallb.yaml
   # - traefik.yaml
