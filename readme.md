@@ -14,6 +14,20 @@ sh -s - server \
   --disable servicelb
 ```
 
+Sealed Secrets 키 복원
+
+```
+export PRIVATEKEY="tinyrack-homelab-secret-key.key"
+export PUBLICKEY="tinyrack-homelab-secret-key.crt"
+export NAMESPACE="sealed-secrets"
+export SECRETNAME="tinyrack-homelab-s3-secret"
+
+kubectl create namespace "$NAMESPACE"
+kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY"
+kubectl -n "$NAMESPACE" label secret "$SECRETNAME" sealedsecrets.bitnami.com/sealed-secrets-key=active
+```
+
+
 Flux 부트스트랩
 
 ```bash
