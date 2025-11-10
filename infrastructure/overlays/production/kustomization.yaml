@@ -11,3 +11,4 @@ resources:
   - traefik.yaml
   - cloudnative-pg.yaml
   - mariadb-operator.yaml
+  - cloudflared.yaml

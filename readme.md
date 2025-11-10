@@ -16,7 +16,7 @@ sh -s - server \
 
 Sealed Secrets 키 복원
 
-```
+```bash
 export PRIVATEKEY="tinyrack-homelab-secret-key.key"
 export PUBLICKEY="tinyrack-homelab-secret-key.crt"
 export NAMESPACE="sealed-secrets"
