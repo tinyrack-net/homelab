@@ -48,9 +48,9 @@ spec:
             - name: database__connection__database
               value: "ghost"
             - name: url
-              value: "https://tinyrack.net"
+              value: "https://cms.winetree94.com"
             - name: mail__from
-              value: "noreply@tinyrack.net"
+              value: "noreply@winetree94.com"
             - name: mail__transport
               value: "SMTP"
             - name: mail__options__host
@@ -60,7 +60,7 @@ spec:
             - name: mail__options__secure
               value: "true"
             - name: mail__options__auth__user
-              value: "noreply@tinyrack.net"
+              value: "noreply@winetree94.com"
             - name: mail__options__auth__pass
               valueFrom:
                 secretKeyRef:

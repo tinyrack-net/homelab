@@ -3,5 +3,5 @@ kind: Kustomization
 resources:
   - repositories.yaml
   - ghost.yaml
-  - authentik.yaml
-  - openwebui.yaml
+  # - authentik.yaml
+  # - openwebui.yaml

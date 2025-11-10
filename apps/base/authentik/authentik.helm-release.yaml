@@ -35,7 +35,7 @@ spec:
           - auth.tinyrack.net
           - authentik.tinyrack.net
         tls:
-          - secretName: letsencrypt-wildcard-cert-tinyrack.net
+          - secretName: letsencletsencrypt-cert
             hosts:
               - auth.tinyrack.net
               - authentik.tinyrack.net

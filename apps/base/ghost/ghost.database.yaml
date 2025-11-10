@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: mariadb-cluster
-      version: "25.8.3"
+      version: "25.10.2"
       sourceRef:
         kind: HelmRepository
         name: mariadb-operator-repository
@@ -17,22 +17,22 @@ spec:
   releaseName: ghost-mariadb-cluster
   values:
     mariadb:
-      image: docker-registry1.mariadb.com/library/mariadb:11.8.2
+      image: docker-registry1.mariadb.com/library/mariadb:12.0.2
       rootPasswordSecretKeyRef:
         name: ghost-database-secret
         key: mysql-root-password
       storage:
         storageClass: longhorn-strict-local
-        size: 3Gi
+        size: 10Gi
       replicas: 1
       galera:
         enabled: false
       replication:
         enabled: false
-      bootstrapFrom:
-        backupRef:
-          name: physicalbackup
-          kind: PhysicalBackup
+      # bootstrapFrom:
+      #   backupRef:
+      #     name: physicalbackup
+      #     kind: PhysicalBackup
     databases:
       - name: ghost
         characterSet: utf8
@@ -71,15 +71,15 @@ spec:
         maxRetention: 720h
         storage:
           s3:
-            bucket: tinyrack-prod
+            bucket: tinyrack-homelab
             prefix: apps/ghost/mariadb-11
-            endpoint: fsn1.your-objectstorage.com
-            region: hetzner
+            endpoint: storage.winetree94.com
+            region: us-east-1
             accessKeyIdSecretKeyRef:
-              name: tinyrack-s3-secret
+              name: tinyrack-homelab-s3-secret
               key: AWS_ACCESS_KEY_ID
             secretAccessKeySecretKeyRef:
-              name: tinyrack-s3-secret
+              name: tinyrack-homelab-s3-secret
               key: AWS_SECRET_ACCESS_KEY
             tls:
               enabled: true
