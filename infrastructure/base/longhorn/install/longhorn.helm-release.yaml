@@ -17,7 +17,7 @@ spec:
   releaseName: longhorn
   values:
     persistence:
-      defaultClass: false
+      defaultClass: true
     longhornUI:
       replicas: 1
     defaultBackupStore:
