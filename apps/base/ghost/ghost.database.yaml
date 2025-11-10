@@ -22,7 +22,7 @@ spec:
         name: ghost-database-secret
         key: mysql-root-password
       storage:
-        storageClass: longhorn-strict-local
+        storageClassName: longhorn-strict-local
         size: 10Gi
       replicas: 1
       galera:
