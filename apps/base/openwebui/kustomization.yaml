@@ -8,5 +8,6 @@ resources:
   - openwebui.redis.secret.yaml
   - openwebui.redis.yaml
   - openwebui.secret.yaml
+  - openwebui.oauth.secret.yaml
   - openwebui.helm-release.yaml
   - openwebui.ingress.yaml

@@ -71,6 +71,32 @@ spec:
         value: "us-east-1"
       - name: S3_BUCKET_NAME
         value: "tinyrack-homelab-openwebui-storage"
+
+      # OIDC
+      - name: OAUTH_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: openwebui-oauth-secret
+            key: client_id
+      - name: OAUTH_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: openwebui-oauth-secret
+            key: client_secret
+      - name: OAUTH_PROVIDER_NAME
+        value: "authentik"
+      - name: OPENID_PROVIDER_URL
+        value: "https://auth.winetree94.com/application/o/open-web-ui/.well-known/openid-configuration"
+      - name: OPENID_REDIRECT_URI
+        value: "https://ai.winetree94.com/oauth/oidc/callback"
+      - name: WEBUI_URL
+        value: "https://ai.winetree94.com"
+      - name: ENABLE_OAUTH_SIGNUP
+        value: "true"
+      - name: ENABLE_LOGIN_FORM
+        value: "false"
+      - name: OAUTH_MERGE_ACCOUNTS_BY_EMAIL
+        value: "true"
       
       # CONFIG
       - name: BYPASS_MODEL_ACCESS_CONTROL
