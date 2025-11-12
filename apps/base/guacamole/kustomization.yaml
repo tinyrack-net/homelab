@@ -9,4 +9,4 @@ resources:
   - guacd.service.yaml
   - guacamole.deployment.yaml
   - guacamole.service.yaml
-  - guacamole.ingress.yaml
+  - guacamole.ingress-route.yaml

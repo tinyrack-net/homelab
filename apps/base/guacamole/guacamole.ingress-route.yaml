@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: guacamole-ingress-route
+  namespace: guacamole-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`remote.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: guacamole-guacamole
+          port: 80
+  tls:
+    secretName: letsencrypt-cert
