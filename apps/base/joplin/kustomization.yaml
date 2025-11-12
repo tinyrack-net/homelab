@@ -5,3 +5,4 @@ resources:
   - joplin.database.superuser.secret.yaml
   - joplin.database.user.secret.yaml
   - joplin.database.yaml
+  - joplin.deployment.yaml

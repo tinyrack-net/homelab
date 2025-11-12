@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: joplin
+  namespace: joplin-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: joplin
+  template:
+    metadata:
+      labels:
+        app: joplin
+    spec:
+      securityContext:
+        fsGroup: 1001
+        runAsNonRoot: true
+        runAsUser: 1001
+      containers:
+        - name: joplin
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          image: "joplin/server:3.4.3"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 22300
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/ping
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: joplin.winetree94.com
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/ping
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: joplin.winetree94.com
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          env:
+            - name: APP_BASE_URL
+              value: "https://joplin.winetree94.com"
+            - name: APP_PORT
+              value: "22300"
+            - name: DB_CLIENT
+              value: "pg"
+            - name: POSTGRES_HOST
+              value: "joplin-database-cluster-rw.joplin-system.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DATABASE
+              value: "joplin"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: joplin-database-user-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: joplin-database-user-secret
+                  key: password
+            - name: S3_REGION
+              value: "us-east-1"
+            - name: S3_BUCKET
+              value: "tinyrack-homelab-joplin-storage"
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tinyrack-homelab-s3-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tinyrack-homelab-s3-secret
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: STORAGE_DRIVER
+              value: "Type=S3; Region=$(S3_REGION); AccessKeyId=$(S3_ACCESS_KEY_ID); SecretAccessKeyId=$(S3_SECRET_ACCESS_KEY); Bucket=$(S3_BUCKET); Endpoint=https://storage.winetree94.com"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_TARGET
+              value: "console"
