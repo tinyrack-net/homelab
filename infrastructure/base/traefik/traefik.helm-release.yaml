@@ -29,5 +29,5 @@ spec:
       name: "traefik"
     service:
       annotations:
-        metallb.universe.tf/loadBalancerIPs: 10.132.246.1
+        metallb.io/loadBalancerIPs: 10.132.246.1
 
