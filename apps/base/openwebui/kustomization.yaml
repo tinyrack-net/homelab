@@ -6,7 +6,8 @@ resources:
   - openwebui.database.user.secret.yaml
   - openwebui.database.yaml
   # - openwebui.database.uri.secret.yaml
-  # - openwebui.redis.secret.yaml
+  - openwebui.redis.secret.yaml
+  - openwebui.redis.yaml
   # - openwebui.redis.uri.secret.yaml
   # - openwebui.secret.yaml
   # - openwebui.redis.helm-release.yaml
