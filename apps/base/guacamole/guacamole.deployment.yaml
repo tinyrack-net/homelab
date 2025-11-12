@@ -105,7 +105,7 @@ spec:
             - name: OPENID_ENABLED
               value: "true"
             - name: EXTENSION_PRIORITY
-              value: "*,openid"
+              value: "openid"
             
           ports:
             - name: http
