@@ -25,8 +25,8 @@ spec:
         user: file:///postgres-creds/username
         password: file:///postgres-creds/password
       redis:
-        host: authentik-redis-master.authentik-system.svc.cluster.local
-        password: file:///redis-creds/redis-password
+        host: authentik-redis.authentik-system.svc.cluster.local
+        password: file:///redis-creds/password
     server:
       ingress:
         ingressClassName: traefik
@@ -34,7 +34,7 @@ spec:
         hosts:
           - auth.winetree94.com
         tls:
-          - secretName: letsencletsencrypt-cert
+          - secretName: letsencrypt-cert
             hosts:
               - auth.winetree94.com
       volumes: &volumes
