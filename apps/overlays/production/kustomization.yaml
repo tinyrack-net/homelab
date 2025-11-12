@@ -4,5 +4,5 @@ resources:
   - repositories.yaml
   - ghost.yaml
   - joplin.yaml
-  # - authentik.yaml
+  - authentik.yaml
   # - openwebui.yaml

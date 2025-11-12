@@ -4,8 +4,8 @@ resources:
   - authentik.namespace.yaml
   - authentik.database.superuser.secret.yaml
   - authentik.database.user.secret.yaml
-  - authentik.redis.secret.yaml
-  - authentik.secret.yaml
   - authentik.database.yaml
-  - authentik.redis.helm-release.yaml
-  - authentik.helm-release.yaml
+  # - authentik.redis.secret.yaml
+  # - authentik.secret.yaml
+  # - authentik.redis.helm-release.yaml
+  # - authentik.helm-release.yaml
