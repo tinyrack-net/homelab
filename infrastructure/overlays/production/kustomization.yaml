@@ -9,6 +9,7 @@ resources:
   - cert-manager.yaml
   - metallb.yaml
   - traefik.yaml
+  - traefik-external.yaml
   - cloudnative-pg.yaml
   - mariadb-operator.yaml
   - cloudflared.yaml

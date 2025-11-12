@@ -1,8 +1,8 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: traefik-release
-  namespace: traefik-system
+  name: traefik-external-release
+  namespace: traefik-external-system
 spec:
   chart:
     spec:
@@ -14,7 +14,7 @@ spec:
         namespace: flux-system
   interval: 5m
   timeout: 5m
-  releaseName: traefik
+  releaseName: traefik-external
   values:
     providers:
       kubernetesCRD:
@@ -25,9 +25,8 @@ spec:
       replicas: 2
     ingressClass:
       enabled: true
-      isDefaultClass: true
-      name: "traefik"
+      isDefaultClass: false
+      name: "traefik-external"
     service:
       annotations:
-        metallb.universe.tf/loadBalancerIPs: 10.132.246.1
-
+        metallb.universe.tf/loadBalancerIPs: 10.132.246.2
