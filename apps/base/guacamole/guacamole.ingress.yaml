@@ -8,7 +8,7 @@ metadata:
     ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   rules:
-    - host: guacamole.winetree94.click
+    - host: remote.intranet.winetree94.com
       http:
         paths:
           - path: /
@@ -20,5 +20,5 @@ spec:
                   name: http
   tls:
     - hosts:
-        - "guacamole.winetree94.click"
+        - "remote.intranet.winetree94.com"
       secretName: letsencrypt-cert
