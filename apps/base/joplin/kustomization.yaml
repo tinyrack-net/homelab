@@ -6,3 +6,5 @@ resources:
   - joplin.database.user.secret.yaml
   - joplin.database.yaml
   - joplin.deployment.yaml
+  - joplin.service.yaml
+  - joplin.ingress-route.yaml
