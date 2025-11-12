@@ -67,7 +67,25 @@ spec:
         - name: guacamole
           image: "guacamole/guacamole:1.6.0"
           imagePullPolicy: IfNotPresent
-          env: *common-env
+          env:
+            - <<: *common-env
+            - name: OPENID_AUTHORIZATION_ENDPOINT
+              value: https://auth.winetree94.com/application/o/authorize/
+            - name: OPENID_CLIENT_ID
+              value: "ZELLU6czGfaVxzpot16ChKxy31bMnQUdUDXoMAl8"
+            - name: OPENID_ISSUER
+              value: "https://auth.winetree94.com/application/o/guacamole/"
+            - name: OPENID_JWKS_ENDPOINT
+              value: "https://auth.winetree94.com/application/o/guacamole/jwks/"
+            - name: OPENID_REDIRECT_URI
+              value: "https://remote.intranet.winetree94.com/"
+            - name: OPENID_USERNAME_CLAIM_TYPE
+              value: "preferred_username"
+            - name: OPENID_ENABLED
+              value: "true"
+            - name: EXTENSION_PRIORITY
+              value: "openid"
+            
           ports:
             - name: http
               containerPort: 8080
