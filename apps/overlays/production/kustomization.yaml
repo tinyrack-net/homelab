@@ -6,3 +6,5 @@ resources:
   - joplin.yaml
   - authentik.yaml
   - openwebui.yaml
+  - guacamole.yaml
+

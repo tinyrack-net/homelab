@@ -1,0 +1,69 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: guacamole-database-cluster
+  namespace: guacamole-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18-bookworm
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  monitoring:
+    enablePodMonitor: true
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore: &barmanObjectStore
+      destinationPath: s3://tinyrack-homelab/apps/guacamole/database-18
+      endpointURL: https://storage.winetree94.com
+      s3Credentials:
+        accessKeyId:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_SECRET_ACCESS_KEY
+      serverName: guacamole-database
+      data:
+        compression: gzip
+      wal:
+        compression: gzip
+        maxParallel: 8
+  externalClusters:
+    - name: guacamole-database
+      barmanObjectStore: *barmanObjectStore
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: guacamole-database-superuser-secret
+
+  # 신규 클러스터 프로비저닝 시 주석 처리
+  # bootstrap:
+  #   recovery:
+  #     source: guacamole-database
+
+  bootstrap:
+    initdb:
+      database: guacamole
+      owner: guacamole
+      secret:
+        name: guacamole-database-user-secret
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: guacamole-backup
+  namespace: guacamole-system
+spec:
+  schedule: "0 0 */4 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: guacamole-database-cluster

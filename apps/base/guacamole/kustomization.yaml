@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - guacamole.namespace.yaml
+  - guacamole.database.superuser.secret.yaml
+  - guacamole.database.user.secret.yaml
+  - guacamole.database.yaml
+  - guacd.deployment.yaml
+  - guacd.service.yaml
+  - guacamole.deployment.yaml
+  - guacamole.service.yaml
+  - guacamole.ingress.yaml

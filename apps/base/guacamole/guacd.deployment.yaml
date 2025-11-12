@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guacamole-guacd
+  namespace: guacamole-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guacamole-guacd
+  template:
+    metadata:
+      labels:
+        app: guacamole-guacd
+    spec:
+      containers:
+        - name: guacamole-guacd
+          image: "guacamole/guacd:1.6.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: guacd
+              containerPort: 4822
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 4822
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 4822
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
