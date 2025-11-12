@@ -68,7 +68,28 @@ spec:
           image: "guacamole/guacamole:1.6.0"
           imagePullPolicy: IfNotPresent
           env:
-            - <<: *common-env
+            - name: GUACD_HOSTNAME
+              value: "guacamole-guacd.guacamole-system.svc.cluster.local"
+            - name: GUACD_PORT
+              value: "4822"
+            - name: POSTGRESQL_HOSTNAME
+              value: guacamole-database-cluster-rw.guacamole-system.svc.cluster.local
+            - name: POSTGRESQL_PORT
+              value: "5432"
+            - name: POSTGRESQL_DATABASE
+              value: guacamole
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: guacamole-database-user-secret
+                  key: username
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: guacamole-database-user-secret
+                  key: password
+            - name: WEBAPP_CONTEXT
+              value: ROOT
             - name: OPENID_AUTHORIZATION_ENDPOINT
               value: https://auth.winetree94.com/application/o/authorize/
             - name: OPENID_CLIENT_ID
