@@ -7,14 +7,14 @@ metadata:
     cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:17-bookworm
+  imageName: ghcr.io/cloudnative-pg/postgresql:18-bookworm
   storage:
     pvcTemplate:
       accessModes:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 3Gi
+          storage: 10Gi
       storageClassName: local-path
       volumeMode: Filesystem
   monitoring:
@@ -22,14 +22,14 @@ spec:
   backup:
     retentionPolicy: 30d
     barmanObjectStore: &barmanObjectStore
-      destinationPath: s3://tinyrack-prod/apps/openwebui/database
-      endpointURL: https://fsn1.your-objectstorage.com
+      destinationPath: s3://tinyrack-homelab/apps/openwebui/database-18
+      endpointURL: https://storage.winetree94.com
       s3Credentials:
         accessKeyId:
-          name: tinyrack-s3-secret
+          name: tinyrack-homelab-s3-secret
           key: AWS_ACCESS_KEY_ID
         secretAccessKey:
-          name: tinyrack-s3-secret
+          name: tinyrack-homelab-s3-secret
           key: AWS_SECRET_ACCESS_KEY
       serverName: openwebui-database
       data:
@@ -46,16 +46,16 @@ spec:
     name: openwebui-database-superuser-secret
 
   # 신규 클러스터 프로비저닝 시 주석 처리
-  bootstrap:
-    recovery:
-      source: openwebui-database
-
   # bootstrap:
-  #   initdb:
-  #     database: openwebui
-  #     owner: openwebui
-  #     secret:
-  #       name: openwebui-database-user-secret
+  #   recovery:
+  #     source: openwebui-database
+
+  bootstrap:
+    initdb:
+      database: openwebui
+      owner: openwebui
+      secret:
+        name: openwebui-database-user-secret
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
