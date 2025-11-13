@@ -4,3 +4,4 @@ resources:
   - authentik.yaml
   - ghost.yaml
   - openwebui.yaml
+  - nextcloud.yaml
