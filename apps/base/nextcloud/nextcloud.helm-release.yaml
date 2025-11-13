@@ -79,7 +79,7 @@ spec:
         usernameKey: username
         passwordKey: password
     persistence:
-      enabled: false
+      enabled: true
       storageClass: longhorn
       accessMode: ReadwriteOnce
       existingClaim: nextcloud-storage
