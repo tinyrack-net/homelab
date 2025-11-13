@@ -1,0 +1,79 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: nextcloud-system
+spec:
+  releaseName: nextcloud
+  interval: 5m
+  chart:
+    spec:
+      chart: nextcloud
+      version: "8.5.2"
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud-repository
+        namespace: flux-system
+  values:
+    replicaCount: 2
+    ingress:
+      enabled: true
+      className: traefik
+      tls:
+        - secretName: letsencrypt-cert
+          hosts:
+            - cloud.winetree94.com
+    nextcloud:
+      host: cloud.winetree94.com
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-secret
+        usernameKey: init-admin-username
+        passwordKey: init-admin-password
+        smtpUsernameKey: smtp-username
+        smtpPasswordKey: smtp-password
+        smtpHostKey: smtp-host
+      mail:
+        enabled: true
+        fromAddress: "noreply@winetree94.com"
+        domain: "winetree94.com"
+      objectStore:
+        s3:
+          enabled: true
+          host: https://storage.winetree94.com
+          region: us-east-1
+          bucket: tinyrack-homelab-nextcloud-storage
+          existingSecret: tinyrack-homelab-s3-secret
+          secretKeys:
+            accessKey: AWS_ACCESS_KEY_ID
+            secretKey: AWS_SECRET_ACCESS_KEY
+
+    redis:
+      enabled: false
+    externalRedis:
+      enabled: true
+      host: nextcloud-redis.nextcloud-system.svc.cluster.local
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-redis-secret
+        passwordKey: password
+    internalDatabase:
+      enabled: false
+    externalDatabase:
+      enabled: true
+      type: postgresql
+      host: nextcloud-database-cluster-rw.nextcloud-system.svc.cluster.local:5432
+      database: nextcloud
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-database-user-secret
+        usernameKey: username
+        passwordKey: password
+    persistence:
+      enabled: true
+      storageClass: longhorn-rwx
+      accessMode: ReadwriteMany
+      existingClaim: nextcloud-storage
+    service:
+      annotations:
+        traefik.ingress.kubernetes.io/service.sticky.cookie: "true"

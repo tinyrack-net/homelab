@@ -7,3 +7,6 @@ resources:
   - nextcloud.database.yaml
   - nextcloud.redis.secret.yaml
   - nextcloud.redis.yaml
+  - nextcloud.secret.yaml
+  - nextcloud.helm-release.yaml
+
