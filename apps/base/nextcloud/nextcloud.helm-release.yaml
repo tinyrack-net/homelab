@@ -61,6 +61,8 @@ spec:
     imaginary:
       enabled: true
       replicaCount: 2
+    phpClientHttpsFix:
+      enabled: true
 
     redis:
       enabled: false
