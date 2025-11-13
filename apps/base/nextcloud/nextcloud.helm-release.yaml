@@ -15,16 +15,25 @@ spec:
         name: nextcloud-repository
         namespace: flux-system
   values:
-    replicaCount: 2
+    replicaCount: 1
     ingress:
       enabled: true
       className: traefik
       tls:
-        - secretName: letsencrypt-cert
-          hosts:
-            - cloud.winetree94.com
+      - secretName: letsencrypt-cert
+        hosts:
+          - cloud.winetree94.com
     nextcloud:
       host: cloud.winetree94.com
+      configs:
+        logging.config.php: |-
+          <?php
+          $CONFIG = array (
+            'log_type' => 'file',
+            'logfile' => 'nextcloud.log',
+            'loglevel' => 1,
+            'logdateformat' => 'F d, Y H:i:s'
+          );
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
