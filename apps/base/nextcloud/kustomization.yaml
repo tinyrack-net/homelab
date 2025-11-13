@@ -4,9 +4,9 @@ resources:
   - nextcloud.namespace.yaml
   - nextcloud.database.superuser.secret.yaml
   - nextcloud.database.user.secret.yaml
-  - nextcloud.database.yaml
+  # - nextcloud.database.yaml
   - nextcloud.redis.secret.yaml
-  - nextcloud.redis.yaml
+  # - nextcloud.redis.yaml
   - nextcloud.secret.yaml
-  - nextcloud.helm-release.yaml
+  # - nextcloud.helm-release.yaml
 
