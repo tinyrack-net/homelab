@@ -44,7 +44,7 @@ spec:
         smtpHostKey: smtp-host
       mail:
         enabled: true
-        fromAddress: "noreply@winetree94.com"
+        fromAddress: "noreply"
         domain: "winetree94.com"
       objectStore:
         s3:
