@@ -83,6 +83,10 @@ spec:
       storageClass: longhorn
       accessMode: ReadwriteOnce
       existingClaim: nextcloud-storage
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
     service:
       annotations:
         traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
