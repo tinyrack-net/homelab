@@ -80,8 +80,8 @@ spec:
         passwordKey: password
     persistence:
       enabled: true
-      storageClass: longhorn-rwx
-      accessMode: ReadwriteMany
+      storageClass: longhorn
+      accessMode: ReadwriteOnce
       existingClaim: nextcloud-storage
     service:
       annotations:
