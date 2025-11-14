@@ -66,6 +66,11 @@ spec:
             'loglevel' => 1,
             'logdateformat' => 'F d, Y H:i:s'
           );
+        general.config.php: |-
+          <?php
+          $CONFIG = array (
+            'default_phone_region' => 'KR',
+          );
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
