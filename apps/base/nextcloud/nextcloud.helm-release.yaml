@@ -111,6 +111,22 @@ spec:
       enabled: true
     collabora:
       enabled: true
+      collabora:
+        aliasgroups:
+          - host: "https://cloue.winetree94.com:443"
+        extra_params: --o:ssl.enable=false --o:ssl.termination=true
+      ingress:
+        enabled: true
+        className: traefik
+        hosts:
+          - host: office.winetree94.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        tls:
+          - secretName: letsencrypt-cert
+            hosts:
+              - office.winetree94.com
 
     redis:
       enabled: false
