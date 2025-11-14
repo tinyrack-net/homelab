@@ -109,8 +109,8 @@ spec:
       replicaCount: 2
     phpClientHttpsFix:
       enabled: true
-    collabora:
-      enabled: true
+    # collabora:
+    #   enabled: true
 
     redis:
       enabled: false
