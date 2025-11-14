@@ -72,6 +72,14 @@ spec:
             'default_phone_region' => 'KR',
             'maintenance_window_start' => 19
           );
+        proxy.config.php: |-
+          <?php
+          $CONFIG = array (
+            'trusted_proxies' =>
+            array (
+              0 => '10.62.0.0/16',
+            )
+          );
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
