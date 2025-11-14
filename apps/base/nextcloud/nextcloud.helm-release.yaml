@@ -19,6 +19,9 @@ spec:
       flavor: fpm
     nginx:
       enabled: true
+      config:
+        headers:
+          "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
     replicaCount: 2
     ingress:
       annotations:
