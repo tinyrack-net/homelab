@@ -115,6 +115,11 @@ spec:
         aliasgroups:
           - host: "https://cloud.winetree94.com:443"
         extra_params: --o:ssl.enable=false --o:ssl.termination=true
+        existingSecret:
+          enabled: true
+          secretName: nextcloud-secret
+          usernameKey: collabora-username
+          passwordKey: collabora-password
       ingress:
         enabled: true
         className: traefik
