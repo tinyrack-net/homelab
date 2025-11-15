@@ -6,52 +6,52 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: minio-external
+  name: minio-proxy-service
   namespace: minio-proxy
 spec:
+  type: ExternalName
   ports:
     - port: 9000
-      targetPort: 9000
       name: api
-    - port: 9001
-      targetPort: 9001
-      name: console
+  externalName: 10.132.245.8
 ---
-apiVersion: v1
-kind: Endpoints
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
 metadata:
-  name: minio-external
+  name: minio-headers
   namespace: minio-proxy
-subsets:
-  - addresses:
-      - ip: 10.132.245.8
-    ports:
-      - port: 9000
-        name: api
-      - port: 9001
-        name: console
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"
+      X-Forwarded-Host: "storage.winetree94.com"
+    customResponseHeaders:
+      X-Frame-Options: "SAMEORIGIN"
+      X-Content-Type-Options: "nosniff"
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
-  name: minio-ingress
+  name: minio-ingress-router
   namespace: minio-proxy
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    kubernetes.io/ingress.class: traefik-external
 spec:
-  ingressClassName: traefik-external
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostRegexp(`^(.+\.)?storage\.winetree94\.com$`)
+      kind: Rule
+      middlewares:
+        - name: minio-headers
+          namespace: minio-proxy
+      services:
+        - name: minio-proxy-service
+          kind: Service
+          port: 9000
+          passHostHeader: true
+          scheme: http
+          responseForwarding:
+            flushInterval: 100ms
   tls:
-    - hosts:
-        - storage.winetree94.com
-      secretName: letsencrypt-cert
-  rules:
-    - host: storage.winetree94.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: minio-external
-                port:
-                  number: 9000
+    secretName: letsencrypt-cert
