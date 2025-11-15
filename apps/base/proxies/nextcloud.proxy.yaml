@@ -1,36 +1,36 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: docmost-proxy
+  name: nextcloud-proxy
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: docmost-proxy-service
-  namespace: docmost-proxy
+  name: nextcloud-proxy-service
+  namespace: nextcloud-proxy
 spec:
   type: ExternalName
   ports:
-    - port: 3000
-  externalName: 10.132.245.34
+    - port: 11000
+  externalName: 10.132.245.3
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: docmost-ingress-router
-  namespace: docmost-proxy
+  name: nextcloud-ingress-router
+  namespace: nextcloud-proxy
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`docs.winetree94.com`)
+    - match: Host(`nextcloud.winetree94.com`)
       kind: Rule
       services:
-        - name: docmost-proxy-service
+        - name: nextcloud-proxy-service
           kind: Service
-          port: 3000
+          port: 11000
           passHostHeader: true
           scheme: http
   tls:

@@ -12,7 +12,7 @@ spec:
   type: ExternalName
   ports:
     - port: 3001
-  externalName: 110.132.244.1
+  externalName: 10.132.245.34
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
