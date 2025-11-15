@@ -17,5 +17,6 @@ spec:
   dnsNames:
     - "*.tinyrack.net"
     - "*.winetree94.com"
+    - "*.storage.winetree94.com"
     - "*.intranet.winetree94.com"
     - "*.winetree94.click"
