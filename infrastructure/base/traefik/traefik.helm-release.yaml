@@ -19,8 +19,10 @@ spec:
     providers:
       kubernetesCRD:
         allowExternalNameServices: true
+        ingressClass: "traefik"
       kubernetesIngress:
         allowExternalNameServices: true
+        ingressClass: "traefik"
     deployment:
       replicas: 2
     ingressClass:
@@ -28,6 +30,6 @@ spec:
       isDefaultClass: true
       name: "traefik"
     service:
-      annotations:
-        metallb.io/loadBalancerIPs: 10.132.246.1
+      externalIPs:
+        - 10.132.246.1
 
