@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - minio.proxy.yaml
   - bookmarks.proxy.yaml
+  - docmost.proxy.yaml
