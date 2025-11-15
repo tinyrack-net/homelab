@@ -8,3 +8,4 @@ resources:
   - openwebui.yaml
   - guacamole.yaml
   - nextcloud.yaml
+  - proxies.yaml
