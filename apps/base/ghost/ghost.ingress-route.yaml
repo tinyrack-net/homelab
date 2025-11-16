@@ -3,6 +3,8 @@ kind: IngressRoute
 metadata:
   name: ghost-ingress-route
   namespace: ghost-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
 spec:
   entryPoints:
     - websecure
@@ -21,6 +23,8 @@ kind: IngressRoute
 metadata:
   name: ghost-activity-pub-ingress-route
   namespace: ghost-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
 spec:
   entryPoints:
     - websecure
