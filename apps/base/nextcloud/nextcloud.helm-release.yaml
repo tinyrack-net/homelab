@@ -22,7 +22,7 @@ spec:
       config:
         headers:
           "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
-    replicaCount: 2
+    replicaCount: 1
     ingress:
       annotations:
         nginx.ingress.kubernetes.io/server-snippet: |-
