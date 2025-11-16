@@ -50,7 +50,7 @@ spec:
             deny all;
           }
       enabled: true
-      className: traefik
+      className: traefik-external
       tls:
         - secretName: letsencrypt-cert
           hosts:
@@ -132,7 +132,7 @@ spec:
           passwordKey: collabora-password
       ingress:
         enabled: true
-        className: traefik
+        className: traefik-external
         hosts:
           - host: office.winetree94.com
             paths:
