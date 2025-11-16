@@ -109,6 +109,8 @@ spec:
       replicaCount: 2
     phpClientHttpsFix:
       enabled: true
+    cronjob:
+      enabled: true
     collabora:
       enabled: true
       collabora:
