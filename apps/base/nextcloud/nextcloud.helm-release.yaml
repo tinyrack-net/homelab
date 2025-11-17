@@ -15,14 +15,18 @@ spec:
         name: nextcloud-repository
         namespace: flux-system
   values:
-    image:
-      flavor: fpm
-    nginx:
-      enabled: true
-      config:
-        headers:
-          "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
+    # image:
+    #   flavor: fpm
+    # nginx:
+    #   enabled: true
+    #   config:
+    #     headers:
+    #       "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
     replicaCount: 1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
     ingress:
       annotations:
         nginx.ingress.kubernetes.io/server-snippet: |-
