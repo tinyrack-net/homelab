@@ -17,11 +17,11 @@ spec:
   values:
     image:
       flavor: fpm
-    # nginx:
-    #   enabled: true
-    #   config:
-    #     headers:
-    #       "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
+    nginx:
+      enabled: true
+      config:
+        headers:
+          "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
     replicaCount: 1
     livenessProbe:
       periodSeconds: 60
