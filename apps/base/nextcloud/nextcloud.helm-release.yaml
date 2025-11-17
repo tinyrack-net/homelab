@@ -74,7 +74,7 @@ spec:
           $CONFIG = array (
             'log_type' => 'file',
             'logfile' => '/var/log/nextcloud.log',
-            'loglevel' => 1,
+            'loglevel' => 0,
             'logdateformat' => 'F d, Y H:i:s'
           );
         general.config.php: |-
