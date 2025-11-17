@@ -27,6 +27,9 @@ spec:
       requests:
         memory: "1Gi"
         cpu: "1000m"
+      limit:
+        memory: "16Gi"
+        cpu: "18.0"
     ingress:
       annotations:
         nginx.ingress.kubernetes.io/server-snippet: |-
@@ -111,6 +114,13 @@ spec:
     imaginary:
       enabled: true
       replicaCount: 2
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "500m"
+        limit:
+          memory: "8Gi"
+          cpu: "12.0"
     phpClientHttpsFix:
       enabled: true
     cronjob:
@@ -120,6 +130,9 @@ spec:
           requests:
             memory: "1Gi"
             cpu: "1000m"
+          limit:
+            memory: "8Gi"
+            cpu: "8.0"
     collabora:
       enabled: true
       collabora:
