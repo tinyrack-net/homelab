@@ -91,6 +91,12 @@ spec:
               0 => '10.62.0.0/16',
             )
           );
+        preview.config.php: |-
+          <?php
+          $CONFIG = array (
+            'preview_concurrency_all' => 12,
+            'preview_concurrency_new' => 8,
+          );
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
