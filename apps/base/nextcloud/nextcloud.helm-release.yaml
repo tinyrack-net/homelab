@@ -23,6 +23,10 @@ spec:
     #     headers:
     #       "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
     replicaCount: 1
+    livenessProbe:
+      periodSeconds: 60
+      timeoutSeconds: 30
+      failureThreshold: 10
     resources:
       requests:
         memory: "1Gi"
