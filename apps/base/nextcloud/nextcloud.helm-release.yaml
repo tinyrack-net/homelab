@@ -45,7 +45,11 @@ spec:
       host: cloud.winetree94.com
       phpConfigs:
         zz-memory_limit.ini: |-
-          memory_limit=2048M
+          memory_limit=2048
+          pm.max_children=768
+          pm.start_servers=223
+          pm.min_spare_servers=223
+          pm.max_spare_servers=699
       configs:
         # logging.config.php: |-
         #   <?php
