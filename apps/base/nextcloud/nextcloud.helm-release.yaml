@@ -43,6 +43,9 @@ spec:
             - cloud.winetree94.com
     nextcloud:
       host: cloud.winetree94.com
+      phpConfigs:
+        zz-memory_limit.ini: |-
+          memory_limit=2048M
       configs:
         # logging.config.php: |-
         #   <?php
