@@ -59,6 +59,20 @@ spec:
     secretName: letsencrypt-cert
 ---
 apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: minio-console-headers
+  namespace: minio-proxy
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"
+      X-Forwarded-Host: "minio.intranet.winetree94.com"
+    customResponseHeaders:
+      X-Frame-Options: "SAMEORIGIN"
+      X-Content-Type-Options: "nosniff"
+---
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: minio-console-ingress-route
@@ -70,6 +84,9 @@ spec:
     - websecure
   routes:
     - match: Host(`minio.intranet.winetree94.com`)
+      middlewares:
+        - name: minio-console-headers
+          namespace: minio-proxy
       kind: Rule
       services:
         - name: minio-proxy-service
