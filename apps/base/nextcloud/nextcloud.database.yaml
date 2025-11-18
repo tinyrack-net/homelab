@@ -17,7 +17,7 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 32Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
   monitoring:
