@@ -13,6 +13,8 @@ spec:
   ports:
     - port: 9000
       name: api
+    - port: 9001
+      name: console
   externalName: 10.132.245.8
 ---
 apiVersion: traefik.io/v1alpha1
@@ -32,7 +34,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: minio-ingress-router
+  name: minio-ingress-route
   namespace: minio-proxy
   annotations:
     kubernetes.io/ingress.class: traefik-external
@@ -53,5 +55,27 @@ spec:
           scheme: http
           responseForwarding:
             flushInterval: 100ms
+  tls:
+    secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-console-ingress-route
+  namespace: minio-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`minio.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: minio-proxy-service
+          kind: Service
+          port: 9001
+          passHostHeader: true
+          scheme: http
   tls:
     secretName: letsencrypt-cert
