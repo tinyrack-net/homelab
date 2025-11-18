@@ -5,3 +5,4 @@ resources:
   - karakeep.proxy.yaml
   - docmost.proxy.yaml
   - nextcloud.proxy.yaml
+  - openmediavault.proxy.yaml

@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openmediavault-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openmediavault-proxy-service
+  namespace: openmediavault-proxy
+spec:
+  type: ExternalName
+  ports:
+    - port: 8080
+      name: api
+  externalName: 10.132.245.8
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openmediavault-console-ingress-route
+  namespace: openmediavault-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`openmediavault.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: openmediavault-proxy-service
+          kind: Service
+          port: 8080
+          passHostHeader: true
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert
