@@ -50,6 +50,9 @@ spec:
           pm.start_servers=223
           pm.min_spare_servers=223
           pm.max_spare_servers=699
+      extraEnv:
+        - name: PHP_MEMORY_LIMIT
+          value: "2048M"
       configs:
         # logging.config.php: |-
         #   <?php
