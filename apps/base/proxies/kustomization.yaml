@@ -4,5 +4,4 @@ resources:
   - minio.proxy.yaml
   - karakeep.proxy.yaml
   - docmost.proxy.yaml
-  - nextcloud.proxy.yaml
   - openmediavault.proxy.yaml
