@@ -66,7 +66,7 @@ spec:
           <?php
           $CONFIG = array (
             'default_phone_region' => 'KR',
-            'maintenance_window_start' => 17
+            'maintenance_window_start' => 100
           );
         proxy.config.php: |-
           <?php
@@ -76,12 +76,12 @@ spec:
               0 => '10.62.0.0/16',
             )
           );
-        preview.config.php: |-
-          <?php
-          $CONFIG = array (
-            'preview_concurrency_all' => 12,
-            'preview_concurrency_new' => 8,
-          );
+        # preview.config.php: |-
+        #   <?php
+        #   $CONFIG = array (
+        #     'preview_concurrency_all' => 12,
+        #     'preview_concurrency_new' => 8,
+        #   );
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
