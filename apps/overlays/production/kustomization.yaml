@@ -7,5 +7,5 @@ resources:
   - authentik.yaml
   - openwebui.yaml
   - guacamole.yaml
-  # - nextcloud.yaml
+  - nextcloud.yaml
   - proxies.yaml
