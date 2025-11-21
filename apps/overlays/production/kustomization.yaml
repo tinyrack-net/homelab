@@ -3,9 +3,9 @@ kind: Kustomization
 resources:
   - repositories.yaml
   - ghost.yaml
-  - joplin.yaml
+  # - joplin.yaml
   - authentik.yaml
-  - openwebui.yaml
+  # - openwebui.yaml
   - guacamole.yaml
-  - nextcloud.yaml
+  # - nextcloud.yaml
   - proxies.yaml
