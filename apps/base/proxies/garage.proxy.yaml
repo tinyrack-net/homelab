@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: garage-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: garage-proxy-service
+  namespace: garage-proxy
+spec:
+  type: ExternalName
+  ports:
+    - port: 3900
+      name: api
+    - port: 3909
+      name: console
+  externalName: 10.132.245.8
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: garage-headers
+  namespace: garage-proxy
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"
+      X-Forwarded-Host: "storage.winetree94.com"
+    customResponseHeaders:
+      X-Frame-Options: "SAMEORIGIN"
+      X-Content-Type-Options: "nosniff"
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: garage-ingress-route
+  namespace: garage-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostRegexp(`^(.+\.)?storage\.winetree94\.com$`)
+      kind: Rule
+      middlewares:
+        - name: garage-headers
+          namespace: garage-proxy
+      services:
+        - name: garage-proxy-service
+          kind: Service
+          port: 3900
+          passHostHeader: true
+          scheme: http
+          responseForwarding:
+            flushInterval: 100ms
+  tls:
+    secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: garage-console-headers
+  namespace: garage-proxy
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"
+      X-Forwarded-Host: "garage.intranet.winetree94.com"
+    customResponseHeaders:
+      X-Frame-Options: "SAMEORIGIN"
+      X-Content-Type-Options: "nosniff"
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: garage-console-ingress-route
+  namespace: garage-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`garage.intranet.winetree94.com`)
+      middlewares:
+        - name: garage-console-headers
+          namespace: garage-proxy
+      kind: Rule
+      services:
+        - name: garage-proxy-service
+          kind: Service
+          port: 3909
+          passHostHeader: true
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert
