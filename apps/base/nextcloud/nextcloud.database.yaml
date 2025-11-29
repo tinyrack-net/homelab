@@ -28,6 +28,7 @@ spec:
       destinationPath: s3://tinyrack-homelab/apps/nextcloud/database-18
       endpointURL: https://storage.winetree94.com
       s3Credentials:
+        region: home
         accessKeyId:
           name: tinyrack-homelab-s3-secret
           key: AWS_ACCESS_KEY_ID
