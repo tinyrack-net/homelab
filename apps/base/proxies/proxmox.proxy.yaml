@@ -15,6 +15,15 @@ spec:
       port: 8006
   externalName: 10.132.244.24
 ---
+# Proxmox 의 self signed certification 검증 생략
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: proxmox-transport
+  namespace: proxmox-proxy
+spec:
+  insecureSkipVerify: true
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -32,5 +41,7 @@ spec:
         - name: proxmox-proxy-service
           kind: Service
           port: 8006
+          serversTransport: proxmox-transport
+          scheme: https
   tls:
     secretName: letsencrypt-cert
