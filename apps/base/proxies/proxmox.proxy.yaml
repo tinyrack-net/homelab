@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: proxmox-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox-proxy-service
+  namespace: proxmox-proxy
+spec:
+  type: ExternalName
+  ports:
+    - name: console
+      port: 8006
+  externalName: 10.132.244.24
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: proxmox-ingress-route
+  namespace: proxmox-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`proxmox.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: proxmox-proxy-service
+          kind: Service
+          port: 8006
+  tls:
+    secretName: letsencrypt-cert

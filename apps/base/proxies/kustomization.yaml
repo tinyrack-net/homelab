@@ -7,3 +7,4 @@ resources:
   - karakeep.proxy.yaml
   - docmost.proxy.yaml
   - openmediavault.proxy.yaml
+  - proxmox.proxy.yaml
