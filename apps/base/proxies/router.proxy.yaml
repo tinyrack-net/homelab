@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: router-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: router-proxy-service
+  namespace: router-proxy
+spec:
+  type: ExternalName
+  ports:
+    - name: console
+      port: 8080
+  externalName: 10.132.244.1
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: router-ingress-router
+  namespace: router-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`router.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: router-proxy-service
+          kind: Service
+          port: 8080
+  tls:
+    secretName: letsencrypt-cert

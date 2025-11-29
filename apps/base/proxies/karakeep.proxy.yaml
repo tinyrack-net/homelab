@@ -20,7 +20,7 @@ metadata:
   name: karakeep-ingress-router
   namespace: karakeep-proxy
   annotations:
-    kubernetes.io/ingress.class: traefik
+    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
     - websecure
