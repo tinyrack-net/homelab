@@ -59,22 +59,22 @@ spec:
   tls:
     secretName: letsencrypt-cert
 ---
-# apiVersion: traefik.io/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: garage-web-ingress-route
-#   namespace: garage-proxy
-#   annotations:
-#     kubernetes.io/ingress.class: traefik
-# spec:
-#   entryPoints:
-#     - websecure
-#   routes:
-#     - match: HostRegexp(`^.+\.garage\.intranet\.winetree94\.com$`)
-#       kind: Rule
-#       services:
-#         - name: garage-proxy-service
-#           kind: Service
-#           port: 3902
-#   tls:
-#     secretName: letsencrypt-cert
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: garage-web-ingress-route
+  namespace: garage-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostRegexp(`^.+\.web.garage\.intranet\.winetree94\.com$`)
+      kind: Rule
+      services:
+        - name: garage-proxy-service
+          kind: Service
+          port: 3902
+  tls:
+    secretName: letsencrypt-cert
