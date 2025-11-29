@@ -74,7 +74,7 @@ spec:
             bucket: tinyrack-homelab
             prefix: apps/ghost/mariadb-11
             endpoint: storage.winetree94.com
-            region: us-east-1
+            region: home
             accessKeyIdSecretKeyRef:
               name: tinyrack-homelab-s3-secret
               key: AWS_ACCESS_KEY_ID

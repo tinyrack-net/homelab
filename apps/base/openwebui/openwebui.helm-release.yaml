@@ -70,7 +70,7 @@ spec:
       - name: S3_ENDPOINT_URL
         value: "https://storage.winetree94.com"
       - name: S3_REGION_NAME
-        value: "us-east-1"
+        value: "home"
       - name: S3_BUCKET_NAME
         value: "tinyrack-homelab-openwebui-storage"
 

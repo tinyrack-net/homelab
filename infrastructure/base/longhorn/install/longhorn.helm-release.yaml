@@ -21,7 +21,7 @@ spec:
     longhornUI:
       replicas: 1
     defaultBackupStore:
-      backupTarget: s3://tinyrack-homelab@us-east-1/clusters/tinyrack-homelab/longhorn
+      backupTarget: s3://tinyrack-homelab@home/clusters/tinyrack-homelab/longhorn
       backupTargetCredentialSecret: tinyrack-homelab-s3-secret
 #    ingress:
 #      enabled: true

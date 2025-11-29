@@ -98,7 +98,7 @@ spec:
         s3:
           enabled: true
           host: storage.winetree94.com
-          region: us-east-1
+          region: home
           bucket: tinyrack-homelab-nextcloud-storage
           existingSecret: tinyrack-homelab-s3-secret
           secretKeys:
