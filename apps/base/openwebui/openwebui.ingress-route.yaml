@@ -1,18 +1,18 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: joplin-ingress-route
-  namespace: joplin-system
+  name: openwebui-ingress-route
+  namespace: openwebui-system
   annotations:
     kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`joplin.winetree94.com`)
+    - match: Host(`ai.winetree94.com`)
       kind: Rule
       services:
-        - name: joplin-service
+        - name: open-webui
           port: 80
   tls:
     secretName: letsencrypt-cert

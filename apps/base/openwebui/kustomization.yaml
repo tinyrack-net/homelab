@@ -10,4 +10,4 @@ resources:
   - openwebui.secret.yaml
   - openwebui.oauth.secret.yaml
   - openwebui.helm-release.yaml
-  - openwebui.ingress.yaml
+  - openwebui.ingress-route.yaml

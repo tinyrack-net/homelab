@@ -29,7 +29,7 @@ spec:
         password: file:///redis-creds/password
     server:
       ingress:
-        ingressClassName: traefik
+        ingressClassName: traefik-external
         enabled: true
         hosts:
           - auth.winetree94.com
