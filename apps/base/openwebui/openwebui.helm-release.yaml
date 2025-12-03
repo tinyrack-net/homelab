@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: open-webui
-      version: "8.18.0"
+      version: "8.19.0"
       sourceRef:
         kind: HelmRepository
         name: openwebui-repository
@@ -38,7 +38,7 @@ spec:
             key: password
       - name: DATABASE_URL
         value: "postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@openwebui-database-cluster-rw.openwebui-system.svc.cluster.local:5432/openwebui?sslmode=disable"
-      
+
       # Redis
       - name: ENABLE_WEBSOCKET_SUPPORT
         value: "true"
@@ -99,7 +99,7 @@ spec:
         value: "false"
       - name: OAUTH_MERGE_ACCOUNTS_BY_EMAIL
         value: "true"
-      
+
       # CONFIG
       - name: BYPASS_MODEL_ACCESS_CONTROL
         value: "false"
