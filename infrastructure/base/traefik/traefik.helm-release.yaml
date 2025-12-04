@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: traefik
-      version: "37.2.0"
+      version: "37.4.0"
       sourceRef:
         kind: HelmRepository
         name: traefik-repository
@@ -32,4 +32,3 @@ spec:
     service:
       externalIPs:
         - 10.132.246.1
-
