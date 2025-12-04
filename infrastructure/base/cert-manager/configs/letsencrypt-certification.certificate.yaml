@@ -19,5 +19,6 @@ spec:
     - "*.winetree94.com"
     - "*.storage.winetree94.com"
     - "*.intranet.winetree94.com"
+    - "*.database.winetree94.com"
     - "*.web.garage.intranet.winetree94.com"
     - "*.winetree94.click"
