@@ -16,6 +16,12 @@ spec:
   timeout: 5m
   releaseName: traefik-external
   values:
+    ports:
+      postgres:
+        port: 5432
+        expose: true
+        exposedPort: 5432
+        protocol: TCP
     providers:
       kubernetesCRD:
         allowExternalNameServices: true
