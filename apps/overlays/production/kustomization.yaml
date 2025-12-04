@@ -8,4 +8,5 @@ resources:
   - openwebui.yaml
   - guacamole.yaml
   - nextcloud.yaml
+  - davinci-resolve-project-server.yaml
   - proxies.yaml
