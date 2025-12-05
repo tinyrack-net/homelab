@@ -4,7 +4,7 @@ resources:
   # - minio.proxy.yaml
   - router.proxy.yaml
   - garage.proxy.yaml
-  - karakeep.proxy.yaml
+#  - karakeep.proxy.yaml
   - docmost.proxy.yaml
   - openmediavault.proxy.yaml
   - proxmox.proxy.yaml
