@@ -17,8 +17,6 @@ spec:
           storage: 30Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
-  monitoring:
-    enablePodMonitor: true
   backup:
     retentionPolicy: 30d
     barmanObjectStore: &barmanObjectStore
