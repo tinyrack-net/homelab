@@ -10,4 +10,5 @@ resources:
   - karakeep.chrome.service.yaml
   - karakeep.web.deployment.yaml
   - karakeep.web.service.yaml
+  - karakeep.ingress-route.yaml
 
