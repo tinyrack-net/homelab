@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  KARAKEEP_VERSION: "release"
+  NEXTAUTH_URL: "https://bookmarks.winetree94.com"
+  OPENAI_BASE_URL: "https://openrouter.ai/api/v1"
+kind: ConfigMap
+metadata:
+  name: karakeep-config-map
+  namespace: karakeep-system

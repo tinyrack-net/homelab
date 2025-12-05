@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - karakeep.namespace.yaml
+  - karakeep.config-map.yaml
+  - karakeep.secrets.yaml
+  - karakeep.meilisearch.deployment.yaml
+  - karakeep.meilisearch.service.yaml
+  - karakeep.chrome.deployment.yaml
+  - karakeep.chrome.service.yaml
+  - karakeep.web.deployment.yaml
+  - karakeep.web.service.yaml
+

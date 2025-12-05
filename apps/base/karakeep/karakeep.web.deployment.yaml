@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: karakeep-web
+  namespace: karakeep-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: karakeep-web
+  template:
+    metadata:
+      labels:
+        app: karakeep-web
+    spec:
+      containers:
+        - env:
+            - name: MEILI_ADDR
+              value: http://karakeep-meilisearch-service:7700
+            - name: BROWSER_WEB_URL
+              value: http://karakeep-chrome-service:9222
+            - name: DATA_DIR
+              value: /data
+          envFrom:
+            - secretRef:
+                name: karakeep-secrets
+            - configMapRef:
+                name: karakeep-config-map
+          image: ghcr.io/karakeep-app/karakeep:release
+          imagePullPolicy: Always
+          name: web
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: karakeep-data-storage

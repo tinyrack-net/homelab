@@ -10,3 +10,4 @@ resources:
   - nextcloud.yaml
   # - davinci-resolve-project-server.yaml
   - proxies.yaml
+  - karakeep.yaml
