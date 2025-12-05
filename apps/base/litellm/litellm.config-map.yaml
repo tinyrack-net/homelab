@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: litellm-config
+  namespace: litellm-system
+data:
+  config.yaml: |
+      general_settings: 
+        master_key: os.environ/LITELLM_MASTER_KEY
+        proxy_batch_write_at: 60
+        database_connection_pool_limit: 10
+        disable_error_logs: True
+        allow_requests_on_db_unavailable: False
+
+        user_header_mappings:
+          - header_name: X-OpenWebUI-User-Id
+            litellm_user_role: internal_user
+          - header_name: X-OpenWebUI-User-Email
+            litellm_user_role: customer

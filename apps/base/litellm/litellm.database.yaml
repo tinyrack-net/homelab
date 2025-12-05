@@ -1,0 +1,70 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: litellm-database-cluster
+  namespace: litellm-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17-bookworm
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 30Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore: &barmanObjectStore
+      destinationPath: s3://tinyrack-homelab/apps/litellm/database-17
+      endpointURL: https://storage.winetree94.com
+      s3Credentials:
+        region:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_REGION
+        accessKeyId:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_SECRET_ACCESS_KEY
+      serverName: litellm-database
+      data:
+        compression: gzip
+      wal:
+        compression: gzip
+        maxParallel: 8
+  externalClusters:
+    - name: litellm-database
+      barmanObjectStore: *barmanObjectStore
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: litellm-database-superuser-secret
+
+  # 신규 클러스터 프로비저닝 시 주석 처리
+#  bootstrap:
+#    recovery:
+#      source: litellm-database
+
+  bootstrap:
+    initdb:
+     database: litellm
+     owner: litellm
+     secret:
+       name: litellm-database-user-secret
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: litellm-backup
+  namespace: litellm-system
+spec:
+  schedule: "0 0 */4 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: litellm-database-cluster
