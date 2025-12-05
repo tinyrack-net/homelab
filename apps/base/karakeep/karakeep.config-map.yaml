@@ -3,6 +3,11 @@ data:
   KARAKEEP_VERSION: "release"
   NEXTAUTH_URL: "https://bookmarks.winetree94.com"
   OPENAI_BASE_URL: "https://openrouter.ai/api/v1"
+  DISABLE_SIGNUPS: "true"
+  DISABLE_PASSWORD_AUTH: "true"
+  OAUTH_PROVIDER_NAME: "authentik"
+  OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING: "true"
+  OAUTH_WELLKNOWN_URL: "https://auth.winetree94.com/application/o/karakeep/.well-known/openid-configuration"
 kind: ConfigMap
 metadata:
   name: karakeep-config-map
