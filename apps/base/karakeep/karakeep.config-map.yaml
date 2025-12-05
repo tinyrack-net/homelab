@@ -3,6 +3,8 @@ data:
   KARAKEEP_VERSION: "release"
   NEXTAUTH_URL: "https://bookmarks.winetree94.com"
   OPENAI_BASE_URL: "https://openrouter.ai/api/v1"
+  CRAWLER_FULL_PAGE_SCREENSHOT: "true"
+  CRAWLER_FULL_PAGE_ARCHIVE: "true"
 #  DISABLE_SIGNUPS: "true"
   DISABLE_PASSWORD_AUTH: "true"
   OAUTH_PROVIDER_NAME: "authentik"
