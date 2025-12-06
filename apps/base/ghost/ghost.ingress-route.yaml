@@ -1,6 +1,25 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
+  name: ghost-ingress-route-http
+  namespace: ghost-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`cms.winetree94.com`)
+      kind: Rule
+      middlewares:
+        - name: redirect-to-https
+      services:
+        - name: ghost-service
+          port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
   name: ghost-ingress-route
   namespace: ghost-system
   annotations:
@@ -16,3 +35,13 @@ spec:
           port: 80
   tls:
     secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-to-https
+  namespace: ghost-system
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
