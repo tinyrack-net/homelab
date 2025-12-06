@@ -126,4 +126,4 @@ spec:
             - name: DELETE_EXPIRED_SESSIONS_SCHEDULE
               value: ""
             - name: LOCAL_AUTH_ENABLED
-              value: "false"
+              value: "true"
