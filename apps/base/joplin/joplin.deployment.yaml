@@ -117,13 +117,13 @@ spec:
               value: "info"
             - name: LOG_TARGET
               value: "console"
-            - name: SAML_ENABLED
-              value: "true"
-            - name: SAML_IDP_CONFIG_FILE
-              value: "/opt/joplin/joplin-idp.xml"
-            - name: SAML_SP_CONFIG_FILE
-              value: "/opt/joplin/joplin-sp.xml"
-            - name: DELETE_EXPIRED_SESSIONS_SCHEDULE
-              value: ""
-            - name: LOCAL_AUTH_ENABLED
-              value: "true"
+#            - name: SAML_ENABLED
+#              value: "true"
+#            - name: SAML_IDP_CONFIG_FILE
+#              value: "/opt/joplin/joplin-idp.xml"
+#            - name: SAML_SP_CONFIG_FILE
+#              value: "/opt/joplin/joplin-sp.xml"
+#            - name: DELETE_EXPIRED_SESSIONS_SCHEDULE
+#              value: ""
+#            - name: LOCAL_AUTH_ENABLED
+#              value: "true"
