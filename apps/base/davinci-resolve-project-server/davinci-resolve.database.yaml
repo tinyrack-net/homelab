@@ -14,7 +14,7 @@ spec:
         - selectorType: rw
           serviceTemplate:
             metadata:
-              name: davinci-resolve-database-cluster-rw
+              name: davinci-resolve-additional-lb
               annotations:
                 metallb.io/loadBalancerIPs: "10.132.246.3"
             spec:
