@@ -5,5 +5,4 @@ resources:
   - davinci-resolve.database.superuser.secret.yaml
   - davinci-resolve.database.user.secret.yaml
   - davinci-resolve.database.yaml
-  - davinci-resolve.service.yaml
 #  - davinci-resolve.ingress-route-tcp.yaml
