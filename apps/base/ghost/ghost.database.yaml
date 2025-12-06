@@ -23,7 +23,7 @@ spec:
         key: mysql-root-password
       storage:
         storageClassName: longhorn-strict-local
-        size: 10Gi
+        size: 30Gi
       replicas: 1
       galera:
         enabled: false
