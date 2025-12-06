@@ -5,6 +5,8 @@ resources:
   - joplin.database.superuser.secret.yaml
   - joplin.database.user.secret.yaml
   - joplin.database.yaml
+  - joplin.saml-sp.config-map.yaml
+  - joplin.saml-idp.secret.yaml
   - joplin.deployment.yaml
   - joplin.service.yaml
   - joplin.ingress-route.yaml

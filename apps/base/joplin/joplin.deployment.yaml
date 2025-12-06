@@ -17,8 +17,24 @@ spec:
         fsGroup: 1001
         runAsNonRoot: true
         runAsUser: 1001
+      volumes:
+        - name: saml-sp-config
+          configMap:
+            name: joplin-saml-sp-config-map
+        - name: saml-idp-config
+          secret:
+            secretName: joplin-saml-idp-secret
       containers:
         - name: joplin
+          volumeMounts:
+            - name: saml-sp-config
+              mountPath: /opt/joplin/joplin-sp.xml
+              subPath: joplin-sp.xml
+              readOnly: true
+            - name: saml-idp-config
+              mountPath: /opt/joplin/joplin-idp.xml
+              subPath: joplin-idp.xml
+              readOnly: true
           resources:
             requests:
               cpu: "250m"
@@ -58,6 +74,8 @@ spec:
             successThreshold: 1
           env:
             - name: APP_BASE_URL
+              value: "https://joplin.winetree94.com"
+            - name: API_BASE_URL
               value: "https://joplin.winetree94.com"
             - name: APP_PORT
               value: "22300"
@@ -99,3 +117,13 @@ spec:
               value: "info"
             - name: LOG_TARGET
               value: "console"
+            - name: SAML_ENABLED
+              value: "true"
+            - name: SAML_IDP_CONFIG_FILE
+              value: "/opt/joplin/joplin-idp.xml"
+            - name: SAML_SP_CONFIG_FILE
+              value: "/opt/joplin/joplin-sp.xml"
+            - name: DELETE_EXPIRED_SESSIONS_SCHEDULE
+              value: ""
+            - name: LOCAL_AUTH_ENABLED
+              value: "false"
