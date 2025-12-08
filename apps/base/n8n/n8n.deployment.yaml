@@ -58,6 +58,16 @@ spec:
                   key: password
             - name: N8N_PROTOCOL
               value: http
+            - name: GENERIC_TIMEZONE
+              value: "Asia/Seoul"
+            - name: TZ
+              value: "Asia/Seoul"
+            - name: WEBHOOK_URL
+              value: "https://n8n.winetree94.com"
+            - name: N8N_PROXY_HOPS
+              value: "1"
+            - name: N8N_RUNNER_ENABLED
+              value: "true"
             - name: N8N_PORT
               value: "5678"
       volumes:
