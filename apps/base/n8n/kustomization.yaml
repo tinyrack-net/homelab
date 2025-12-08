@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - n8n.namespace.yaml
+  - n8n.database.superuser.secret.yaml
+  - n8n.database.user.secret.yaml
+  - n8n.database.yaml
+  - n8n.deployment.yaml
+  - n8n.service.yaml
+  - n8n.ingress-route.yaml

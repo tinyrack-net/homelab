@@ -11,3 +11,4 @@ resources:
   - davinci-resolve-project-server.yaml
   - proxies.yaml
   - karakeep.yaml
+  - n8n.yaml

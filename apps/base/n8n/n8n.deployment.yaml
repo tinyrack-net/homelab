@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+  namespace: n8n-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      containers:
+        - name: n8n
+          image: docker.n8n.io/n8nio/n8n:1.123.3
+          ports:
+            - name: http
+              containerPort: 5678
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
+          volumeMounts:
+            - mountPath: /home/node/.n8n
+              name: n8n-storage
+          env:
+            - name: DB_TYPE
+              value: postgresdb
+            - name: DB_POSTGRESDB_HOST
+              value: n8n-database-cluster-rw.n8n-system.svc.cluster.local
+            - name: DB_POSTGRESDB_PORT
+              value: "5432"
+            - name: DB_POSTGRESDB_DATABASE
+              value: n8n
+            - name: DB_POSTGRESDB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-database-user-secret
+                  key: username
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-database-user-secret
+                  key: password
+            - name: N8N_PROTOCOL
+              value: http
+            - name: N8N_PORT
+              value: "5678"
+      volumes:
+        - name: n8n-storage
+          persistentVolumeClaim:
+            claimName: n8n-storage
