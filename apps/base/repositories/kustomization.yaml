@@ -4,3 +4,4 @@ resources:
   - authentik.yaml
   - openwebui.yaml
   - nextcloud.yaml
+  - forgejo.yaml
