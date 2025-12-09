@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-task-runner
+  namespace: n8n-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n-task-runner
+  template:
+    metadata:
+      labels:
+        app: n8n-task-runner
+    spec:
+      containers:
+        - name: n8n-task-runner
+          image: docker.n8n.io/n8nio/runners:1.123.3
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          env:
+            - name: N8N_RUNNERS_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-secrets
+                  key: N8N_RUNNERS_AUTH_TOKEN
+            - name: N8N_RUNNERS_TASK_BROKER_URI
+              value: "http://n8n-service.n8n-system.svc.cluster.local:5679"
