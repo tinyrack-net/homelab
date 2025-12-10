@@ -43,6 +43,8 @@ spec:
           REPO_INDEXER_ENABLED: true
         service:
           DISABLE_REGISTRATION: true
+        server:
+          LANDING_PAGE: "explore"
       additionalConfigFromEnvs:
         - name: FORGEJO__QUEUE__CONN_STR
           valueFrom:
