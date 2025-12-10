@@ -45,6 +45,8 @@ spec:
           DISABLE_REGISTRATION: true
         server:
           LANDING_PAGE: "explore"
+        ui:
+          DEFAULT_THEME: "gitea-auto"
       additionalConfigFromEnvs:
         - name: FORGEJO__QUEUE__CONN_STR
           valueFrom:
