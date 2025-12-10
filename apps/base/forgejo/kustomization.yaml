@@ -5,5 +5,5 @@ resources:
   - forgejo.database.superuser.secret.yaml
   - forgejo.database.user.secret.yaml
   - forgejo.database.yaml
-#  - forgejo.helm-release.yaml
+  - forgejo.helm-release.yaml
 

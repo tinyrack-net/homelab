@@ -25,8 +25,8 @@ spec:
             - git.winetree94.com
     persistence:
       enabled: true
-#      storageClass: longhorn
-#      claimName: forgejo-storage
+      storageClass: longhorn
+      claimName: forgejo-storage
 
     gitea:
       config:
