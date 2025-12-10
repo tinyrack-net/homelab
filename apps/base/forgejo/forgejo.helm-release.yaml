@@ -1,0 +1,55 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: forgejo-system
+spec:
+  releaseName: forgejo
+  interval: 5m
+  chartRef:
+    kind: OCIRepository
+    name: forgejo-repository
+    namespace: flux-system
+  values:
+    ingress:
+      enabled: true
+      className: traefik-external
+      hosts:
+        - host: git.winetree94.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: letsencrypt-cert
+          hosts:
+            - git.winetree94.com
+    persistence:
+      enabled: true
+#      storageClass: longhorn
+#      claimName: forgejo-storage
+
+    gitea:
+      config:
+        indexer:
+          REPO_INDEXER_ENABLED: true
+      additionalConfigFromEnvs:
+        - name: FORGEJO__DATABASE__DB_TYPE
+          value: "postgres"
+        - name: FORGEJO__DATABASE__HOST
+          value: "forgejo-database-cluster-rw.forgejo-system.svc.cluster.local:5432"
+        - name: FORGEJO__DATABASE__NAME
+          value: "forgejo"
+        - name: FORGEJO__DATABASE__USER
+          valueFrom:
+            secretKeyRef:
+              name: forgejo-database-user-secret
+              key: username
+        - name: FORGEJO__DATABASE__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: forgejo-database-user-secret
+              key: password
+#        - secret:
+#            secretName: forgejo-app-ini-oauth
+#        - configMap:
+#            name: forgejo-app-ini-plaintext

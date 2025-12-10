@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgejo-app-ini-plaintext
+data:
+  session: |
+    PROVIDER=memory
+    SAME_SITE=strict
+  cron.archive_cleanup: |
+    ENABLED=true
