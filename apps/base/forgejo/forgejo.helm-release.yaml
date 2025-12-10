@@ -49,7 +49,3 @@ spec:
             secretKeyRef:
               name: forgejo-database-user-secret
               key: password
-#        - secret:
-#            secretName: forgejo-app-ini-oauth
-#        - configMap:
-#            name: forgejo-app-ini-plaintext
