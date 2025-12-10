@@ -1,0 +1,27 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pangolin-helm-release
+  namespace: pangolin-system
+spec:
+  chart:
+    spec:
+      chart: newt
+      version: "1.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: fossorial-repository
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  releaseName: pangolin
+  values:
+    newtInstances:
+      - name: xeon
+        enabled: true
+        auth:
+          existingSecretName: pangolin-secrets
+          keys:
+            endpointKey: PANGOLIN_ENDPOINT
+            idKey: NEWT_ID
+            secretKey: NEWT_SECRET
