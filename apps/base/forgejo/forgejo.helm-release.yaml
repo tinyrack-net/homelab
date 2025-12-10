@@ -24,12 +24,6 @@ spec:
           hosts:
             - git.winetree94.com
 
-    service:
-      ssh:
-        type: LoadBalancer
-        annotations:
-          metallb.io/loadBalancerIPs: "10.132.246.4"
-
     persistence:
       enabled: true
       storageClass: longhorn
@@ -52,7 +46,7 @@ spec:
           DISABLE_REGISTRATION: true
         server:
           LANDING_PAGE: "winetree94"
-          SSH_PORT: "3278"
+          DISABLE_SSH: "true"
         ui:
           DEFAULT_THEME: "gitea-auto"
         other:
