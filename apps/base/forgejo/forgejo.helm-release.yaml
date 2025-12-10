@@ -32,13 +32,13 @@ spec:
         - ReadWriteOnce
 
     gitea:
-      queue:
-        TYPE: redis
-      cache:
-        ADAPTER: redis
-      session:
-        PROVIDER: redis
       config:
+        queue:
+          TYPE: redis
+        cache:
+          ADAPTER: redis
+        session:
+          PROVIDER: redis
         indexer:
           REPO_INDEXER_ENABLED: true
       additionalConfigFromEnvs:
