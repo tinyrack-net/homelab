@@ -33,6 +33,8 @@ spec:
         indexer:
           REPO_INDEXER_ENABLED: true
       additionalConfigFromEnvs:
+        - name: DISABLE_REGISTRATION
+          value: "true"
         - name: FORGEJO__DATABASE__DB_TYPE
           value: "postgres"
         - name: FORGEJO__DATABASE__HOST
