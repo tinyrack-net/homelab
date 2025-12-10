@@ -45,18 +45,18 @@ spec:
         - name: FORGEJO__QUEUE__CONN_STR
           valueFrom:
             secretKeyRef:
-              - name: forgejo-redis-host-secret
-              - key: QUEUE_CONN_STR
+              name: forgejo-redis-host-secret
+              key: QUEUE_CONN_STR
         - name: FORGEJO__CACHE__HOST
           valueFrom:
             secretKeyRef:
-              - name: forgejo-redis-host-secret
-              - key: CACHE_HOST
+              name: forgejo-redis-host-secret
+              key: CACHE_HOST
         - name: FORGEJO__SESSION__PROVIDER_CONFIG
           valueFrom:
             secretKeyRef:
-              - name: forgejo-redis-host-secret
-              - key: SESSION_PROVIDER_CONFIG
+              name: forgejo-redis-host-secret
+              key: SESSION_PROVIDER_CONFIG
 
         - name: DISABLE_REGISTRATION
           value: "true"
