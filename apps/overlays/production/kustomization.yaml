@@ -12,4 +12,4 @@ resources:
   - proxies.yaml
   - karakeep.yaml
   - n8n.yaml
-  - forgejo.yaml
+#  - forgejo.yaml
