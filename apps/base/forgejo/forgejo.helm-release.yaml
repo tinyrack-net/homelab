@@ -44,7 +44,7 @@ spec:
         service:
           DISABLE_REGISTRATION: true
         server:
-          LANDING_PAGE: "explore"
+          LANDING_PAGE: "winetree94"
         ui:
           DEFAULT_THEME: "gitea-auto"
         other:
