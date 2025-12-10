@@ -27,6 +27,9 @@ spec:
       enabled: true
       storageClass: longhorn
       claimName: forgejo-storage
+      size: 80Gi
+      accessModes:
+        - ReadWriteOnce
 
     gitea:
       config:
