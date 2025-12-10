@@ -41,6 +41,8 @@ spec:
           PROVIDER: redis
         indexer:
           REPO_INDEXER_ENABLED: true
+        service:
+          DISABLE_REGISTRATION: true
       additionalConfigFromEnvs:
         - name: FORGEJO__QUEUE__CONN_STR
           valueFrom:
@@ -58,8 +60,6 @@ spec:
               name: forgejo-redis-host-secret
               key: SESSION_PROVIDER_CONFIG
 
-        - name: DISABLE_REGISTRATION
-          value: "true"
         - name: FORGEJO__DATABASE__DB_TYPE
           value: "postgres"
         - name: FORGEJO__DATABASE__HOST
