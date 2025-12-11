@@ -11,7 +11,7 @@ spec:
     branch: main
   secretRef:
     name: flux-system
-  url: ssh://git@git.winetree94.com/tinyrack/homelab
+  url: https://git.winetree94.com/tinyrack/homelab.git
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
