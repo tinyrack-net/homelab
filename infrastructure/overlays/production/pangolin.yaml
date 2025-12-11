@@ -7,8 +7,8 @@ spec:
   interval: 15m
   path: ./infrastructure/base/pangolin
   prune: true
-  timeout: 5m
-  wait: true
+  timeout: 10m
+  wait: false
   sourceRef:
     kind: GitRepository
     name: flux-system
