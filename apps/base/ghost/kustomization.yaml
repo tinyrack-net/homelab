@@ -3,9 +3,8 @@ kind: Kustomization
 resources:
   - ghost.namespace.yaml
   - ghost.database.secret.yaml
+  - ghost.database.yaml
   - ghost.smtp.secret.yaml
   - ghost.deployment.yaml
   - ghost.service.yaml
-  - ghost.database.yaml
-  - activity-pub.service.yaml
   - ghost.ingress-route.yaml
