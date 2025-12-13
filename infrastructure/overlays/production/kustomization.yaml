@@ -15,4 +15,4 @@ resources:
   - mariadb-operator.yaml
   - ot-redis-operator.yaml
   - cloudflared.yaml
-#  - kube-prometheus-stack.yaml
+  - kube-prometheus-stack.yaml
