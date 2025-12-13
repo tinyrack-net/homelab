@@ -23,8 +23,8 @@ spec:
     defaultBackupStore:
       backupTarget: s3://tinyrack-homelab@home/clusters/tinyrack-homelab/longhorn
       backupTargetCredentialSecret: tinyrack-homelab-s3-secret
-#    ingress:
-#      enabled: true
-#      host: longhorn.internal.tinyrack.net
-#      tls: true
-#      tlsSecret: letsencrypt-cert
+    ingress:
+      enabled: true
+      host: longhorn.intranet.winetree94.com
+      tls: true
+      tlsSecret: letsencrypt-cert
