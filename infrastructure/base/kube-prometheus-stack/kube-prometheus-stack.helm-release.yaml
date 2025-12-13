@@ -16,7 +16,7 @@ spec:
       ingress:
         enabled: true
         ingressClassName: traefik
-        annotaions:
+        annotations:
           kubernetes.io/ingress.class: traefik
         hosts:
           - grafana.intranet.winetree94.com
