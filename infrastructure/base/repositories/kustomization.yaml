@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - mariadb-operator.yaml
   - longhorn.yaml
-  - prometheus.yaml
+  - totmicro.yaml
   - traefik.yaml
   - metallb.yaml
   - sealed-secrets.yaml
