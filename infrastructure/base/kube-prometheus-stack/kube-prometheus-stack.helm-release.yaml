@@ -11,3 +11,16 @@ spec:
   interval: 5m
   timeout: 5m
   releaseName: kube-prometheus-stack
+  values:
+    grafana:
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotaions:
+          kubernetes.io/ingress.class: traefik
+        hosts:
+          - grafana.intranet.winetree94.com
+        tls:
+          - secretName: letsencrypt-cert
+            hosts:
+              - grafana.intranet.winetree94.com
