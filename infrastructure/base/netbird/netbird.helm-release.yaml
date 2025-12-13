@@ -1,0 +1,176 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: netbird-helm-release
+  namespace: netbird-system
+spec:
+  chart:
+    spec:
+      chart: netbird
+      version: "1.8.2"
+      sourceRef:
+        kind: HelmRepository
+        name: totmicro-repository
+        namespace: flux-system
+  interval: 5m
+  timeout: 10m
+  releaseName: netbird
+  values:
+    fullnameOverride: netbird
+    management:
+      configmap: |-
+        {
+          "Stuns": [
+            {
+              "Proto": "udp",
+              "URI": "{{ .STUN_SERVER }}",
+              "Username": "",
+              "Password": ""
+            }
+          ],
+          "TURNConfig": {
+            "TimeBasedCredentials": false,
+            "CredentialsTTL": "12h0m0s",
+            "Secret": "secret",
+            "Turns": [
+              {
+                "Proto": "udp",
+                "URI": "{{ .TURN_SERVER }}",
+                "Username": "{{ .TURN_SERVER_USER }}",
+                "Password": "{{ .TURN_SERVER_PASSWORD }}"
+              }
+            ]
+          },
+          "Relay": {
+            "Addresses": ["rels://vpn.winetree94.com:443/relay"],
+            "CredentialsTTL": "24h",
+            "Secret": "{{ .RELAY_PASSWORD }}"
+          },
+          "Signal": {
+            "Proto": "https",
+            "URI": "vpn.winetree94.com:443",
+            "Username": "",
+            "Password": ""
+          },
+          "Datadir": "/var/lib/netbird/",
+          "DataStoreEncryptionKey": "{{ .DATASTORE_ENCRYPTION_KEY }}",
+          "HttpConfig": {
+            "LetsEncryptDomain": "",
+            "CertFile": "",
+            "CertKey": "",
+            "AuthAudience": "{{ .IDP_CLIENT_ID }}",
+            "AuthIssuer": "https://auth.winetree94.com/application/o/netbird/",
+            "AuthUserIDClaim": "",
+            "AuthKeysLocation": "https://auth.winetree94.com/application/o/netbird/jwks/",
+            "OIDCConfigEndpoint": "https://auth.winetree94.com/application/o/netbird/.well-known/openid-configuration",
+            "IdpSignKeyRefreshEnabled": false
+          },
+          "IdpManagerConfig": {
+            "ManagerType": "authentik",
+            "ClientConfig": {
+              "Issuer": "https://auth.winetree94.com/application/o/example-traefik-netbird",
+              "TokenEndpoint": "https://auth.winetree94.com/application/o/token/",
+              "ClientID": "{{ .IDP_CLIENT_ID }}",
+              "ClientSecret": "",
+              "GrantType": "client_credentials"
+            },
+            "ExtraConfig": {
+              "Password": "{{ .IDP_SERVICE_ACCOUNT_PASSWORD }}",
+              "Username": "{{ .IDP_SERVICE_ACCOUNT_USER }}"
+            },
+            "Auth0ClientCredentials": null,
+            "AzureClientCredentials": null,
+            "KeycloakClientCredentials": null,
+            "ZitadelClientCredentials": null
+          },
+          "DeviceAuthorizationFlow": {
+            "Provider": "hosted",
+            "ProviderConfig": {
+              "ClientID": "{{ .IDP_CLIENT_ID }}",
+              "ClientSecret": "",
+              "Domain": "idp.example.com",
+              "Audience": "{{ .IDP_CLIENT_ID }}",
+              "TokenEndpoint": "https://auth.winetree94.com/application/o/token/",
+              "DeviceAuthEndpoint": "https://auth.winetree94.com/application/o/device/",
+              "AuthorizationEndpoint": "",
+              "Scope": "openid",
+              "UseIDToken": false,
+              "RedirectURLs": null
+            }
+          },
+          "PKCEAuthorizationFlow": {
+            "ProviderConfig": {
+              "ClientID": "{{ .IDP_CLIENT_ID }}",
+              "ClientSecret": "",
+              "Domain": "",
+              "Audience": "{{ .IDP_CLIENT_ID }}",
+              "TokenEndpoint": "https://auth.winetree94.com/application/o/token/",
+              "DeviceAuthEndpoint": "",
+              "AuthorizationEndpoint": "https://auth.winetree94.com/application/o/authorize/",
+              "Scope": "openid profile email offline_access api",
+              "UseIDToken": false,
+              "RedirectURLs": ["http://localhost:53000"]
+            }
+          },
+          "StoreConfig": {
+            "Engine": "postgres"
+          },
+          "ReverseProxy": {
+            "TrustedHTTPProxies": null,
+            "TrustedHTTPProxiesCount": 0,
+            "TrustedPeers": null
+          }
+        }
+
+      image:
+        tag: 0.59.13
+      persistentVolume:
+        enabled: false
+      envFromSecret:
+        NETBIRD_STORE_ENGINE_POSTGRES_DSN: netbird/postgresDSN
+        STUN_SERVER: netbird/stunServer
+        TURN_SERVER: netbird/turnServer
+        TURN_SERVER_USER: netbird/turnServerUser
+        TURN_SERVER_PASSWORD: netbird/turnServerPassword
+        RELAY_PASSWORD: netbird/relayPassword
+        IDP_CLIENT_ID: netbird/idpClientID
+        IDP_SERVICE_ACCOUNT_USER: netbird/idpServiceAccountUser
+        IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
+        DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+
+    signal:
+      image:
+        tag: 0.59.13
+
+    relay:
+      image:
+        tag: 0.59.13
+      envFromSecret:
+        NB_AUTH_SECRET: netbird/relayPassword
+      env:
+        NB_LOG_LEVEL: info
+        NB_LISTEN_ADDRESS: ":33080"
+        NB_EXPOSED_ADDRESS: rels://vpn.winetree94.com:443/relay
+
+    dashboard:
+      enabled: true
+      image:
+        tag: v2.21.0
+      env:
+        # Endpoints
+        NETBIRD_MGMT_API_ENDPOINT: https://vpn.winetree94.com:443
+        NETBIRD_MGMT_GRPC_API_ENDPOINT: https://vpn.winetree94.com:443
+        # OIDC
+        AUTH_CLIENT_SECRET:
+        AUTH_AUTHORITY: https://auth.winetree94.com/application/o/netbird/
+        USE_AUTH0: false
+        AUTH_SUPPORTED_SCOPES: openid profile email offline_access api
+        AUTH_REDIRECT_URI:
+        AUTH_SILENT_REDIRECT_URI:
+        NETBIRD_TOKEN_SOURCE: accessToken
+        NGINX_SSL_PORT:
+        LETSENCRYPT_DOMAIN:
+        LETSENCRYPT_EMAIL:
+      envFromSecret:
+        AUTH_CLIENT_ID: netbird/idpClientID
+        AUTH_AUDIENCE: netbird/idpClientID

@@ -1,0 +1,55 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: netbird-ingress-route
+  namespace: netbird-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`vpn.winetree94.com`) && !PathPrefix(`/api`) && !PathPrefix(`/management`) && !PathPrefix(`/signalexchange`) && !PathPrefix(`/relay`) && !PathPrefix(`/ws-proxy/management`) && !PathPrefix(`/ws-proxy/signal`)
+      services:
+        - name: netbird-traefik-dashboard
+          namespace: netbird-traefik
+          passHostHeader: true
+          port: 80
+    - kind: Rule
+      match: Host(`vpn.winetree94.com`) && (PathPrefix(`/api`) || PathPrefix(`/ws-proxy/management`))
+      services:
+        - name: netbird-traefik-management
+          namespace: netbird-traefik
+          passHostHeader: true
+          port: 80
+    - kind: Rule
+      match: Host(`vpn.winetree94.com`) && PathPrefix(`/relay`)
+      services:
+        - name: netbird-traefik-relay
+          namespace: netbird-traefik
+          passHostHeader: true
+          port: 33080
+    - kind: Rule
+      match: Host(`vpn.winetree94.com`) && PathPrefix(`/management`)
+      services:
+        - name: netbird-traefik-management
+          namespace: netbird-traefik
+          passHostHeader: true
+          port: 80
+          scheme: h2c
+    - kind: Rule
+      match: Host(`vpn.winetree94.com`) && PathPrefix(`/signalexchange`)
+      services:
+        - name: netbird-traefik-signal
+          namespace: netbird-traefik
+          passHostHeader: true
+          port: 80
+          scheme: h2c
+    - kind: Rule
+      match: Host(`vpn.winetree94.com`) && PathPrefix(`/ws-proxy/signal`)
+      services:
+        - name: netbird-signal
+          namespace: netbird
+          passHostHeader: true
+          port: 80
+  tls:
+    secretName: letsencrypt-cert

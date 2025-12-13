@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - netbird.namespace.yaml
+  - netbird.database.superuser.secret.yaml
+  - netbird.database.user.secret.yaml
+  - netbird.database.yaml
+#  - netbird.helm-release.yaml
