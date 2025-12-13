@@ -16,4 +16,4 @@ resources:
   - ot-redis-operator.yaml
   - cloudflared.yaml
   - kube-prometheus-stack.yaml
-  - netbird.yaml
+#  - netbird.yaml
