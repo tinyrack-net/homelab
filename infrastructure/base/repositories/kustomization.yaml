@@ -12,3 +12,4 @@ resources:
   - jetstack.yaml
   - ot-container-kit.yaml
   - fossorial.yaml
+  - kube-prometheus-stack.yaml
