@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack-release
+  namespace: kube-prometheus-stack-system
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack-repository
+    namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  releaseName: kube-prometheus-stack
