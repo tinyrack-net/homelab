@@ -68,6 +68,7 @@ spec:
             'default_phone_region' => 'KR',
             'maintenance_window_start' => 100,
             'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
+            'allow_local_remote_servers' => true,
           );
         proxy.config.php: |-
           <?php
