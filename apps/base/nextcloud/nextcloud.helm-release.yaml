@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: nextcloud
-      version: "8.6.0"
+      version: "8.7.0"
       sourceRef:
         kind: HelmRepository
         name: nextcloud-repository
@@ -66,7 +66,8 @@ spec:
           <?php
           $CONFIG = array (
             'default_phone_region' => 'KR',
-            'maintenance_window_start' => 100
+            'maintenance_window_start' => 100,
+            'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
           );
         proxy.config.php: |-
           <?php
