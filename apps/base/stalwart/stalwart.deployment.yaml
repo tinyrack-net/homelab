@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stalwart-deployment
+  namespace: stalwart-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stalwart
+  template:
+    metadata:
+      labels:
+        app: stalwart
+    spec:
+      containers:
+        - name: stalwart
+          image: stalwartlabs/stalwart:v0.14.1
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "3Gi"
+              cpu: "4"
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+            - containerPort: 25
+            - containerPort: 587
+            - containerPort: 465
+            - containerPort: 143
+            - containerPort: 993
+            - containerPort: 4190
+            - containerPort: 110
+            - containerPort: 995
+          volumeMounts:
+            - name: stalwart-config
+              mountPath: "/opt/stalwart/etc/config.toml"
+              subPath: "config.toml"
+              readOnly: true
+          env:
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: stalwart-secret
+                  key: admin-username
+            - name: ADMIN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: stalwart-secret
+                  key: admin-secret
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: stalwart-database-user-secret
+                  key: password
+      volumes:
+        - name: stalwart-config
+          configMap:
+            name: stalwart-config
+            optional: false
+

@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stalwart-config
+  namespace: stalwart-system
+data:
+  config.toml: |
+    # [authentication.fallback-admin]
+    # user = "%{env:ADMIN_USERNAME}%"
+    # secret = "%{env:ADMIN_SECRET}%"
+
+    [server.listener."http"]
+    bind = ["[::]:80"]
+    protocol = "http"
+    
+    [server.listener."https"]
+    bind = ["[::]:443"]
+    protocol = "http"
+    tls.implicit = true
+    
+    [server.listener."imap"]
+    bind = ["[::]:143"]
+    protocol = "imap"
+    
+    [server.listener."imaptls"]
+    bind = ["[::]:993"]
+    protocol = "imap"
+    tls.implicit = true
+    
+    [server.listener."pop3"]
+    bind = ["[::]:110"]
+    protocol = "pop3"
+    
+    [server.listener."pop3s"]
+    bind = ["[::]:995"]
+    protocol = "pop3"
+    tls.implicit = true
+    
+    [server.listener."sieve"]
+    bind = ["[::]:4190"]
+    protocol = "managesieve"
+    
+    [server.listener."smtp"]
+    bind = ["[::]:25"]
+    protocol = "smtp"
+    
+    [server.listener."submission"]
+    bind = ["[::]:587"]
+    protocol = "smtp"
+    
+    [server.listener."submissions"]
+    bind = ["[::]:465"]
+    protocol = "smtp"
+    tls.implicit = true
+    
+    [server]
+    hostname = "mail.winetree94.com"
+    max-connections = 8192
+    socket.backlog = 1024
+    socket.nodelay = true
+    socket.reuse-addr = true
+    socket.reuse-port = true
+
+    [storage]
+    data = "postgresql"
+    fts = "postgresql"
+    blob = "postgresql"
+    lookup = "postgresql"
+    directory = "internal"
+    
+    [store."postgresql"]
+    type = "postgresql"
+    host = "stalwart-database-cluster-rw.stalwart-system.svc.cluster.local"
+    port = 5432
+    database = "stalwart"
+    user = "stalwart"
+    password = "%{env:DATABASE_PASSWORD}%"
+    timeout = "15s"
+    
+    [store."postgresql".tls]
+    enable = false
+    allow-invalid-certs = false
+    
+    [store."postgresql".pool]
+    max-connections = 10
+    
+    [directory."internal"]
+    type = "internal"
+    store = "postgresql"
+    
+    [tracer]
+    log.ansi = false
+    log.enable = true
+    log.level = "info"
+    log.path = "/opt/stalwart/logs"
+    log.prefix = "stalwart.log"
+    log.rotate = "daily"
+    log.type = "log"
+    
+    [tracer."stdout"]
+    type = "stdout"
+    level = "info"
+    ansi = false
+    enable = true
