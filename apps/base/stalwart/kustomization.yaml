@@ -8,4 +8,6 @@ resources:
   - stalwart.secret.yaml
   - stalwart.config.yaml
   - stalwart.deployment.yaml
-  - stalwart.service.yaml
+  - stalwart.web.service.yaml
+  - stalwart.mail.service.yaml
+  - stalwart.ingress-route.yaml
