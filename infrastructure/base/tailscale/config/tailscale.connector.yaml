@@ -4,7 +4,7 @@ metadata:
   name: tailscale-pod-cidrs
   namespace: tailscale
 spec:
-  hostname: tinyrack-tailscale-connector
+  hostname: homelab-tailscale-connector
   exitNode: true
   subnetRouter:
     advertiseRoutes:
