@@ -47,6 +47,12 @@ spec:
         server:
           LANDING_PAGE: "winetree94"
           DISABLE_SSH: "true"
+        storage:
+          STORAGE_TYPE: "minio"
+          MINIO_USE_SSL: true
+          MINIO_ENDPOINT: storage.winetree94.com
+          MINIO_BUCKET: tinyrack-homelab-forgejo-storage
+          MINIO_LOCATION: home
         ui:
           DEFAULT_THEME: "gitea-auto"
         other:
@@ -54,6 +60,16 @@ spec:
           SHOW_FOOTER_TEMPLATE_LOAD_TIME: "false"
           SHOW_FOOTER_VERSION: "false"
       additionalConfigFromEnvs:
+        - name: FORGEJO__STORAGE__MINIO_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: tinyrack-homelab-s3-secret
+              key: AWS_ACCESS_KEY_ID
+        - name: FORGEJO__STORAGE__MINIO_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: tinyrack-homelab-s3-secret
+              key: AWS_SECRET_ACCESS_KEY
         - name: FORGEJO__QUEUE__CONN_STR
           valueFrom:
             secretKeyRef:
