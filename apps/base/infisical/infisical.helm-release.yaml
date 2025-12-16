@@ -15,4 +15,17 @@ spec:
         name: infisical-repository
         namespace: flux-system
   values:
-    sdf: true
+    ingress:
+      enabled: true
+      hostName: infisical.winetree94.com
+      ingressClassName: traefik-external
+      nginx:
+        enabled: false
+      tls:
+        - secretName: letsencrypt-cert
+          hosts:
+            - infisical.winetree94.com
+    postgresql:
+      enabled: false
+    redis:
+      enabled: false

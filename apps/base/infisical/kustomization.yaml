@@ -2,9 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - infisical.namespace.yaml
+  - infisical.secrets.yaml
   - infisical.database.superuser.secret.yaml
   - infisical.database.user.secret.yaml
   - infisical.database.yaml
   - infisical.redis.secret.yaml
   - infisical.redis.yaml
+  - infisical.helm-release.yaml
 
