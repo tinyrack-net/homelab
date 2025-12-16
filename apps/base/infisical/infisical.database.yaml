@@ -1,0 +1,73 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: infisical-database-cluster
+  namespace: infisical-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17-bookworm
+  postgresql:
+    parameters:
+      max_connections: "500"
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 32Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore: &barmanObjectStore
+      destinationPath: s3://tinyrack-homelab/apps/infisical/database-17
+      endpointURL: https://storage.winetree94.com
+      s3Credentials:
+        region:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_REGION
+        accessKeyId:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_SECRET_ACCESS_KEY
+      serverName: infisical-database
+      data:
+        compression: gzip
+      wal:
+        compression: gzip
+        maxParallel: 8
+  externalClusters:
+    - name: infisical-database
+      barmanObjectStore: *barmanObjectStore
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: infisical-database-superuser-secret
+
+  # 신규 클러스터 프로비저닝 시 주석 처리
+  # bootstrap:
+  #   recovery:
+  #     source: infisical-database
+
+  bootstrap:
+    initdb:
+      database: infisical
+      owner: infisical
+      secret:
+        name: infisical-database-user-secret
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: infisical-backup
+  namespace: infisical-system
+spec:
+  schedule: "0 0 */4 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: infisical-database-cluster
