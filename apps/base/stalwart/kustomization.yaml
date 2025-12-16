@@ -5,9 +5,10 @@ resources:
   - stalwart.database.superuser.secret.yaml
   - stalwart.database.user.secret.yaml
   - stalwart.database.yaml
-#  - stalwart.secret.yaml
-#  - stalwart.config.yaml
-#  - stalwart.deployment.yaml
-#  - stalwart.web.service.yaml
-#  - stalwart.mail.service.yaml
-#  - stalwart.ingress-route.yaml
+  - stalwart.secret.yaml
+  - stalwart.smtp2go.secret.yaml
+  - stalwart.config.yaml
+  - stalwart.deployment.yaml
+  - stalwart.web.service.yaml
+  - stalwart.mail.service.yaml
+  - stalwart.ingress-route.yaml

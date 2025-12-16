@@ -63,11 +63,31 @@ spec:
                 secretKeyRef:
                   name: stalwart-secret
                   key: admin-secret
+            - name: SMTP2GO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: stalwart-smtp2go-secret
+                  key: SMTP2GO_USERNAME
+            - name: SMTP2GO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: stalwart-smtp2go-secret
+                  key: SMTP2GO_PASSWORD
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: stalwart-database-user-secret
                   key: password
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tinyrack-s3-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tinyrack-s3-secret
+                  key: AWS_SECRET_ACCESS_KEY
       volumes:
         - name: stalwart-config
           configMap:

@@ -4,10 +4,9 @@ metadata:
   name: stalwart-mail-service
   namespace: stalwart-system
   annotations:
-    metallb.io/loadBalancerIPs: 10.132.246.4
+    metallb.io/loadBalancerIPs: "10.132.246.4"
 spec:
   type: LoadBalancer
-  externalTrafficPolicy: Local
   selector:
     app: stalwart
   ports:

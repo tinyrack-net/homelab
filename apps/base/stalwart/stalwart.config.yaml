@@ -8,7 +8,16 @@ data:
     # [authentication.fallback-admin]
     # user = "%{env:ADMIN_USERNAME}%"
     # secret = "%{env:ADMIN_SECRET}%"
-
+    
+    # [server.proxy]
+    # trusted-networks = ["10.57.0.0/16", "::1", "10.58.0.0/16"]
+    
+    [http]
+    hsts = true
+    permissive-cors = false
+    url = "protocol + '://' + config_get('server.hostname') + ':' + local_port"
+    use-x-forwarded = true
+    
     [server.listener."http"]
     bind = ["[::]:80"]
     protocol = "http"
@@ -60,13 +69,7 @@ data:
     socket.nodelay = true
     socket.reuse-addr = true
     socket.reuse-port = true
-
-    [storage]
-    data = "postgresql"
-    fts = "postgresql"
-    blob = "postgresql"
-    lookup = "postgresql"
-    directory = "internal"
+    allowed-ip = { "10.57.0.0/16", "10.58.0.0/16" }
     
     [store."postgresql"]
     type = "postgresql"
@@ -83,6 +86,27 @@ data:
     
     [store."postgresql".pool]
     max-connections = 10
+    
+    [store."hetzner-object-storage"]
+    type = "s3"
+    bucket = "tinyrack-stalwart"
+    region = "hetzner"
+    access-key = "%{env:AWS_ACCESS_KEY_ID}%"
+    secret-key = "%{env:AWS_SECRET_ACCESS_KEY}%"
+    endpoint = "https://nbg1.your-objectstorage.com"
+    timeout = "30s"
+    key-prefix = "stalwart/"
+    compression = "lz4"
+    
+    [store."hetzner-object-storage".purge]
+    frequency = "30 5 *"
+    
+    [storage]
+    data = "postgresql"
+    fts = "postgresql"
+    blob = "hetzner-object-storage"
+    lookup = "postgresql"
+    directory = "internal"
     
     [directory."internal"]
     type = "internal"
@@ -102,3 +126,27 @@ data:
     level = "info"
     ansi = false
     enable = true
+    
+    [queue.route."local"]
+    type = "local"
+    
+    [queue.route."mx"]
+    type = "mx"
+    ip-lookup = "ipv4_then_ipv6"
+    
+    [queue.route."smtp2go"]
+    type = "relay"
+    address = "mail.smtp2go.com"
+    port = 587
+    protocol = "smtp"
+    
+    [queue.route."smtp2go".tls]
+    implicit = false
+    allow-invalid-certs = false
+    
+    [queue.route."smtp2go".auth]
+    username = "%{env:SMTP2GO_USERNAME}%"
+    secret = "%{env:SMTP2GO_PASSWORD}%"
+    
+    [queue.strategy]
+    route = [ { if = "is_local_domain('', rcpt_domain)", then = "'local'" }, { else = "'smtp2go'" } ]

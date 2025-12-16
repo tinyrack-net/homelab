@@ -54,14 +54,14 @@ spec:
   #     owner: stalwart
   #     secret:
   #       name: stalwart-database-user-secret
-#---
-#apiVersion: postgresql.cnpg.io/v1
-#kind: ScheduledBackup
-#metadata:
-#  name: stalwart-backup
-#  namespace: stalwart-system
-#spec:
-#  schedule: "0 0 */4 * * *"
-#  backupOwnerReference: self
-#  cluster:
-#    name: stalwart-database-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: stalwart-backup
+  namespace: stalwart-system
+spec:
+  schedule: "0 0 */4 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: stalwart-database-cluster
