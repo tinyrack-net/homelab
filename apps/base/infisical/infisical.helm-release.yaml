@@ -15,6 +15,8 @@ spec:
         name: infisical-repository
         namespace: flux-system
   values:
+    infisical:
+      replicaCount: 1
     ingress:
       enabled: true
       hostName: infisical.winetree94.com
