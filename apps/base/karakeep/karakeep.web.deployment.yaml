@@ -26,7 +26,7 @@ spec:
                 name: karakeep-secrets
             - configMapRef:
                 name: karakeep-config-map
-          image: ghcr.io/karakeep-app/karakeep:0.29.1
+          image: ghcr.io/karakeep-app/karakeep:0.29.3
           imagePullPolicy: Always
           name: web
           ports:
