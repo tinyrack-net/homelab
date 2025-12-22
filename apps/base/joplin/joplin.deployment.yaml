@@ -42,7 +42,7 @@ spec:
             limits:
               cpu: "1"
               memory: "1Gi"
-          image: "joplin/server:3.5.1"
+          image: "joplin/server:3.5.2"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
