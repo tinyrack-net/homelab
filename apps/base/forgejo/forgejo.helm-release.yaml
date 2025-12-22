@@ -40,6 +40,7 @@ spec:
           ADAPTER: redis
         session:
           PROVIDER: redis
+          SESSION_LIFE_TIME: 2592000
         indexer:
           REPO_INDEXER_ENABLED: true
         service:
