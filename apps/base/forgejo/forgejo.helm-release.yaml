@@ -45,6 +45,7 @@ spec:
           REPO_INDEXER_ENABLED: true
         service:
           DISABLE_REGISTRATION: true
+          ENABLE_INTERNAL_SIGNIN: false
         server:
           LANDING_PAGE: "winetree94"
           DISABLE_SSH: "true"
