@@ -16,3 +16,4 @@ resources:
   - n8n.yaml
   - forgejo.yaml
   - infisical.yaml
+  - test-database.yaml

@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - test-database.namespace.yaml
+  - test-database.database.superuser.secret.yaml
+  - test-database.database.yaml
+  - test-database.ingress-route-tcp.yaml

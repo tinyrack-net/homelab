@@ -1,0 +1,26 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: test-database-ingress-route-tcp
+  namespace: test-database-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - postgres
+  tls:
+    secretName: letsencrypt-cert # Cert-manager가 생성한 Secret
+    passthrough: false # (기본값) Traefik에서 TLS 종료 후 평문으로 DB전달
+    # passthrough: true  # DB가 직접 인증서 처리를 한다면 true (이 경우 Secret 필요 없음)
+  routes:
+    # 첫 번째 DB 라우팅
+    - match: HostSNI(`test.database.winetree94.com`)
+      services:
+        - name: test-database-cluster-rw
+          port: 5432
+
+    # 두 번째 DB 라우팅
+    # - match: HostSNI(`db2.example.com`)
+    #   services:
+    #     - name: postgres-instance-2
+    #       port: 5432
