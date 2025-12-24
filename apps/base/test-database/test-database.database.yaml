@@ -55,7 +55,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
   name: test-backup
-  namespace: test-system
+  namespace: test-database-system
 spec:
   schedule: "0 0 */4 * * *"
   backupOwnerReference: self
