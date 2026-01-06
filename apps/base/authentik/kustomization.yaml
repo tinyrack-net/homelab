@@ -9,3 +9,4 @@ resources:
   - authentik.redis.yaml
   - authentik.secret.yaml
   - authentik.helm-release.yaml
+  - authentik.database.ingress-route.yaml
