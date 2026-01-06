@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: authentik-database-ingress-route-tcp
+  namespace: authentik-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - postgres
+  tls:
+    secretName: letsencrypt-cert
+    passthrough: false
+  routes:
+    - match: HostSNI(`authentik.database.intranet.winetree94.com`)
+      services:
+        - name: authentik-database-cluster-rw
+          port: 5432
