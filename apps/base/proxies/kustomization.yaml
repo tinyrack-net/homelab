@@ -5,3 +5,4 @@ resources:
   - garage.proxy.yaml
   - openmediavault.proxy.yaml
   - proxmox.proxy.yaml
+  - opencode.proxy.yaml

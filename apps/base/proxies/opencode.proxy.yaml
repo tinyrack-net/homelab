@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opencode-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opencode-proxy-service
+  namespace: opencode-proxy
+spec:
+  type: ExternalName
+  ports:
+    - port: 8080
+      name: api
+  externalName: 10.132.247.31
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: opencode-ingress-route
+  namespace: opencode-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`opencode.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: opencode-proxy-service
+          kind: Service
+          port: 4096
+          passHostHeader: true
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert
