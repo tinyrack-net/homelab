@@ -4,7 +4,7 @@ metadata:
   name: test-database-ingress-route-tcp
   namespace: test-database-system
   annotations:
-    kubernetes.io/ingress.class: traefik-external
+    kubernetes.io/ingress.class: traefik
 spec:
   entryPoints:
     - postgres
@@ -14,7 +14,7 @@ spec:
     # passthrough: true  # DB가 직접 인증서 처리를 한다면 true (이 경우 Secret 필요 없음)
   routes:
     # 첫 번째 DB 라우팅
-    - match: HostSNI(`test.database.winetree94.com`)
+    - match: HostSNI(`test.database.intranet.winetree94.com`)
       services:
         - name: test-database-cluster-rw
           port: 5432
