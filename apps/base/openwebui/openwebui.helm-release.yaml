@@ -21,6 +21,10 @@ spec:
       enabled: false
     pipelines:
       enabled: false
+    websocket:
+      enabled: false
+      redis:
+        enabled: false
     replicaCount: 2
     persistence:
       enabled: false
