@@ -6,3 +6,4 @@ resources:
   - openmediavault.proxy.yaml
   - proxmox.proxy.yaml
   - opencode.proxy.yaml
+  - auth-test.proxy.yaml
