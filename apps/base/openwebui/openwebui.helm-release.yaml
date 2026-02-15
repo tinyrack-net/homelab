@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: open-webui
-      version: "12.0.1"
+      version: "11.1.0"
       sourceRef:
         kind: HelmRepository
         name: openwebui-repository
@@ -28,14 +28,14 @@ spec:
     replicaCount: 2
     persistence:
       enabled: false
-    sso:
-      oidc:
-        clientExistingSecret: openwebui-oauth-secret
-        clientExistingSecretKey: client_secret
-        clientId: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
-        enabled: true
-        providerName: "authentik"
-        providerUrl: "https://auth.winetree94.com/application/o/open-web-ui/.well-known/openid-configuration"
+    # sso:
+    #   oidc:
+    #     clientExistingSecret: openwebui-oauth-secret
+    #     clientExistingSecretKey: client_secret
+    #     clientId: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
+    #     enabled: true
+    #     providerName: "authentik"
+    #     providerUrl: "https://auth.winetree94.com/application/o/open-web-ui/.well-known/openid-configuration"
     extraEnvVars:
       # DB
       - name: DATABASE_USER
@@ -87,22 +87,22 @@ spec:
         value: "tinyrack-homelab-openwebui-storage"
 
       # OIDC
-      # - name: OAUTH_CLIENT_ID
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: openwebui-oauth-secret
-      #       key: client_id
-      # - name: OAUTH_CLIENT_SECRET
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: openwebui-oauth-secret
-      #       key: client_secret
-      # - name: OAUTH_PROVIDER_NAME
-      #   value: "authentik"
-      # - name: OPENID_PROVIDER_URL
-      #   value: "https://auth.winetree94.com/application/o/open-web-ui/.well-known/openid-configuration"
-      # - name: OPENID_REDIRECT_URI
-      #   value: "https://ai.winetree94.com/oauth/oidc/callback"
+      - name: OAUTH_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: openwebui-oauth-secret
+            key: client_id
+      - name: OAUTH_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: openwebui-oauth-secret
+            key: client_secret
+      - name: OAUTH_PROVIDER_NAME
+        value: "authentik"
+      - name: OPENID_PROVIDER_URL
+        value: "https://auth.winetree94.com/application/o/open-web-ui/.well-known/openid-configuration"
+      - name: OPENID_REDIRECT_URI
+        value: "https://ai.winetree94.com/oauth/oidc/callback"
       - name: WEBUI_URL
         value: "https://ai.winetree94.com"
       - name: ENABLE_OAUTH_SIGNUP
