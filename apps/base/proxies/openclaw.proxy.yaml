@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openclaw-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openclaw-proxy-service
+  namespace: openclaw-proxy
+spec:
+  type: ExternalName
+  ports:
+    - port: 18789
+      name: api
+  externalName: 10.132.247.33
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openclaw-ingress-route
+  namespace: openclaw-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`openclaw.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: openclaw-proxy-service
+          kind: Service
+          port: 18789
+          passHostHeader: true
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert
