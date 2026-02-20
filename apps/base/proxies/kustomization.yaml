@@ -5,6 +5,7 @@ resources:
   - garage.proxy.yaml
   - openmediavault.proxy.yaml
   - proxmox.proxy.yaml
+  - llm-server.proxy.yaml
   - opencode.proxy.yaml
   - openclaw.proxy.yaml
   - auth-test.proxy.yaml
