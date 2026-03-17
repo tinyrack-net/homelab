@@ -15,6 +15,7 @@ spec:
         name: openwebui-repository
         namespace: flux-system
   values:
+    fullnameOverride: open-webui
     tika:
       enabled: true
     ollama:
@@ -22,8 +23,7 @@ spec:
     pipelines:
       enabled: false
     websocket:
-      enabled: true
-      manager: redis
+      enabled: false
       redis:
         enabled: false
     replicaCount: 2
@@ -65,6 +65,10 @@ spec:
         value: "postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@openwebui-database-cluster-rw.openwebui-system.svc.cluster.local:5432/openwebui?sslmode=disable"
 
       # Redis
+      - name: ENABLE_WEBSOCKET_SUPPORT
+        value: "true"
+      - name: WEBSOCKET_MANAGER
+        value: "redis"
       - name: REDIS_PASSWORD
         valueFrom:
           secretKeyRef:
