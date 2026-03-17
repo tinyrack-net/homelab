@@ -85,6 +85,14 @@ spec:
       - name: WEBUI_URL
         value: "https://ai.winetree94.com"
 
+      # AUTH
+      - name: ENABLE_LOGIN_FORM
+        value: "false"
+      - name: ENABLE_SIGNUP
+        value: "false"
+      - name: ENABLE_OAUTH_SIGNUP
+        value: "true"
+
       # CONFIG
       - name: BYPASS_MODEL_ACCESS_CONTROL
         value: "false"
