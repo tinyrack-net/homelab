@@ -28,6 +28,10 @@ data:
         - html
         - json
 
+    engines:
+      - name: karma
+        disabled: true
+
     ui:
       default_theme: simple
       default_locale: "en"
