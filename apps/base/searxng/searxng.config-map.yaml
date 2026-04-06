@@ -23,15 +23,15 @@ data:
 
     search:
       safe_search: 0
-      autocomplete: ""
-      default_lang: ""
+      autocomplete: "google"
+      default_lang: "en"
       formats:
         - html
         - json
 
     ui:
       default_theme: simple
-      default_locale: ""
+      default_locale: "en"
       theme_args:
         simple_style: black
       query_in_title: false
