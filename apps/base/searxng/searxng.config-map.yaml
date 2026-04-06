@@ -23,11 +23,7 @@ data:
 
     search:
       safe_search: 0
-      autocomplete: "google"
       default_lang: "en"
-      languages:
-        - en
-        - en-US
       formats:
         - html
         - json
@@ -38,14 +34,6 @@ data:
       theme_args:
         simple_style: black
       query_in_title: false
-
-    preferences:
-      lock:
-        - language
-        - autocomplete
-        - method
-        - theme
-        - locale
 
     valkey:
       url:
