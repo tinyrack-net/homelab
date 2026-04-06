@@ -6,35 +6,34 @@ metadata:
 data:
   settings.yml: |
     use_default_settings: true
-    
+
     general:
       instance_name: "SearXNG"
       enable_metrics: false
-      
+
     server:
       port: 8080
       bind_address: "0.0.0.0"
-      secret_key: 
-      base_url: 
+      secret_key:
+      base_url:
       limiter: true
       public_instance: true
       image_proxy: false
       method: "POST"
-      
+
     search:
       safe_search: 0
       autocomplete: ""
       default_lang: ""
       formats:
         - html
-      
+
     ui:
       default_theme: simple
       default_locale: ""
       theme_args:
         simple_style: black
       query_in_title: false
-    
-    valkey:
-      url: 
 
+    valkey:
+      url:
