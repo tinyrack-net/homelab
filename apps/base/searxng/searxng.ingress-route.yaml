@@ -1,0 +1,47 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: searxng-ingress-route-http
+  namespace: searxng-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`search.tinyrack.net`)
+      kind: Rule
+      middlewares:
+        - name: redirect-to-https
+      services:
+        - name: searxng-service
+          port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: searxng-ingress-route
+  namespace: searxng-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`search.tinyrack.net`)
+      kind: Rule
+      services:
+        - name: searxng-service
+          port: 80
+  tls:
+    secretName: letsencrypt-wildcard-cert-tinyrack.net
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-to-https
+  namespace: searxng-system
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

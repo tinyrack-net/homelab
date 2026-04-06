@@ -17,3 +17,4 @@ resources:
   - forgejo.yaml
   - infisical.yaml
   - test-database.yaml
+  - searxng.yaml
