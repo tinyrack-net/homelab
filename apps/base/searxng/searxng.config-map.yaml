@@ -16,8 +16,8 @@ data:
       bind_address: "0.0.0.0"
       secret_key: 
       base_url: 
-      limiter: false
-      public_instance: false
+      limiter: true
+      public_instance: true
       image_proxy: false
       method: "POST"
       
@@ -34,3 +34,7 @@ data:
       theme_args:
         simple_style: black
       query_in_title: false
+    
+    valkey:
+      url: 
+

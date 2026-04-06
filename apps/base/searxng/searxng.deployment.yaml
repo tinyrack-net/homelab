@@ -37,10 +37,19 @@ spec:
                   key: secret_key
             - name: SEARXNG_BASE_URL
               value: "https://search.winetree94.com/"
+            - name: SEARXNG_VALKEY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: searxng-valkey-url-secret
+                  key: url
           volumeMounts:
             - name: config-volume
               mountPath: /etc/searxng/settings.yml
               subPath: settings.yml
+              readOnly: true
+            - name: limiter-config-volume
+              mountPath: /etc/searxng/limiter.toml
+              subPath: limiter.toml
               readOnly: true
           livenessProbe:
             httpGet:
@@ -62,3 +71,6 @@ spec:
         - name: config-volume
           configMap:
             name: searxng-config
+        - name: limiter-config-volume
+          configMap:
+            name: searxng-limiter-config
