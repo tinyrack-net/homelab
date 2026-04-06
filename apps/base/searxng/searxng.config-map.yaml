@@ -27,6 +27,7 @@ data:
       default_lang: ""
       formats:
         - html
+        - json
 
     ui:
       default_theme: simple
