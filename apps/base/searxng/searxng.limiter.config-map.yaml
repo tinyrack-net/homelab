@@ -31,12 +31,6 @@ data:
     # activate link_token method in the ip_limit method
     link_token = true
 
-    # Rate limiting을 완화하여 속도 개선
-    # requests per interval
-    rate_limit = 100
-    # interval in seconds
-    interval = 60
-
     [botdetection.ip_lists]
 
     # In the limiter, the ip_lists method has priority over all other methods -> if
