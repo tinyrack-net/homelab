@@ -36,7 +36,7 @@ spec:
                   name: searxng-secret
                   key: secret_key
             - name: SEARXNG_BASE_URL
-              value: "https://search.tinyrack.net/"
+              value: "https://search.winetree94.com/"
           volumeMounts:
             - name: config-volume
               mountPath: /etc/searxng/settings.yml
