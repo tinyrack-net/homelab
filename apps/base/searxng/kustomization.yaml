@@ -4,9 +4,9 @@ resources:
   - searxng.namespace.yaml
   - searxng.config-map.yaml
   - searxng.limiter.config-map.yaml
-  - searxng.redis.yaml
-  - searxng.redis.secret.yaml
-  - searxng.valkey-url.secret.yaml
+  # - searxng.redis.yaml  # Temporarily disabled for password reset
+  # - searxng.redis.secret.yaml
+  # - searxng.valkey-url.secret.yaml
   - searxng.deployment.yaml
   - searxng.service.yaml
   - searxng.ingress-route.yaml
