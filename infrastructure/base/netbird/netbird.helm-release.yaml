@@ -123,7 +123,7 @@ spec:
         }
 
       image:
-        tag: 0.59.13
+        tag: 0.68.1
       persistentVolume:
         enabled: false
       envFromSecret:
@@ -140,11 +140,11 @@ spec:
 
     signal:
       image:
-        tag: 0.59.13
+        tag: 0.68.1
 
     relay:
       image:
-        tag: 0.59.13
+        tag: 0.68.1
       envFromSecret:
         NB_AUTH_SECRET: netbird/relayPassword
       env:
@@ -155,7 +155,7 @@ spec:
     dashboard:
       enabled: true
       image:
-        tag: v2.21.0
+        tag: v2.36.0
       env:
         # Endpoints
         NETBIRD_MGMT_API_ENDPOINT: https://vpn.winetree94.com:443
