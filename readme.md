@@ -30,13 +30,11 @@ kubectl -n "$NAMESPACE" label secret "$SECRETNAME" sealedsecrets.bitnami.com/sea
 Flux 부트스트랩
 
 ```bash
-flux bootstrap gitea \
-  --token-auth \
-  --hostname=git.winetree94.com \
+flux bootstrap github \
   --repository=homelab \
   --branch=main \
   --path=./clusters/production \
-  --owner=tinyrack
+  --owner=tinyrack-net
 ```
 
 # Sealed Secret 암호화
