@@ -7,7 +7,7 @@ spec:
   interval: 15m
   path: ./infrastructure/base/mariadb-operator
   prune: true
-  timeout: 2m
+  timeout: 10m
   wait: true
   sourceRef:
     kind: GitRepository

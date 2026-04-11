@@ -7,7 +7,7 @@ spec:
   interval: 15m
   path: ./infrastructure/base/cert-manager
   prune: true
-  timeout: 5m
+  timeout: 10m
   wait: true
   sourceRef:
     kind: GitRepository
