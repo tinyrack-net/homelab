@@ -4,10 +4,14 @@ metadata:
   name: kube-prometheus-stack-release
   namespace: kube-prometheus-stack-system
 spec:
-  chartRef:
-    kind: OCIRepository
-    name: kube-prometheus-stack-repository
-    namespace: flux-system
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "83.4.0"
+      sourceRef:
+        kind: HelmRepository
+        name: kube-prometheus-stack-repository
+        namespace: flux-system
   interval: 5m
   timeout: 5m
   releaseName: kube-prometheus-stack
