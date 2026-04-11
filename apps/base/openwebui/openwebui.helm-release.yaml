@@ -25,7 +25,7 @@ spec:
     websocket:
       enabled: true
       redis:
-        enabled: false
+        enabled: true
     replicaCount: 2
     persistence:
       enabled: false
@@ -65,18 +65,6 @@ spec:
         value: "postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@openwebui-database-cluster-rw.openwebui-system.svc.cluster.local:5432/openwebui?sslmode=disable"
 
       # Redis
-      - name: WEBSOCKET_MANAGER
-        value: "redis"
-      - name: REDIS_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: openwebui-redis-secret
-            key: password
-      - name: REDIS_URL
-        value: "redis://:$(REDIS_PASSWORD)@openwebui-redis.openwebui-system.svc.cluster.local:6379/0"
-      - name: WEBSOCKET_REDIS_URL
-        value: "redis://:$(REDIS_PASSWORD)@openwebui-redis.openwebui-system.svc.cluster.local:6379/1"
-
       # OIDC
       - name: OPENID_REDIRECT_URI
         value: "https://ai.winetree94.com/oauth/oidc/callback"
@@ -88,9 +76,6 @@ spec:
         value: "false"
       - name: ENABLE_SIGNUP
         value: "false"
-      - name: ENABLE_OAUTH_SIGNUP
-        value: "true"
-
       # CONFIG
       - name: BYPASS_MODEL_ACCESS_CONTROL
         value: "false"

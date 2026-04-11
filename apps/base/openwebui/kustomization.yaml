@@ -5,8 +5,6 @@ resources:
   - openwebui.database.superuser.secret.yaml
   - openwebui.database.user.secret.yaml
   - openwebui.database.yaml
-  - openwebui.redis.secret.yaml
-  - openwebui.redis.yaml
   - openwebui.secret.yaml
   - openwebui.oauth.secret.yaml
   - openwebui.helm-release.yaml
