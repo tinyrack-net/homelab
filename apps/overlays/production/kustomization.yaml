@@ -14,7 +14,7 @@ resources:
   - proxies.yaml
   - karakeep.yaml
   - n8n.yaml
-  - forgejo.yaml
+  # - forgejo.yaml
   - infisical.yaml
   - test-database.yaml
   - searxng.yaml
