@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`llm.tinyrack.net`)
+    - match: Host(`llm.winetree94.com`)
       kind: Rule
       services:
         - name: litellm-service
