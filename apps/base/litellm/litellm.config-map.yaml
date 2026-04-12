@@ -5,16 +5,6 @@ metadata:
   namespace: litellm-system
 data:
   config.yaml: |
-    model_list:
-      - model_name: llamacpp
-        litellm_params:
-          model: openai/llamacpp
-          api_base: http://10.132.247.34:8080/v1
-          api_key: os.environ/LLAMACPP_API_KEY
-      - model_name: "*"
-        litellm_params:
-          model: "*"
-
     litellm_settings:
       request_timeout: 600
       json_logs: true
