@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: litellm-container
-          image: ghcr.io/berriai/litellm:v1.83.7.rc.1
+          image: ghcr.io/berriai/litellm-database:v1.83.7.rc.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -29,6 +29,18 @@ spec:
               cpu: "2"
               memory: "4Gi"
           env:
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: litellm-database-user-secret
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: litellm-database-user-secret
+                  key: password
+            - name: DATABASE_URL
+              value: postgresql://$(DATABASE_USER):$(DATABASE_PASSWORD)@litellm-database-cluster-rw.litellm-system.svc.cluster.local:5432/litellm
             - name: LITELLM_MODE
               value: PRODUCTION
             - name: LITELLM_LOG
@@ -38,6 +50,8 @@ spec:
           envFrom:
             - secretRef:
                 name: litellm-secret
+            - secretRef:
+                name: litellm-database-secret
           args:
             - "--config"
             - "/app/proxy_config.yaml"
