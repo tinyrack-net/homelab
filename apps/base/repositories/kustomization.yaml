@@ -6,4 +6,3 @@ resources:
   - nextcloud.yaml
   - forgejo.yaml
   - infisical.yaml
-  - supabase.yaml
