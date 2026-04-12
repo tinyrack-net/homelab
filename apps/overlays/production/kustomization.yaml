@@ -8,6 +8,7 @@ resources:
   - joplin.yaml
   - authentik.yaml
   - openwebui.yaml
+  - litellm.yaml
   - guacamole.yaml
   - nextcloud.yaml
   - davinci-resolve-project-server.yaml
