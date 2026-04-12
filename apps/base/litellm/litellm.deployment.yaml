@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: litellm-container
-          image: ghcr.io/berriai/litellm:main-stable
-          imagePullPolicy: Always
+          image: ghcr.io/berriai/litellm:v1.83.7.rc.1
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 4000
@@ -29,25 +29,11 @@ spec:
               cpu: "2"
               memory: "4Gi"
           env:
-            - name: POSTGRES_HOST
-              value: litellm-database-cluster-rw.litellm-system.svc.cluster.local
-            - name: POSTGRES_PORT
-              value: "5432"
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: litellm-database-user-secret
-                  key: username
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: litellm-database-user-secret
-                  key: password
-            - name: POSTGRES_DB
-              value: litellm
-            - name: DATABASE_URL
-              value: postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
-            - name: STORE_MODEL_IN_DB
+            - name: LITELLM_MODE
+              value: PRODUCTION
+            - name: LITELLM_LOG
+              value: ERROR
+            - name: LITELLM_LOCAL_MODEL_COST_MAP
               value: "True"
           envFrom:
             - secretRef:

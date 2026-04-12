@@ -5,15 +5,33 @@ metadata:
   namespace: litellm-system
 data:
   config.yaml: |
-      general_settings: 
-        master_key: os.environ/LITELLM_MASTER_KEY
-        proxy_batch_write_at: 60
-        database_connection_pool_limit: 10
-        disable_error_logs: True
-        allow_requests_on_db_unavailable: False
+    model_list:
+      - model_name: llamacpp
+        litellm_params:
+          model: openai/llamacpp
+          api_base: http://10.132.247.34:8080/v1
+          api_key: os.environ/LLAMACPP_API_KEY
+      - model_name: "*"
+        litellm_params:
+          model: "*"
 
-        user_header_mappings:
-          - header_name: X-OpenWebUI-User-Id
-            litellm_user_role: internal_user
-          - header_name: X-OpenWebUI-User-Email
-            litellm_user_role: customer
+    litellm_settings:
+      request_timeout: 600
+      json_logs: true
+
+    router_settings:
+      routing_strategy: simple-shuffle
+
+    general_settings:
+      master_key: os.environ/LITELLM_MASTER_KEY
+      disable_spend_logs: true
+      disable_spend_updates: true
+      disable_error_logs: true
+      disable_reset_budget: true
+      disable_adding_master_key_hash_to_db: true
+
+      user_header_mappings:
+        - header_name: X-OpenWebUI-User-Id
+          litellm_user_role: internal_user
+        - header_name: X-OpenWebUI-User-Email
+          litellm_user_role: customer
