@@ -47,6 +47,8 @@ spec:
               value: ERROR
             - name: LITELLM_LOCAL_MODEL_COST_MAP
               value: "True"
+            - name: STORE_MODEL_IN_DB
+              value: "True"
           envFrom:
             - secretRef:
                 name: litellm-secret
