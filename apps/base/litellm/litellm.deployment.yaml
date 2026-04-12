@@ -49,6 +49,8 @@ spec:
               value: "True"
             - name: STORE_MODEL_IN_DB
               value: "True"
+            - name: SEARXNG_API_BASE
+              value: "https://search.winetree94.com"
           envFrom:
             - secretRef:
                 name: litellm-secret
