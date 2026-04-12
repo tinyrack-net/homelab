@@ -1,23 +1,21 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
-  name: litellm-ingress
+  name: litellm-ingress-route
   namespace: litellm-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
 spec:
-  ingressClassName: traefik
-  rules:
-    - host: llm.tinyrack.net
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: litellm-service
-                port:
-                  name: http
-
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`llm.tinyrack.net`)
+      kind: Rule
+      services:
+        - name: litellm-service
+          kind: Service
+          port: 80
+          passHostHeader: true
+          scheme: http
   tls:
-    - hosts:
-        - "llm.tinyrack.net"
-      secretName: letsencrypt-wildcard-cert-tinyrack.net
+    secretName: letsencrypt-wildcard-cert-tinyrack.net
