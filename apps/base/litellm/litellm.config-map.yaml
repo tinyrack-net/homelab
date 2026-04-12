@@ -8,6 +8,7 @@ data:
     litellm_settings:
       request_timeout: 600
       json_logs: true
+      drop_params: true
 
     router_settings:
       routing_strategy: simple-shuffle
