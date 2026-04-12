@@ -17,7 +17,7 @@
 ## Secrets
 - Committed `*.secret.yaml` and `*.secrets.yaml` files are encrypted `SealedSecret` manifests, often stored as JSON rather than YAML.
 - Do not replace them with plaintext `Secret` resources.
-- Recreate encrypted secrets with the repo certificate: `kubectl create secret generic ... --dry-run=client -o yaml | kubeseal --cert ./tinyrack-homelab-secret-key.crt > <name>.secret.yaml`.
+- Recreate encrypted secrets with the repo certificate using the same pattern as `README.md`: `kubectl create secret generic <secret-name> --namespace <namespace> --dry-run=client --from-literal=KEY=VALUE -o yaml | kubeseal --cert ./tinyrack-homelab-secret-key.crt > ./<name>.secret.yaml`.
 - The public cert is committed at `./tinyrack-homelab-secret-key.crt`; the private key file `tinyrack-homelab-secret-key.key` is intentionally gitignored.
 
 ## Bootstrap / Ops
