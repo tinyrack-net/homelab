@@ -62,6 +62,20 @@ data:
         disabled: true
       - name: brave.news
         disabled: true
+      - name: duckduckgo
+        disabled: true
+      - name: duckduckgo images
+        disabled: true
+      - name: duckduckgo videos
+        disabled: true
+      - name: duckduckgo news
+        disabled: true
+      - name: aol
+        disabled: true
+      - name: aol images
+        disabled: true
+      - name: aol videos
+        disabled: true
 
     ui:
       default_theme: simple
