@@ -20,6 +20,7 @@ data:
       public_instance: true
       image_proxy: false
       method: "POST"
+      http_protocol_version: "1.1"
 
     search:
       safe_search: 0
@@ -27,6 +28,14 @@ data:
       formats:
         - html
         - json
+
+    outgoing:
+      request_timeout: 3.0
+      max_request_timeout: 6.0
+      pool_connections: 200
+      pool_maxsize: 50
+      keepalive_expiry: 30.0
+      enable_http2: true
 
     engines:
       - name: karma
