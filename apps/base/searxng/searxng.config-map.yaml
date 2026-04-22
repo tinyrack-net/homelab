@@ -38,7 +38,21 @@ data:
       enable_http2: true
 
     engines:
-      - name: karma
+      - name: karmasearch
+        disabled: true
+      - name: karmasearch images
+        disabled: true
+      - name: karmasearch videos
+        disabled: true
+      - name: karmasearch news
+        disabled: true
+      - name: startpage
+        disabled: true
+      - name: startpage news
+        disabled: true
+      - name: startpage images
+        disabled: true
+      - name: wikidata
         disabled: true
 
     ui:
