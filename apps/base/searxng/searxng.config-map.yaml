@@ -54,27 +54,15 @@ data:
         disabled: true
       - name: wikidata
         disabled: true
-      - name: brave
+      - name: google
         disabled: true
-      - name: brave.images
+      - name: google images
         disabled: true
-      - name: brave.videos
+      - name: google news
         disabled: true
-      - name: brave.news
+      - name: google videos
         disabled: true
-      - name: duckduckgo
-        disabled: true
-      - name: duckduckgo images
-        disabled: true
-      - name: duckduckgo videos
-        disabled: true
-      - name: duckduckgo news
-        disabled: true
-      - name: aol
-        disabled: true
-      - name: aol images
-        disabled: true
-      - name: aol videos
+      - name: google scholar
         disabled: true
 
     ui:
