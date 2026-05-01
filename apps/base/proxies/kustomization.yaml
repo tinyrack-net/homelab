@@ -7,6 +7,8 @@ resources:
   - proxmox.proxy.yaml
   - llm-server.proxy.yaml
   - opencode.proxy.yaml
+  - macmini-nanokvm.proxy.yaml
   - llamacpp.proxy.yaml
   - openclaw.proxy.yaml
   - auth-test.proxy.yaml
+
