@@ -51,7 +51,7 @@ data:
     terms: []
 
     clients:
-      - id: homelab-test-client
+      - id: 5f4d8c3b-2a1e-4b9f-8c7d-6e5a4f3b2c1d
         name: Homelab Test Client
         client_id: homelab-test-client
         redirect_uris:
