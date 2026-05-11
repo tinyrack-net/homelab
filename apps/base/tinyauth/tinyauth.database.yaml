@@ -1,0 +1,70 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: tinyauth-database-cluster
+  namespace: tinyauth-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17-bookworm
+  postgresql:
+    parameters:
+      max_connections: "500"
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 32Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  monitoring:
+    enablePodMonitor: true
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore: &barmanObjectStore
+      destinationPath: s3://tinyrack-homelab/apps/tinyauth/database-17
+      endpointURL: https://storage.winetree94.com
+      s3Credentials:
+        region:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_REGION
+        accessKeyId:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: tinyrack-homelab-s3-secret
+          key: AWS_SECRET_ACCESS_KEY
+      serverName: tinyauth-database
+      data:
+        compression: gzip
+      wal:
+        compression: gzip
+        maxParallel: 8
+  externalClusters:
+    - name: tinyauth-database
+      barmanObjectStore: *barmanObjectStore
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: tinyauth-database-superuser-secret
+
+  bootstrap:
+    initdb:
+      database: tinyauth
+      owner: tinyauth
+      secret:
+        name: tinyauth-database-user-secret
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: tinyauth-backup
+  namespace: tinyauth-system
+spec:
+  schedule: "0 0 */4 * * *"
+  backupOwnerReference: self
+  cluster:
+    name: tinyauth-database-cluster
