@@ -19,4 +19,4 @@ resources:
   - infisical.yaml
   - test-database.yaml
   - searxng.yaml
-  - tinyauth.yaml
+  # - tinyauth.yaml
