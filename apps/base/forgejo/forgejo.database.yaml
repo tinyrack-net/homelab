@@ -1,3 +1,29 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: forgejo-database-backup-store
+  namespace: forgejo-system
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://tinyrack-homelab/apps/forgejo/database-17
+    endpointURL: https://storage.winetree94.com
+    s3Credentials:
+      region:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_REGION
+      accessKeyId:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -8,6 +34,11 @@ metadata:
 spec:
   instances: 1
   imageName: ghcr.io/cloudnative-pg/postgresql:17-bookworm
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: forgejo-database-backup-store
   postgresql:
     parameters:
       max_connections: "500"
@@ -20,30 +51,13 @@ spec:
           storage: 32Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
-  backup:
-    retentionPolicy: 30d
-    barmanObjectStore: &barmanObjectStore
-      destinationPath: s3://tinyrack-homelab/apps/forgejo/database-17
-      endpointURL: https://storage.winetree94.com
-      s3Credentials:
-        region:
-          name: tinyrack-homelab-s3-secret
-          key: AWS_REGION
-        accessKeyId:
-          name: tinyrack-homelab-s3-secret
-          key: AWS_ACCESS_KEY_ID
-        secretAccessKey:
-          name: tinyrack-homelab-s3-secret
-          key: AWS_SECRET_ACCESS_KEY
-      serverName: forgejo-database
-      data:
-        compression: gzip
-      wal:
-        compression: gzip
-        maxParallel: 8
   externalClusters:
     - name: forgejo-database
-      barmanObjectStore: *barmanObjectStore
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: forgejo-database-backup-store
+          serverName: forgejo-database
 
   enableSuperuserAccess: true
   superuserSecret:
@@ -69,5 +83,8 @@ metadata:
 spec:
   schedule: "0 0 */4 * * *"
   backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
   cluster:
     name: forgejo-database-cluster
