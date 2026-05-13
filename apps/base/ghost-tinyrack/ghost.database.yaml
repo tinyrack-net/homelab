@@ -21,6 +21,7 @@ spec:
       rootPasswordSecretKeyRef:
         name: ghost-database-secret
         key: mysql-root-password
+        generate: false
       storage:
         storageClassName: longhorn-strict-local
         size: 30Gi
