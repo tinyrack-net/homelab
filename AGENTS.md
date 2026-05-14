@@ -22,6 +22,3 @@
 
 ## Bootstrap / Ops
 - The README bootstrap flow is: install K3S without Traefik, restore the Sealed Secrets TLS secret, then run `flux bootstrap github --repository=homelab --branch=main --path=./clusters/production --owner=tinyrack-net`.
-
-## Known Gotcha
-- `flux build kustomization apps --path .` is currently not a reliable whole-repo verification step: `apps/base/ghost-tinyrack/ghost.ingress-route.yaml` defines `Middleware redirect-to-https` in namespace `ghost-system`, which collides with `apps/base/ghost` when both are built together. Prefer verifying the specific base you changed unless you are fixing that collision.
