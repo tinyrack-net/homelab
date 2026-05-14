@@ -2,9 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - repositories.yaml
-  # - stalwart.yaml
-  - ghost.yaml
-  - ghost-tinyrack.yaml
   - joplin.yaml
   - authentik.yaml
   - openwebui.yaml
@@ -15,8 +12,6 @@ resources:
   - proxies.yaml
   - karakeep.yaml
   - n8n.yaml
-  # - forgejo.yaml
   - infisical.yaml
-  - test-database.yaml
   - searxng.yaml
   # - tinyauth.yaml
