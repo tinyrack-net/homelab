@@ -14,4 +14,4 @@ resources:
   - n8n.yaml
   - infisical.yaml
   - searxng.yaml
-  # - tinyauth.yaml
+  - tinyauth.yaml
