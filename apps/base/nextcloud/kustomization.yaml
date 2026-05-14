@@ -8,4 +8,5 @@ resources:
   - nextcloud.redis.secret.yaml
   - nextcloud.redis.yaml
   - nextcloud.secret.yaml
+  - nextcloud.storage.pvc.yaml
   - nextcloud.helm-release.yaml

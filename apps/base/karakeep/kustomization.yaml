@@ -4,6 +4,8 @@ resources:
   - karakeep.namespace.yaml
   - karakeep.config-map.yaml
   - karakeep.secrets.yaml
+  - karakeep.data-storage.pvc.yaml
+  - karakeep.meilisearch.pvc.yaml
   - karakeep.meilisearch.deployment.yaml
   - karakeep.meilisearch.service.yaml
   - karakeep.chrome.deployment.yaml
