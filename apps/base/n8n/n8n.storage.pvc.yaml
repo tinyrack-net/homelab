@@ -6,6 +6,7 @@ metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
+    recurring-job.longhorn.io/source: enabled
     recurring-job-group.longhorn.io/longhorn-backup: enabled
 spec:
   accessModes:
