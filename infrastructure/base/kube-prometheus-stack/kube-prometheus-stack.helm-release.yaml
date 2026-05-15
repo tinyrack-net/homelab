@@ -17,6 +17,13 @@ spec:
   releaseName: kube-prometheus-stack
   values:
     grafana:
+      persistence:
+        enabled: true
+        type: pvc
+        storageClassName: longhorn
+        accessModes:
+          - ReadWriteOnce
+        size: 10Gi
       ingress:
         enabled: true
         ingressClassName: traefik
@@ -28,3 +35,16 @@ spec:
           - secretName: letsencrypt-cert
             hosts:
               - grafana.intranet.winetree94.com
+    prometheus:
+      prometheusSpec:
+        retention: 15d
+        retentionSize: 40GB
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: longhorn
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi

@@ -1,0 +1,73 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kube-prometheus-stack-homelab-rules
+  namespace: kube-prometheus-stack-system
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: homelab.gitops
+      rules:
+        - alert: HomelabFluxKustomizationNotReady
+          expr: gotk_reconcile_condition{kind="Kustomization",type="Ready",status="False"} == 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Flux Kustomization {{ $labels.namespace }}/{{ $labels.name }} is not ready
+            description: Flux has reported the Kustomization as not ready for more than 10 minutes.
+        - alert: HomelabFluxHelmReleaseNotReady
+          expr: gotk_reconcile_condition{kind="HelmRelease",type="Ready",status="False"} == 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Flux HelmRelease {{ $labels.namespace }}/{{ $labels.name }} is not ready
+            description: Flux has reported the HelmRelease as not ready for more than 10 minutes.
+    - name: homelab.workloads
+      rules:
+        - alert: HomelabPodRestartingFrequently
+          expr: increase(kube_pod_container_status_restarts_total[15m]) > 3
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} is restarting frequently
+            description: Container {{ $labels.container }} restarted more than 3 times in the last 15 minutes.
+    - name: homelab.storage
+      rules:
+        - alert: HomelabNodeFilesystemLowSpace
+          expr: |
+            (
+              node_filesystem_avail_bytes{fstype!~"tmpfs|overlay",mountpoint!~"/run.*|/var/lib/kubelet/pods.*"}
+              /
+              node_filesystem_size_bytes{fstype!~"tmpfs|overlay",mountpoint!~"/run.*|/var/lib/kubelet/pods.*"}
+            ) < 0.15
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: Node filesystem {{ $labels.instance }} {{ $labels.mountpoint }} is below 15% free
+            description: The filesystem has less than 15% available space for more than 15 minutes.
+        - alert: HomelabPVCLowSpace
+          expr: |
+            (
+              kubelet_volume_stats_available_bytes
+              /
+              kubelet_volume_stats_capacity_bytes
+            ) < 0.15
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is below 15% free
+            description: The persistent volume claim has less than 15% available space for more than 15 minutes.
+        - alert: HomelabLonghornVolumeDegraded
+          expr: longhorn_volume_robustness == 2
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} is degraded
+            description: Longhorn reports the volume robustness as degraded for more than 10 minutes.
