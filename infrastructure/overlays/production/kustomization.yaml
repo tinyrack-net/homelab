@@ -17,5 +17,6 @@ resources:
   - cloudflared.yaml
   - kube-prometheus-stack.yaml
   - loki.yaml
+  - alloy.yaml
   - tailscale.yaml
 #  - netbird.yaml
