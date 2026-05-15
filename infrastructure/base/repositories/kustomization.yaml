@@ -13,3 +13,4 @@ resources:
   - ot-container-kit.yaml
   - fossorial.yaml
   - kube-prometheus-stack.yaml
+  - grafana.yaml
