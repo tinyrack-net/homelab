@@ -43,8 +43,8 @@ spec:
       messageTemplate: |
         chore(images): update tinyauth
 
-        {{ range .Updated.Images -}}
-        - {{ . }}
+        {{ range .Changed.Changes -}}
+        - {{ .OldValue }} -> {{ .NewValue }}
         {{ end -}}
     push:
       branch: main
@@ -98,8 +98,8 @@ spec:
       messageTemplate: |
         chore(images): update proxer
 
-        {{ range .Updated.Images -}}
-        - {{ . }}
+        {{ range .Changed.Changes -}}
+        - {{ .OldValue }} -> {{ .NewValue }}
         {{ end -}}
     push:
       branch: main
