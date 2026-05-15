@@ -4,3 +4,10 @@ resources:
   - kube-prometheus-stack.namespace.yaml
   - kube-prometheus-stack.helm-release.yaml
   - kube-prometheus-stack.prometheus-rules.yaml
+  - monitors/flux.podmonitor.yaml
+  - monitors/traefik.podmonitor.yaml
+  - monitors/cert-manager.servicemonitor.yaml
+  - monitors/longhorn.servicemonitor.yaml
+  - monitors/cnpg.podmonitor.yaml
+  - monitors/mariadb-operator.podmonitor.yaml
+  - monitors/redis-operator.podmonitor.yaml
