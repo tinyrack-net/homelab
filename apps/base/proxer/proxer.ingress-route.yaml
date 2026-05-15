@@ -9,6 +9,14 @@ spec:
   entryPoints:
     - websecure
   routes:
+    - match: Host(`proxy.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: proxer-service
+          kind: Service
+          port: 8080
+          passHostHeader: true
+          scheme: http
     - match: 'HostRegexp(`[a-z0-9-]+\.proxy\.intranet\.winetree94\.com`)'
       kind: Rule
       services:
