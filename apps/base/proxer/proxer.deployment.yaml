@@ -39,12 +39,12 @@ spec:
                   key: PROXER_TOKEN
           livenessProbe:
             httpGet:
-              path: /__proxer/health/live
+              path: /__proxer__/health/live
               port: http
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /__proxer/health/ready
+              path: /__proxer__/health/ready
               port: http
             periodSeconds: 10
           securityContext:
