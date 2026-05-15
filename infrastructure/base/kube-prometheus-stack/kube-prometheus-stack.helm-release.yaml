@@ -16,6 +16,70 @@ spec:
   timeout: 5m
   releaseName: kube-prometheus-stack
   values:
+    alertmanager:
+      config:
+        global:
+          resolve_timeout: 5m
+        inhibit_rules:
+          - source_matchers:
+              - 'severity = critical'
+            target_matchers:
+              - 'severity =~ warning|info'
+            equal:
+              - 'namespace'
+              - 'alertname'
+          - source_matchers:
+              - 'severity = warning'
+            target_matchers:
+              - 'severity = info'
+            equal:
+              - 'namespace'
+              - 'alertname'
+          - source_matchers:
+              - 'alertname = InfoInhibitor'
+            target_matchers:
+              - 'severity = info'
+            equal:
+              - 'namespace'
+          - target_matchers:
+              - 'alertname = InfoInhibitor'
+        route:
+          group_by:
+            - cluster
+            - namespace
+            - alertname
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 12h
+          receiver: telegram
+          routes:
+            - receiver: 'null'
+              matchers:
+                - alertname = "Watchdog"
+        receivers:
+          - name: 'null'
+          - name: telegram
+            telegram_configs:
+              - api_url: https://api.telegram.org
+                bot_token_file: /etc/alertmanager/secrets/alertmanager-telegram/bot_token
+                chat_id: -1003609470982
+                message_thread_id: 2
+                parse_mode: HTML
+                send_resolved: true
+                message: |-
+                  {{ if eq .Status "firing" }}🔥{{ else }}✅{{ end }} <b>[homelab] {{ .CommonLabels.alertname }}</b>
+                  <b>Status:</b> {{ .Status }}
+                  <b>Severity:</b> {{ .CommonLabels.severity }}
+                  {{ if .CommonLabels.namespace }}<b>Namespace:</b> {{ .CommonLabels.namespace }}{{ end }}
+                  {{ range .Alerts }}
+                  • {{ if .Annotations.summary }}{{ .Annotations.summary }}{{ else }}{{ .Labels.alertname }}{{ end }}
+                  {{ if .Annotations.description }}  {{ .Annotations.description }}{{ end }}
+                  {{ end }}
+        templates:
+          - /etc/alertmanager/config/*.tmpl
+      alertmanagerSpec:
+        secrets:
+          - alertmanager-telegram
     grafana:
       additionalDataSources:
         - name: Loki
@@ -43,6 +107,8 @@ spec:
               - grafana.intranet.winetree94.com
     prometheus:
       prometheusSpec:
+        externalLabels:
+          cluster: homelab
         retention: 15d
         retentionSize: 40GB
         storageSpec:
