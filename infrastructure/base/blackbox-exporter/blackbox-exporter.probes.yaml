@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: intranet-http-endpoints
+  namespace: kube-prometheus-stack-system
+  labels:
+    release: kube-prometheus-stack
+spec:
+  interval: 1m
+  scrapeTimeout: 30s
+  module: http_2xx
+  prober:
+    url: blackbox-exporter-prometheus-blackbox-exporter.observability-system.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - https://auth-test.intranet.winetree94.com
+        - https://garage.intranet.winetree94.com
+        - https://grafana.intranet.winetree94.com
+        - https://llm.intranet.winetree94.com
+        - https://longhorn.intranet.winetree94.com
+        - https://macmini.nanokvm.intranet.winetree94.com
+        - https://openclaw.intranet.winetree94.com
+        - https://opencode.intranet.winetree94.com
+        - https://openmediavault.intranet.winetree94.com
+        - https://openmediavault.nanokvm.intranet.winetree94.com
+        - https://proxmox.intranet.winetree94.com
+        - https://remote.intranet.winetree94.com
+        - https://router.intranet.winetree94.com
+        - https://tinyauth.intranet.winetree94.com
+        - https://xeon.nanokvm.intranet.winetree94.com

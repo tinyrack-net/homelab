@@ -18,5 +18,6 @@ resources:
   - kube-prometheus-stack.yaml
   - loki.yaml
   - alloy.yaml
+  - blackbox-exporter.yaml
   - tailscale.yaml
 #  - netbird.yaml
