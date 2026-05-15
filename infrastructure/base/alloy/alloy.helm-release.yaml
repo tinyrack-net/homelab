@@ -77,8 +77,9 @@ spec:
           }
 
           loki.source.file "pod_logs" {
-            targets    = local.file_match.pod_logs.targets
-            forward_to = [loki.process.pod_logs.receiver]
+            targets       = local.file_match.pod_logs.targets
+            tail_from_end = true
+            forward_to    = [loki.process.pod_logs.receiver]
           }
 
           loki.process "pod_logs" {
