@@ -37,7 +37,7 @@ spec:
         replication_factor: 1
       compactor:
         compaction_interval: 10m
-        delete_request_store: s3
+        delete_request_store: filesystem
         retention_delete_delay: 2h
         retention_delete_worker_count: 150
         retention_enabled: true
