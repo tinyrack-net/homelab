@@ -51,3 +51,58 @@ spec:
   update:
     path: ./apps/base/tinyauth
     strategy: Setters
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: proxer
+  namespace: flux-system
+spec:
+  image: ghcr.io/tinyrack-net/proxer
+  interval: 5m
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: proxer
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: proxer
+  filterTags:
+    pattern: '^latest$'
+  policy:
+    alphabetical:
+      order: asc
+  digestReflectionPolicy: Always
+  interval: 5m
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: proxer
+  namespace: flux-system
+spec:
+  interval: 10m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        name: flux-image-automation
+        email: flux-image-automation@users.noreply.github.com
+      messageTemplate: |
+        chore(images): update proxer
+
+        {{ range .Updated.Images -}}
+        - {{ . }}
+        {{ end -}}
+    push:
+      branch: main
+  update:
+    path: ./apps/base/proxer
+    strategy: Setters

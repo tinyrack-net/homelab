@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxer
+  namespace: proxer-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxer
+  template:
+    metadata:
+      labels:
+        app: proxer
+    spec:
+      containers:
+        - name: proxer
+          image: ghcr.io/tinyrack-net/proxer:latest@sha256:32a1e9ea8e964c61de58defbcaffaa086fa1e8a33db18a97ad7253ae0ed37e15 # {"$imagepolicy": "flux-system:proxer:digest"}
+          imagePullPolicy: Always
+          command:
+            - proxer
+          args:
+            - server
+            - --listen=0.0.0.0:8080
+            - --token=$(PROXER_TOKEN)
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PROXER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: proxer-token
+                  key: PROXER_TOKEN
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
