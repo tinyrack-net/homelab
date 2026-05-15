@@ -21,18 +21,38 @@ spec:
             - proxer
           args:
             - server
-            - --listen=0.0.0.0:8080
-            - --token=$(PROXER_TOKEN)
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           env:
+            - name: PROXER_LISTEN
+              value: 0.0.0.0:8080
+            - name: PROXER_DOMAIN
+              value: proxy.intranet.winetree94.com
+            - name: PROXER_TRUSTED_PROXIES
+              value: private,loopback
             - name: PROXER_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: proxer-token
                   key: PROXER_TOKEN
+          livenessProbe:
+            httpGet:
+              path: /__proxer/health/live
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /__proxer/health/ready
+              port: http
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           resources:
             requests:
               cpu: 50m
@@ -40,3 +60,9 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+      securityContext:
+        runAsGroup: 65532
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
