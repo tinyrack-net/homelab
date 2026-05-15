@@ -20,6 +20,8 @@ spec:
       defaultClass: true
     longhornUI:
       replicas: 1
+    defaultSettings:
+      defaultReplicaCount: 1
     defaultBackupStore:
       backupTarget: s3://tinyrack-homelab@home/clusters/tinyrack-homelab/longhorn
       backupTargetCredentialSecret: tinyrack-homelab-s3-secret
