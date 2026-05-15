@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tinyauth
-          image: ghcr.io/tinyrack-net/tinyauth:0.0.15
+          image: ghcr.io/tinyrack-net/tinyauth:0.0.16
           imagePullPolicy: IfNotPresent
           command:
             - node
