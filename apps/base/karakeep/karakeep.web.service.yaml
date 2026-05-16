@@ -10,4 +10,4 @@ spec:
       targetPort: 3000
   selector:
     app: karakeep-web
-  type: LoadBalancer
+  type: ClusterIP
