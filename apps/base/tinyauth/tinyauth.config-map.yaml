@@ -6,7 +6,7 @@ metadata:
 data:
   config.yaml: |
     server:
-      public_origin: https://tinyauth.intranet.winetree94.com
+      public_origin: https://auth2.winetree94.com
       listen_port: 8080
       trust_proxy: true
 
@@ -34,7 +34,7 @@ data:
       hash_secret: ${TINYAUTH_HASH_SECRET}
 
     registration:
-      enabled: true
+      enabled: false
       allowed_email_patterns: []
       email_verification_required: false
 
@@ -54,8 +54,45 @@ data:
       - id: 5f4d8c3b-2a1e-4b9f-8c7d-6e5a4f3b2c1d
         name: Homelab Test Client
         client_id: homelab-test-client
+        client_secret: ${TINYAUTH_TEST_CLIENT_SECRET:-homelab-test-secret}
         redirect_uris:
-          - https://tinyauth.intranet.winetree94.com/callback
+          - https://auth2.winetree94.com/callback
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
+      - id: openwebui
+        name: OpenWebUI
+        client_id: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
+        client_secret: ${TINYAUTH_OPENWEBUI_CLIENT_SECRET}
+        redirect_uris:
+          - https://ai.winetree94.com/oauth/oidc/callback
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
+      - id: karakeep
+        name: Karakeep
+        client_id: msWzYbh6iiGSsEsdTx5yh9cYSsNgJsQjZ9om4RLl
+        client_secret: ${TINYAUTH_KARAKEEP_CLIENT_SECRET}
+        redirect_uris:
+          - https://bookmarks.winetree94.com/api/auth/callback/custom
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
+      - id: guacamole
+        name: Guacamole
+        client_id: ZELLU6czGfaVxzpot16ChKxy31bMnQUdUDXoMAl8
+        client_secret: ${TINYAUTH_GUACAMOLE_CLIENT_SECRET}
+        redirect_uris:
+          - https://remote.intranet.winetree94.com/
         response_types:
           - code
         grant_types:
@@ -63,6 +100,18 @@ data:
           - refresh_token
         scope: openid profile email
 
-    users: []
+    users:
+      - sub: fad44b241e78d08912fa943a50c2592f1473e15d7f1598d5a8017c8254e9d14d
+        email: admin@winetree94.com
+        password: ${TINYAUTH_USER_PASSWORD_AKADMIN}
+        role: admin
+      - sub: a3203fb69abc088d8d772eba309ececd924227e0d8c4c74b37d77386a49f1603
+        email: me@winetree94.com
+        password: ${TINYAUTH_USER_PASSWORD_ME}
+        role: admin
+      - sub: cb4e8869b302014573f49a8bce0e5b8c2cd243ce683b1d3bf0a3d7759abedb5b
+        email: leesol9491@gmail.com
+        password: ${TINYAUTH_USER_PASSWORD_LEESOL}
+        role: user
 
     identity_providers: []

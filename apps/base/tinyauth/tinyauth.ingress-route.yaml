@@ -4,12 +4,12 @@ metadata:
   name: tinyauth-ingress-route
   namespace: tinyauth-system
   annotations:
-    kubernetes.io/ingress.class: traefik
+    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`tinyauth.intranet.winetree94.com`)
+    - match: Host(`auth2.winetree94.com`)
       kind: Rule
       services:
         - name: tinyauth-service
