@@ -105,6 +105,12 @@ spec:
           - secretName: letsencrypt-cert
             hosts:
               - grafana.intranet.winetree94.com
+    kubeControllerManager:
+      enabled: false
+    kubeProxy:
+      enabled: false
+    kubeScheduler:
+      enabled: false
     prometheus:
       prometheusSpec:
         externalLabels:
