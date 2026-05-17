@@ -10,6 +10,8 @@ spec:
       app: tinyauth
   template:
     metadata:
+      annotations:
+        tinyauth.winetree94.com/config-revision: auth2-migration-20260517
       labels:
         app: tinyauth
     spec:
