@@ -9,10 +9,6 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
-  mountOptions:
-    - nfsvers=4.2
-    - hard
-    - noatime
   nfs:
     server: 10.132.245.8
     path: /export/immich
@@ -42,10 +38,6 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
-  mountOptions:
-    - nfsvers=4.2
-    - hard
-    - noatime
   nfs:
     server: 10.132.245.8
     path: /export/winetree94-nas/Pictures
