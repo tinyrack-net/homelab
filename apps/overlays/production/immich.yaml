@@ -1,0 +1,20 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: immich
+  namespace: flux-system
+spec:
+  interval: 30m0s
+  path: ./apps/base/immich
+  prune: true
+  retryInterval: 2m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  timeout: 10m0s
+  wait: true
+  dependsOn:
+    - name: load-repositories
+    - name: cloudnative-pg
+    - name: ot-redis-operator-deployment
+    - name: longhorn

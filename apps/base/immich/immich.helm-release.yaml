@@ -1,0 +1,115 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: immich-system
+spec:
+  releaseName: immich
+  interval: 5m
+  chartRef:
+    kind: OCIRepository
+    name: immich-repository
+    namespace: flux-system
+  values:
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              tag: v2.6.3
+            env:
+              DB_HOSTNAME: immich-database-cluster-rw.immich-system.svc.cluster.local
+              DB_PORT: "5432"
+              DB_DATABASE_NAME: immich
+              DB_VECTOR_EXTENSION: vectorchord
+              DB_USERNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-database-user-secret
+                    key: username
+              DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-database-user-secret
+                    key: password
+              REDIS_HOSTNAME: immich-redis.immich-system.svc.cluster.local
+              REDIS_PORT: "6379"
+              REDIS_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-redis-secret
+                    key: password
+              IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning:3003
+    immich:
+      metrics:
+        enabled: true
+      persistence:
+        library:
+          existingClaim: immich-library
+      configurationKind: Secret
+      existingConfiguration: immich-config
+    valkey:
+      enabled: false
+    server:
+      enabled: true
+      ingress:
+        main:
+          enabled: true
+          className: traefik-external
+          annotations:
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          hosts:
+            - host: photos.winetree94.com
+              paths:
+                - path: /
+                  service:
+                    identifier: main
+                    port: http
+          tls:
+            - secretName: letsencrypt-cert
+              hosts:
+                - photos.winetree94.com
+      persistence:
+        external-pictures:
+          enabled: true
+          existingClaim: immich-external-pictures
+          globalMounts:
+            - path: /external-library/Pictures
+              readOnly: true
+      controllers:
+        main:
+          strategy: Recreate
+          pod:
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 100
+              fsGroup: 100
+          containers:
+            main:
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: "4"
+                  memory: 4Gi
+    machine-learning:
+      enabled: true
+      persistence:
+        cache:
+          enabled: true
+          type: persistentVolumeClaim
+          storageClass: longhorn-strict-local
+          accessMode: ReadWriteOnce
+          size: 10Gi
+      controllers:
+        main:
+          containers:
+            main:
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: "4"
+                  memory: 4Gi

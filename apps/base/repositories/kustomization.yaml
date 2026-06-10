@@ -5,3 +5,4 @@ resources:
   - openwebui.yaml
   - nextcloud.yaml
   - infisical.yaml
+  - immich.yaml
