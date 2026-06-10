@@ -6,6 +6,7 @@ metadata:
 spec:
   releaseName: immich
   interval: 5m
+  timeout: 15m
   chartRef:
     kind: OCIRepository
     name: immich-repository
