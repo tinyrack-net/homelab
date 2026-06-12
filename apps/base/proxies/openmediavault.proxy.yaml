@@ -36,38 +36,3 @@ spec:
           scheme: http
   tls:
     secretName: letsencrypt-cert
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: openmediavault-webdav-slash-redirect
-  namespace: openmediavault-proxy
-spec:
-  redirectRegex:
-    regex: ^https?://openmediavault\.winetree94\.com/webdav$
-    replacement: https://openmediavault.winetree94.com/webdav/
-    permanent: true
----
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: openmediavault-webdav-external-ingress-route
-  namespace: openmediavault-proxy
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
-spec:
-  entryPoints:
-    - websecure
-  routes:
-    - match: Host(`openmediavault.winetree94.com`) && (Path(`/webdav`) || PathPrefix(`/webdav/`))
-      kind: Rule
-      middlewares:
-        - name: openmediavault-webdav-slash-redirect
-      services:
-        - name: openmediavault-proxy-service
-          kind: Service
-          port: 8080
-          passHostHeader: true
-          scheme: http
-  tls:
-    secretName: letsencrypt-cert
