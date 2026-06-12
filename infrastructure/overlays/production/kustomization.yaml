@@ -4,7 +4,6 @@ resources:
   - repositories.yaml
   - system-upgrade-controller.yaml
   - k3s-upgrade-plan.yaml
-#  - pangolin.yaml
   - sealed-secrets.yaml
   - reflector.yaml
   - configs.yaml
@@ -22,4 +21,3 @@ resources:
   - alloy.yaml
   - blackbox-exporter.yaml
   - tailscale.yaml
-#  - netbird.yaml
