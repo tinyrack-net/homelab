@@ -13,4 +13,5 @@ resources:
   - llamacpp.proxy.yaml
   - openclaw.proxy.yaml
   - auth-test.proxy.yaml
+  - photos.proxy.yaml
 
