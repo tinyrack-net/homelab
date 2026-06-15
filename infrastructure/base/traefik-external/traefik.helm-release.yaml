@@ -24,7 +24,7 @@ spec:
         exposedPort: 5432
         protocol: TCP
     additionalArguments:
-      - --entryPoints.websecure.transport.respondingTimeouts.readTimeout=600s
+      - --entryPoints.websecure.transport.respondingTimeouts.readTimeout=0s
       - --entryPoints.websecure.transport.respondingTimeouts.idleTimeout=600s
     providers:
       kubernetesCRD:
