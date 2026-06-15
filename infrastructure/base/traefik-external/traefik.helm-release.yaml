@@ -23,6 +23,9 @@ spec:
           default: true
         exposedPort: 5432
         protocol: TCP
+    # WebDAV uploads can be very large and slow; Traefik's default readTimeout
+    # limits the total time allowed to read the request body, which caused
+    # long-running DAV uploads to be interrupted before completion.
     additionalArguments:
       - --entryPoints.websecure.transport.respondingTimeouts.readTimeout=0s
       - --entryPoints.websecure.transport.respondingTimeouts.idleTimeout=600s
