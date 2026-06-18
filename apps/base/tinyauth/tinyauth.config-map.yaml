@@ -95,6 +95,7 @@ data:
           - https://remote.intranet.winetree94.com/
         response_types:
           - code
+          - id_token
         grant_types:
           - authorization_code
           - refresh_token

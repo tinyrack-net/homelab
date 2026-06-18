@@ -91,13 +91,13 @@ spec:
             - name: WEBAPP_CONTEXT
               value: ROOT
             - name: OPENID_AUTHORIZATION_ENDPOINT
-              value: https://auth.winetree94.com/application/o/authorize/
+              value: https://auth2.winetree94.com/oauth/authorize
             - name: OPENID_CLIENT_ID
               value: "ZELLU6czGfaVxzpot16ChKxy31bMnQUdUDXoMAl8"
             - name: OPENID_ISSUER
-              value: "https://auth.winetree94.com/application/o/guacamole/"
+              value: "https://auth2.winetree94.com"
             - name: OPENID_JWKS_ENDPOINT
-              value: "https://auth.winetree94.com/application/o/guacamole/jwks/"
+              value: "https://auth2.winetree94.com/oauth/.well-known/jwks"
             - name: OPENID_REDIRECT_URI
               value: "https://remote.intranet.winetree94.com/"
             - name: OPENID_USERNAME_CLAIM_TYPE
