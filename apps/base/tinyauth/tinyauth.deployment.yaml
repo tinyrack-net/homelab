@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        tinyauth.winetree94.com/config-revision: auth2-migration-20260517
+        tinyauth.winetree94.com/config-revision: authentik-user-migration-20260618-192004
       labels:
         app: tinyauth
     spec:

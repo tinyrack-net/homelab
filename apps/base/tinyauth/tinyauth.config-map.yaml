@@ -101,15 +101,15 @@ data:
         scope: openid profile email
 
     users:
-      - sub: fad44b241e78d08912fa943a50c2592f1473e15d7f1598d5a8017c8254e9d14d
+      - sub: 9e4c8c93-ed46-4491-8794-1759765fcb50
         email: admin@winetree94.com
         password: ${TINYAUTH_USER_PASSWORD_AKADMIN}
         role: admin
-      - sub: a3203fb69abc088d8d772eba309ececd924227e0d8c4c74b37d77386a49f1603
+      - sub: d7b0968d-796f-480c-8cc2-d7577ee0e19e
         email: me@winetree94.com
         password: ${TINYAUTH_USER_PASSWORD_ME}
         role: admin
-      - sub: cb4e8869b302014573f49a8bce0e5b8c2cd243ce683b1d3bf0a3d7759abedb5b
+      - sub: 37afd734-f0f7-459a-a301-5876334bb20d
         email: leesol9491@gmail.com
         password: ${TINYAUTH_USER_PASSWORD_LEESOL}
         role: user
