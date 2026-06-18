@@ -18,6 +18,8 @@ spec:
     fullnameOverride: open-webui
     tika:
       enabled: true
+      image:
+        tag: 3.3.1.0-full
     ollama:
       enabled: false
     pipelines:
