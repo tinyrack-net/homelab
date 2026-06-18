@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        karakeep.winetree94.com/auth-migration: tinyauth-20260618
+        karakeep.winetree94.com/auth-migration: tinyauth-20260618-direct-wellknown
       labels:
         app: karakeep-web
     spec:
