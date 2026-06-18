@@ -10,6 +10,8 @@ spec:
       app: karakeep-web
   template:
     metadata:
+      annotations:
+        karakeep.winetree94.com/auth-migration: tinyauth-20260618
       labels:
         app: karakeep-web
     spec:
