@@ -100,18 +100,6 @@ data:
           - refresh_token
         scope: openid profile email
 
-    users:
-      - sub: 9e4c8c93-ed46-4491-8794-1759765fcb50
-        email: admin@winetree94.com
-        password: ${TINYAUTH_USER_PASSWORD_AKADMIN}
-        role: admin
-      - sub: d7b0968d-796f-480c-8cc2-d7577ee0e19e
-        email: me@winetree94.com
-        password: ${TINYAUTH_USER_PASSWORD_ME}
-        role: admin
-      - sub: 37afd734-f0f7-459a-a301-5876334bb20d
-        email: leesol9491@gmail.com
-        password: ${TINYAUTH_USER_PASSWORD_LEESOL}
-        role: user
+    users: []
 
     identity_providers: []
