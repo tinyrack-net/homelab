@@ -4,7 +4,6 @@ resources:
   - guacamole.namespace.yaml
   - guacamole.database.superuser.secret.yaml
   - guacamole.database.user.secret.yaml
-  - guacamole.oauth.secret.yaml
   - guacamole.database.yaml
   - guacd.deployment.yaml
   - guacd.service.yaml
