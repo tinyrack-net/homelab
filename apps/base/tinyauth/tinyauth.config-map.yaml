@@ -98,6 +98,7 @@ data:
           - id_token
         grant_types:
           - authorization_code
+          - implicit
           - refresh_token
         scope: openid profile email
 
