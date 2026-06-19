@@ -3,6 +3,5 @@ kind: Kustomization
 resources:
   - authentik.yaml
   - openwebui.yaml
-  - nextcloud.yaml
   - infisical.yaml
   - immich.yaml
