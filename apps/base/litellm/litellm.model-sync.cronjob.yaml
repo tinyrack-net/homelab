@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: litellm-model-sync
+  namespace: litellm-system
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: sync
+              image: python:3.12-alpine
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: LITELLM_BASE
+                  value: https://llm.winetree94.com
+              envFrom:
+                - secretRef:
+                    name: litellm-secret
+              command:
+                - python
+                - /app/sync.py
+                - --backends-json
+                - /app/backends.json
+                - --apply
+                - --delete
+              volumeMounts:
+                - name: sync-config
+                  mountPath: /app
+                  readOnly: true
+          volumes:
+            - name: sync-config
+              configMap:
+                name: litellm-model-sync

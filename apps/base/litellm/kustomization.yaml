@@ -8,6 +8,8 @@ resources:
   - litellm.database.yaml
   - litellm.secret.yaml
   - litellm.config-map.yaml
+  - litellm.model-sync.config-map.yaml
+  - litellm.model-sync.cronjob.yaml
   - litellm.deployment.yaml
   - litellm.service.yaml
   - litellm.ingress.yaml
