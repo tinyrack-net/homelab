@@ -101,6 +101,7 @@ data:
           - authorization_code
           - refresh_token
         scope: openid profile email
+        skip_consent: true
       - id: guacamole
         name: Guacamole
         client_id: ZELLU6czGfaVxzpot16ChKxy31bMnQUdUDXoMAl8
@@ -115,6 +116,7 @@ data:
           - implicit
           - refresh_token
         scope: openid profile email
+        skip_consent: true
       - id: litellm
         name: LiteLLM Admin UI
         client_id: litellm-admin-ui
@@ -127,6 +129,7 @@ data:
           - authorization_code
           - refresh_token
         scope: openid profile email
+        skip_consent: true
 
     users: []
 
