@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        tinyauth.winetree94.com/config-revision: litellm-oauth-20260619-152617
+        tinyauth.winetree94.com/config-revision: immich-client-20260619-1554
       labels:
         app: tinyauth
     spec:

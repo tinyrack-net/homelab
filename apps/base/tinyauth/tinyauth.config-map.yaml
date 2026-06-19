@@ -87,6 +87,20 @@ data:
           - authorization_code
           - refresh_token
         scope: openid profile email
+      - id: immich
+        name: Immich
+        client_id: immich
+        client_secret: ${TINYAUTH_IMMICH_CLIENT_SECRET}
+        redirect_uris:
+          - https://photos.winetree94.com/auth/login
+          - https://photos.winetree94.com/user-settings
+          - https://photos.winetree94.com/api/oauth/mobile-redirect
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
       - id: guacamole
         name: Guacamole
         client_id: ZELLU6czGfaVxzpot16ChKxy31bMnQUdUDXoMAl8
