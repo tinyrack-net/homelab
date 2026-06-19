@@ -6,7 +6,7 @@ metadata:
 data:
   config.yaml: |
     server:
-      public_origin: https://auth2.winetree94.com
+      public_origin: https://auth.winetree94.com
       listen_port: 8080
       trust_proxy: true
 
@@ -56,7 +56,7 @@ data:
         client_id: homelab-test-client
         client_secret: ${TINYAUTH_TEST_CLIENT_SECRET:-homelab-test-secret}
         redirect_uris:
-          - https://auth2.winetree94.com/callback
+          - https://auth.winetree94.com/callback
         response_types:
           - code
         grant_types:

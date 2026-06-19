@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`auth2.winetree94.com`)
+    - match: Host(`auth.winetree94.com`)
       kind: Rule
       services:
         - name: tinyauth-service

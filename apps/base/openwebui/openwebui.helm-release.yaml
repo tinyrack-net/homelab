@@ -50,7 +50,7 @@ spec:
         clientId: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
         enabled: true
         providerName: "tinyauth"
-        providerUrl: "https://auth2.winetree94.com/oauth/.well-known/openid-configuration"
+        providerUrl: "https://auth.winetree94.com/oauth/.well-known/openid-configuration"
     extraEnvVars:
       # DB
       - name: DATABASE_USER

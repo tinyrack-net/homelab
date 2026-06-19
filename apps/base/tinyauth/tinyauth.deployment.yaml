@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        tinyauth.winetree94.com/config-revision: guacamole-id-token-20260618-2231
+        tinyauth.winetree94.com/config-revision: auth-domain-20260619-0933
       labels:
         app: tinyauth
     spec:
