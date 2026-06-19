@@ -40,7 +40,7 @@ spec:
                   name: litellm-database-user-secret
                   key: password
             - name: DATABASE_URL
-              value: postgresql://$(DATABASE_USER):***@litellm-database-cluster-rw.litellm-system.svc.cluster.local:5432/litellm
+              value: postgresql://$(DATABASE_USER):$(DATABASE_PASSWORD)@litellm-database-cluster-rw.litellm-system.svc.cluster.local:5432/litellm
             - name: LITELLM_MODE
               value: PRODUCTION
             - name: LITELLM_LOG
