@@ -4,231 +4,142 @@ metadata:
   name: litellm-model-sync
   namespace: litellm-system
 data:
-  backends.json: |
-    {
-      "backends": [
-        {
-          "name": "b70-llama-swap",
-          "api_base": "http://10.132.247.31:18080/v1",
-          "api_key_env": "LLAMA_SWAP_B70_API_KEY",
-          "litellm_api_key_env": "LLAMA_SWAP_B70_API_KEY",
-          "provider_prefix": "openai"
-        }
-      ]
-    }
-  sync.py: |
-    #!/usr/bin/env python
-    """Sync OpenAI-compatible backend /v1/models into LiteLLM model registry.
+  generate-litellm-config.py: |
+    #!/usr/bin/env python3
+    """GitOps sync: regenerate litellm.config-map.yaml from llama-swap + static models.
     
-    Conservative reconciler:
-    - Adds missing backend models through LiteLLM /model/new.
-    - Updates only models previously marked managed_by=llama-swap-sync.
-    - Deletes only managed models when --delete is passed.
-    - Never prints API keys.
+    Environment:
+      BACKEND_API_KEY    - llama-swap API key (required)
+      LLAMA_SWAP_URL     - llama-swap base URL (default http://10.132.247.31:18080/v1)
+      REPO_DIR           - path to homelab git repo (default /workspace)
     """
-    from __future__ import annotations
     
-    import argparse
-    import json
-    import os
-    import sys
-    import time
-    import urllib.error
-    import urllib.request
-    from dataclasses import dataclass
-    from typing import Any
+    import json, os, subprocess, sys, urllib.request
+    from pathlib import Path
     
-    MANAGED_BY = "llama-swap-sync"
+    BACKEND_KEY_ENV = "BACKEND_API_KEY"
+    LLAMA_SWAP_URL = os.environ.get("LLAMA_SWAP_URL", "http://10.132.247.31:18080/v1")
+    # (running in-cluster, applying directly)
+    # target: cluster ConfigMap litellm-config
     
-    @dataclass
-    class Backend:
-        name: str
-        api_base: str
-        api_key: str | None
-        provider_prefix: str = "openai"
-        litellm_api_key_env: str = "LLAMACPP_API_KEY"
+    STATIC_MODELS = [
+        {
+            "model_name": "gemma-4-E4B-it-Q4_K_M",
+            "model": "openai/gemma-4-E4B-it-Q4_K_M",
+            "api_base": "http://10.132.247.31:18080/v1",
+            "api_key_env": "LLAMACPP_API_KEY",
+        },
+        {
+            "model_name": "gpt-5.5",
+            "model": "openai/gpt-5.5",
+            "api_base": "http://10.132.247.31:18080/v1",
+            "api_key_env": "LLAMACPP_API_KEY",
+        },
+        {
+            "model_name": "gemma-4-12B-it-qat-GGUF",
+            "model": "openai/gemma-4-12B-it-qat-GGUF",
+            "api_base": "http://10.132.247.31:18080/v1",
+            "api_key_env": "LLAMACPP_API_KEY",
+        },
+    ]
     
-    
-    def http_json(method: str, url: str, *, token: str | None = None, body: Any = None, timeout: int = 30) -> Any:
-        data = None
-        headers = {"Accept": "application/json"}
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-        if body is not None:
-            data = json.dumps(body, separators=(",", ":")).encode("utf-8")
-            headers["Content-Type"] = "application/json"
-        req = urllib.request.Request(url, data=data, headers=headers, method=method)
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                raw = r.read().decode("utf-8", "replace")
-                return json.loads(raw) if raw else {}
-        except urllib.error.HTTPError as e:
-            raw = e.read().decode("utf-8", "replace")
-            raise RuntimeError(f"{method} {url} -> HTTP {e.code}: {raw[:500]}") from e
-    
-    
-    def normalize_base(url: str) -> str:
-        return url.rstrip("/")
-    
-    
-    def load_backends(path: str | None) -> list[Backend]:
-        if path:
-            obj = json.load(open(path, encoding="utf-8"))
-            backends = []
-            for b in obj.get("backends", []):
-                api_key = b.get("api_key")
-                api_key_env = b.get("api_key_env")
-                if api_key_env:
-                    api_key = os.environ.get(api_key_env)
-                backends.append(Backend(
-                    name=b["name"],
-                    api_base=normalize_base(b["api_base"]),
-                    api_key=api_key,
-                    provider_prefix=b.get("provider_prefix", "openai"),
-                    litellm_api_key_env=b.get("litellm_api_key_env", "LLAMACPP_API_KEY"),
-                ))
-            return backends
-        return [Backend(
-            name=os.environ.get("BACKEND_NAME", "b70-llama-swap"),
-            api_base=normalize_base(os.environ["BACKEND_API_BASE"]),
-            api_key=os.environ.get("BACKEND_API_KEY"),
-            provider_prefix=os.environ.get("BACKEND_PROVIDER_PREFIX", "openai"),
-            litellm_api_key_env=os.environ.get("LITELLM_BACKEND_API_KEY_ENV", "LLAMACPP_API_KEY"),
-        )]
-    
-    
-    def backend_models(backend: Backend) -> list[str]:
-        obj = http_json("GET", f"{backend.api_base}/models", token=backend.api_key, timeout=20)
-        ids = sorted({m.get("id") for m in obj.get("data", []) if m.get("id")})
-        return ids
-    
-    
-    def litellm_model_info(litellm_base: str, master_key: str) -> list[dict[str, Any]]:
-        obj = http_json("GET", f"{litellm_base.rstrip('/')}/model/info", token=master_key, timeout=30)
-        return obj.get("data", [])
-    
-    
-    def desired_deployment(backend: Backend, model_id: str) -> dict[str, Any]:
-        return {
-            "model_name": model_id,
-            "litellm_params": {
-                "model": f"{backend.provider_prefix}/{model_id}",
-                "api_base": backend.api_base,
-                "api_key": f"os.environ/{backend.litellm_api_key_env}",
-            },
-            "model_info": {
-                "id": f"{MANAGED_BY}:{backend.name}:{model_id}",
-                "managed_by": MANAGED_BY,
-                "source": backend.name,
-                "source_api_base": backend.api_base,
-                "source_model_id": model_id,
-                "synced_at_unix": int(time.time()),
-            },
-        }
-    
-    
-    def current_key(item: dict[str, Any]) -> tuple[str, str | None]:
-        mi = item.get("model_info") or {}
-        return item.get("model_name"), mi.get("source")
-    
-    
-    def is_managed(item: dict[str, Any]) -> bool:
-        return (item.get("model_info") or {}).get("managed_by") == MANAGED_BY
-    
-    
-    def same_route(current: dict[str, Any], desired: dict[str, Any]) -> bool:
-        cp = current.get("litellm_params") or {}
-        dp = desired.get("litellm_params") or {}
-        cmi = current.get("model_info") or {}
-        dmi = desired.get("model_info") or {}
+    def build_model_entry(model_name, model, api_base, api_key_env):
         return (
-            cp.get("model") == dp.get("model")
-            and normalize_base(cp.get("api_base", "")) == normalize_base(dp.get("api_base", ""))
-            and cmi.get("managed_by") == dmi.get("managed_by")
-            and cmi.get("source") == dmi.get("source")
-            and cmi.get("source_model_id") == dmi.get("source_model_id")
+            f"    - model_name: {model_name}\n"
+            f"      litellm_params:\n"
+            f"        model: {model}\n"
+            f"        api_base: {api_base}\n"
+            f"        api_key: os.environ/{api_key_env}"
         )
     
+    def main():
+        backend_key = os.environ.get(BACKEND_KEY_ENV)
+        if not backend_key:
+            print(f"ERROR: {BACKEND_KEY_ENV} not set", file=sys.stderr)
+            sys.exit(1)
     
-    def post(litellm_base: str, master_key: str, path: str, payload: Any) -> Any:
-        return http_json("POST", f"{litellm_base.rstrip('/')}{path}", token=master_key, body=payload, timeout=30)
+        # Fetch llama-swap models
+        req = urllib.request.Request(
+            f"{LLAMA_SWAP_URL}/models",
+            headers={"Authorization": f"Bearer {backend_key}"},
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode())
+            swap_models = sorted(
+                {m.get("id") for m in data.get("data", []) if m.get("id")}
+            )
     
+        # Build entries
+        entries = []
+        for m in STATIC_MODELS:
+            entries.append(build_model_entry(**m))
+        for mid in swap_models:
+            entries.append(
+                build_model_entry(mid, f"openai/{mid}", LLAMA_SWAP_URL, "LLAMA_SWAP_B70_API_KEY")
+            )
     
-    def main() -> int:
-        ap = argparse.ArgumentParser()
-        ap.add_argument("--litellm-base", default=os.environ.get("LITELLM_BASE", "https://llm.winetree94.com"))
-        ap.add_argument("--litellm-master-key", default=os.environ.get("LITELLM_MASTER_KEY"))
-        ap.add_argument("--backends-json", help="JSON file: {backends:[{name,api_base,api_key_env|api_key,provider_prefix}]}")
-        ap.add_argument("--apply", action="store_true")
-        ap.add_argument("--delete", action="store_true", help="Delete managed models absent from source. Requires --apply.")
-        ap.add_argument("--include-existing-unmanaged", action="store_true", help="If false, unmanaged name conflicts are skipped.")
-        args = ap.parse_args()
+        config = (
+            "litellm_settings:\n"
+            "  request_timeout: 600\n"
+            "  json_logs: true\n"
+            "  drop_params: true\n"
+            "\n"
+            "router_settings:\n"
+            "  routing_strategy: simple-shuffle\n"
+            "\n"
+            "general_settings:\n"
+            "  master_key: os.environ/LITELLM_MASTER_KEY\n"
+            "  disable_spend_logs: true\n"
+            "  disable_spend_updates: true\n"
+            "  disable_error_logs: true\n"
+            "  disable_reset_budget: true\n"
+            "  disable_adding_master_key_hash_to_db: true\n"
+            "\n"
+            "  user_header_mappings:\n"
+            "    - header_name: X-OpenWebUI-User-Id\n"
+            "      litellm_user_role: internal_user\n"
+            "    - header_name: X-OpenWebUI-User-Email\n"
+            "      litellm_user_role: customer\n"
+            "\n"
+            "model_list:\n"
+            + "\n".join(entries)
+        )
     
-        if not args.litellm_master_key:
-            raise SystemExit("LITELLM_MASTER_KEY or --litellm-master-key required")
+        # Build ConfigMap YAML
+        cm_lines = [
+            "apiVersion: v1",
+            "kind: ConfigMap",
+            "metadata:",
+            "  name: litellm-config",
+            "  namespace: litellm-system",
+            "data:",
+            "  config.yaml: |",
+        ]
+        for line in config.splitlines():
+            cm_lines.append("    " + line)
+        cm_yaml = "\n".join(cm_lines) + "\n"
     
-        backends = load_backends(args.backends_json)
-        desired: dict[tuple[str, str], dict[str, Any]] = {}
-        source_counts = {}
-        for backend in backends:
-            ids = backend_models(backend)
-            source_counts[backend.name] = len(ids)
-            for mid in ids:
-                desired[(mid, backend.name)] = desired_deployment(backend, mid)
+        # Apply directly to cluster
+        print(f"generated ConfigMap ({len(swap_models)} swap + {len(STATIC_MODELS)} static = {len(entries)} total)")
     
-        current_items = litellm_model_info(args.litellm_base, args.litellm_master_key)
-        current_by_name = {i.get("model_name"): i for i in current_items if i.get("model_name")}
-        current_managed_by_key = {current_key(i): i for i in current_items if is_managed(i)}
+        # Apply ConfigMap to cluster
+        tmp = Path("/tmp/litellm-cm.yaml")
+        tmp.write_text(cm_yaml, encoding="utf-8")
+        subprocess.run(
+            ["kubectl", "apply", "-f", str(tmp)],
+            check=True,
+        )
+        # Restart deployment to pick up new config
+        subprocess.run(
+            ["kubectl", "rollout", "restart", "deploy/litellm-deployment", "-n", "litellm-system"],
+            check=True,
+        )
+        subprocess.run(
+            ["kubectl", "rollout", "status", "deploy/litellm-deployment", "-n", "litellm-system", "--timeout=120s"],
+            check=True,
+        )
+        print("applied and restarted")
     
-        add, update, skip_conflict, delete = [], [], [], []
-        for key, dep in desired.items():
-            model_name, source = key
-            if key in current_managed_by_key:
-                cur = current_managed_by_key[key]
-                if not same_route(cur, dep):
-                    update.append(dep)
-            elif model_name in current_by_name and not args.include_existing_unmanaged:
-                skip_conflict.append({"model_name": model_name, "reason": "unmanaged model with same name exists"})
-            else:
-                add.append(dep)
-    
-        desired_keys = set(desired)
-        for key, item in current_managed_by_key.items():
-            if key not in desired_keys:
-                delete.append(item)
-    
-        summary = {
-            "mode": "apply" if args.apply else "dry-run",
-            "sources": source_counts,
-            "current_total": len(current_items),
-            "desired_total": len(desired),
-            "add": [d["model_name"] for d in add],
-            "update": [d["model_name"] for d in update],
-            "skip_conflict": skip_conflict,
-            "delete": [d.get("model_name") for d in delete],
-        }
-        print(json.dumps(summary, indent=2, ensure_ascii=False))
-    
-        if not args.apply:
-            return 0
-    
-        for dep in add:
-            print(f"ADD {dep['model_name']}")
-            post(args.litellm_base, args.litellm_master_key, "/model/new", dep)
-        for dep in update:
-            print(f"UPDATE {dep['model_name']}")
-            post(args.litellm_base, args.litellm_master_key, "/model/update", dep)
-        if args.delete:
-            for item in delete:
-                mid = (item.get("model_info") or {}).get("id")
-                if not mid:
-                    print(f"SKIP DELETE {item.get('model_name')}: missing model_info.id")
-                    continue
-                print(f"DELETE {item.get('model_name')}")
-                post(args.litellm_base, args.litellm_master_key, "/model/delete", {"id": mid})
-        elif delete:
-            print(f"DELETE skipped for {len(delete)} absent managed model(s); pass --delete to enable")
-        return 0
     
     if __name__ == "__main__":
-        raise SystemExit(main())
+        main()
