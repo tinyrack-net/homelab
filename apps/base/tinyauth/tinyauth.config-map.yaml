@@ -63,6 +63,7 @@ data:
           - authorization_code
           - refresh_token
         scope: openid profile email
+        skip_consent: true
       - id: openwebui
         name: OpenWebUI
         client_id: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
@@ -75,6 +76,7 @@ data:
           - authorization_code
           - refresh_token
         scope: openid profile email
+        skip_consent: true
       - id: karakeep
         name: Karakeep
         client_id: msWzYbh6iiGSsEsdTx5yh9cYSsNgJsQjZ9om4RLl
@@ -87,6 +89,7 @@ data:
           - authorization_code
           - refresh_token
         scope: openid profile email
+        skip_consent: true
       - id: immich
         name: Immich
         client_id: immich
