@@ -10,6 +10,8 @@ spec:
       app: litellm
   template:
     metadata:
+      annotations:
+        litellm.winetree94.com/config-revision: salt-key-20260619-155155
       labels:
         app: litellm
     spec:
