@@ -42,11 +42,11 @@ data:
       password:
         enabled: true
         two_factor:
-          enrollment_required: false
+          enrollment_required: true
         totp:
-          enabled: false
+          enabled: true
       passkey:
-        enabled: false
+        enabled: true
 
     terms: []
 
