@@ -18,7 +18,7 @@ spec:
           serviceAccountName: litellm-model-sync
           containers:
             - name: sync
-              image: bitnami/kubectl:latest
+              image: python:3.12-alpine
               imagePullPolicy: IfNotPresent
               env:
                 - name: LLAMA_SWAP_URL
@@ -30,7 +30,7 @@ spec:
                 - sh
                 - -c
                 - |
-                  pip install --quiet urllib3 && python /app/generate-litellm-config.py
+                  apk add --quiet curl && curl -sLO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x kubectl && mv kubectl /usr/local/bin/ && python /app/generate-litellm-config.py
               volumeMounts:
                 - name: sync-config
                   mountPath: /app

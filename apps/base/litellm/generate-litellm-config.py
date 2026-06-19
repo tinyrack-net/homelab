@@ -4,16 +4,12 @@
 Environment:
   BACKEND_API_KEY    - llama-swap API key (required)
   LLAMA_SWAP_URL     - llama-swap base URL (default http://10.132.247.31:18080/v1)
-  REPO_DIR           - path to homelab git repo (default /workspace)
 """
 
-import json, os, subprocess, sys, urllib.request
-from pathlib import Path
+import json, os, sys, urllib.request
 
 BACKEND_KEY_ENV = "BACKEND_API_KEY"
 LLAMA_SWAP_URL = os.environ.get("LLAMA_SWAP_URL", "http://10.132.247.31:18080/v1")
-# (running in-cluster, applying directly)
-# target: cluster ConfigMap litellm-config
 
 STATIC_MODELS = [
     {
@@ -71,7 +67,7 @@ def main():
             build_model_entry(mid, f"openai/{mid}", LLAMA_SWAP_URL, "LLAMA_SWAP_B70_API_KEY")
         )
 
-    config = (
+    config_str = (
         "litellm_settings:\n"
         "  request_timeout: 600\n"
         "  json_logs: true\n"
@@ -98,7 +94,10 @@ def main():
         + "\n".join(entries)
     )
 
-    # Build ConfigMap YAML
+    # Apply directly to cluster
+    print(f"generated ConfigMap ({len(swap_models)} swap + {len(STATIC_MODELS)} static = {len(entries)} total)")
+
+    # Write ConfigMap YAML to temp file and apply via kubectl
     cm_lines = [
         "apiVersion: v1",
         "kind: ConfigMap",
@@ -108,29 +107,16 @@ def main():
         "data:",
         "  config.yaml: |",
     ]
-    for line in config.splitlines():
+    for line in config_str.splitlines():
         cm_lines.append("    " + line)
     cm_yaml = "\n".join(cm_lines) + "\n"
 
-    # Apply directly to cluster
-    print(f"generated ConfigMap ({len(swap_models)} swap + {len(STATIC_MODELS)} static = {len(entries)} total)")
-
-    # Apply ConfigMap to cluster
-    tmp = Path("/tmp/litellm-cm.yaml")
-    tmp.write_text(cm_yaml, encoding="utf-8")
-    subprocess.run(
-        ["kubectl", "apply", "-f", str(tmp)],
-        check=True,
-    )
-    # Restart deployment to pick up new config
-    subprocess.run(
-        ["kubectl", "rollout", "restart", "deploy/litellm-deployment", "-n", "litellm-system"],
-        check=True,
-    )
-    subprocess.run(
-        ["kubectl", "rollout", "status", "deploy/litellm-deployment", "-n", "litellm-system", "--timeout=120s"],
-        check=True,
-    )
+    import subprocess, tempfile
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        f.write(cm_yaml)
+        tmp = f.name
+    subprocess.run(["kubectl", "apply", "-f", tmp], check=True)
+    subprocess.run(["kubectl", "rollout", "restart", "deploy/litellm-deployment", "-n", "litellm-system"], check=True)
     print("applied and restarted")
 
 
