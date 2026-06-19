@@ -101,6 +101,18 @@ data:
           - implicit
           - refresh_token
         scope: openid profile email
+      - id: litellm
+        name: LiteLLM Admin UI
+        client_id: litellm-admin-ui
+        client_secret: ${TINYAUTH_LITELLM_CLIENT_SECRET}
+        redirect_uris:
+          - https://llm.winetree94.com/sso/callback
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
 
     users: []
 

@@ -51,6 +51,26 @@ spec:
               value: "False"
             - name: SEARXNG_API_BASE
               value: "https://search.winetree94.com"
+            - name: GENERIC_CLIENT_ID
+              value: litellm-admin-ui
+            - name: GENERIC_AUTHORIZATION_ENDPOINT
+              value: https://auth.winetree94.com/oauth/authorize
+            - name: GENERIC_TOKEN_ENDPOINT
+              value: https://auth.winetree94.com/oauth/token
+            - name: GENERIC_USERINFO_ENDPOINT
+              value: https://auth.winetree94.com/oauth/userinfo
+            - name: GENERIC_SCOPE
+              value: "openid email profile"
+            - name: GENERIC_CLIENT_USE_PKCE
+              value: "true"
+            - name: GENERIC_USER_ID_ATTRIBUTE
+              value: sub
+            - name: GENERIC_USER_DISPLAY_NAME_ATTRIBUTE
+              value: name
+            - name: GENERIC_USER_EMAIL_ATTRIBUTE
+              value: email
+            - name: PROXY_BASE_URL
+              value: https://llm.winetree94.com
           envFrom:
             - secretRef:
                 name: litellm-secret
