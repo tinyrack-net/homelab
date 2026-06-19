@@ -14,4 +14,3 @@ resources:
   - searxng.yaml
   - tinyauth.yaml
   - proxer.yaml
-  # - immich.yaml

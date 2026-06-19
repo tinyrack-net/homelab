@@ -4,4 +4,3 @@ resources:
   - authentik.yaml
   - openwebui.yaml
   - infisical.yaml
-  - immich.yaml

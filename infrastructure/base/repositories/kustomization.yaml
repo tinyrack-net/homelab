@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - mariadb-operator.yaml
   - longhorn.yaml
-  - totmicro.yaml
   - traefik.yaml
   - metallb.yaml
   - sealed-secrets.yaml
@@ -11,6 +10,5 @@ resources:
   - reflector.yaml
   - jetstack.yaml
   - ot-container-kit.yaml
-  - fossorial.yaml
   - kube-prometheus-stack.yaml
   - grafana.yaml
