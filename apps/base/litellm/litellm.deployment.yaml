@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        litellm.winetree94.com/config-revision: desktop-model-prefix-20260620-114649
+        litellm.winetree94.com/config-revision: ubuntu-gpu-e4b-qat-20260620-155742
       labels:
         app: litellm
     spec:
