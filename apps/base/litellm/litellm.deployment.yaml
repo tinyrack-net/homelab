@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        litellm.winetree94.com/config-revision: models-20260620-025653
+        litellm.winetree94.com/config-revision: desktop-model-prefix-20260620-114649
       labels:
         app: litellm
     spec:

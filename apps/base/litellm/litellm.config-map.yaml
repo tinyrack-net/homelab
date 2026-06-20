@@ -28,27 +28,27 @@ data:
           litellm_user_role: customer
     
     model_list:
-      - model_name: gemma4-12b-qat
+      - model_name: desktop/gemma4-12b-qat
         litellm_params:
           model: openai/gemma4-12b-qat
           api_base: http://10.132.247.31:18080/v1
           api_key: os.environ/LLAMA_SWAP_B70_API_KEY
-      - model_name: gemma4-26b-a4b-qat
+      - model_name: desktop/gemma4-26b-a4b-qat
         litellm_params:
           model: openai/gemma4-26b-a4b-qat
           api_base: http://10.132.247.31:18080/v1
           api_key: os.environ/LLAMA_SWAP_B70_API_KEY
-      - model_name: gemma4-e4b-qat
+      - model_name: desktop/gemma4-e4b-qat
         litellm_params:
           model: openai/gemma4-e4b-qat
           api_base: http://10.132.247.31:18080/v1
           api_key: os.environ/LLAMA_SWAP_B70_API_KEY
-      - model_name: qwen3-coder-next
+      - model_name: desktop/qwen3-coder-next
         litellm_params:
           model: openai/qwen3-coder-next
           api_base: http://10.132.247.31:18080/v1
           api_key: os.environ/LLAMA_SWAP_B70_API_KEY
-      - model_name: qwen3.6-27b
+      - model_name: desktop/qwen3.6-27b
         litellm_params:
           model: openai/qwen3.6-27b
           api_base: http://10.132.247.31:18080/v1
