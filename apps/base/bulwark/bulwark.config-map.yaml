@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bulwark-config
+  namespace: bulwark-system
+data:
+  APP_NAME: "Tinyrack Webmail"
+  APP_SHORT_NAME: "Webmail"
+  APP_DESCRIPTION: "Tinyrack webmail powered by Stalwart JMAP"
+  JMAP_SERVER_URL: "https://mail.winetree94.com"
+  STALWART_FEATURES: "true"
+  OAUTH_ENABLED: "true"
+  OAUTH_ONLY: "true"
+  OAUTH_CLIENT_ID: "bulwark-webmail"
+  OAUTH_ISSUER_URL: "https://auth.winetree94.com"
+  OAUTH_SCOPES: "openid email profile"
+  AUTO_SSO_ENABLED: "true"
+  SETTINGS_SYNC_ENABLED: "true"
+  SETTINGS_DATA_DIR: "/app/data/settings"
+  ADMIN_CONFIG_DIR: "/app/data/admin"
+  ADMIN_STATE_DIR: "/app/data/admin-state"
+  TELEMETRY_DATA_DIR: "/app/data/telemetry"
+  BULWARK_TELEMETRY: "off"
+  LOG_FORMAT: "json"
+  LOG_LEVEL: "info"
+  HOSTNAME: "0.0.0.0"
+  PORT: "3000"
+  LOGIN_COMPANY_NAME: "Tinyrack Webmail"
+  LOGIN_WEBSITE_URL: "https://winetree94.com"

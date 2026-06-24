@@ -12,4 +12,5 @@ resources:
   - infisical.yaml
   - searxng.yaml
   - tinyauth.yaml
+  - bulwark.yaml
   - proxer.yaml

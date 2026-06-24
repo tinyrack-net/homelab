@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - bulwark.namespace.yaml
+  - bulwark.config-map.yaml
+  - bulwark.secret.yaml
+  - bulwark.settings.pvc.yaml
+  - bulwark.admin.pvc.yaml
+  - bulwark.admin-state.pvc.yaml
+  - bulwark.telemetry.pvc.yaml
+  - bulwark.deployment.yaml
+  - bulwark.service.yaml
+  - bulwark.ingress-route.yaml

@@ -133,6 +133,35 @@ data:
           - refresh_token
         scope: openid profile email
         skip_consent: true
+      - id: bulwark-webmail
+        name: Bulwark Webmail
+        client_id: bulwark-webmail
+        client_secret: ${TINYAUTH_BULWARK_WEBMAIL_CLIENT_SECRET}
+        redirect_uris:
+          - https://webmail.winetree94.com/cs/auth/callback
+          - https://webmail.winetree94.com/da/auth/callback
+          - https://webmail.winetree94.com/de/auth/callback
+          - https://webmail.winetree94.com/en/auth/callback
+          - https://webmail.winetree94.com/es/auth/callback
+          - https://webmail.winetree94.com/fr/auth/callback
+          - https://webmail.winetree94.com/it/auth/callback
+          - https://webmail.winetree94.com/ja/auth/callback
+          - https://webmail.winetree94.com/ko/auth/callback
+          - https://webmail.winetree94.com/lv/auth/callback
+          - https://webmail.winetree94.com/nl/auth/callback
+          - https://webmail.winetree94.com/pl/auth/callback
+          - https://webmail.winetree94.com/pt/auth/callback
+          - https://webmail.winetree94.com/ru/auth/callback
+          - https://webmail.winetree94.com/tr/auth/callback
+          - https://webmail.winetree94.com/uk/auth/callback
+          - https://webmail.winetree94.com/zh/auth/callback
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
+        skip_consent: true
 
     users: []
 
