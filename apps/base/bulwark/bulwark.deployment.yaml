@@ -15,6 +15,22 @@ spec:
       labels:
         app: bulwark
     spec:
+      initContainers:
+        - name: fix-data-permissions
+          image: busybox:1.38.0
+          command:
+            - sh
+            - -c
+            - chown -R 1001:65533 /app/data/settings /app/data/admin /app/data/admin-state /app/data/telemetry
+          volumeMounts:
+            - name: settings
+              mountPath: /app/data/settings
+            - name: admin
+              mountPath: /app/data/admin
+            - name: admin-state
+              mountPath: /app/data/admin-state
+            - name: telemetry
+              mountPath: /app/data/telemetry
       containers:
         - name: bulwark
           image: ghcr.io/bulwarkmail/webmail:1.7.4
