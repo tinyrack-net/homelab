@@ -49,7 +49,7 @@ data:
         enabled: true
       account_selection:
         enabled: true
-        mode: smart
+        mode: always
         remember_accounts:
           enabled: true
           max_accounts: 5
