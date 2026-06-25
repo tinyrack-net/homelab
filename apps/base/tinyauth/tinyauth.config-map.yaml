@@ -47,6 +47,18 @@ data:
           enabled: true
       passkey:
         enabled: true
+      account_selection:
+        enabled: true
+        mode: smart
+        remember_accounts:
+          enabled: true
+          max_accounts: 5
+          ttl: 30d
+        allow_add_account: true
+        allow_remove_account: true
+        login_hint:
+          behavior: prefer
+        prompt_none_error: account_selection_required
 
     terms: []
 
