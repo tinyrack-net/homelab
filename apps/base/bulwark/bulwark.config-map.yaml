@@ -13,7 +13,7 @@ data:
   OAUTH_ONLY: "true"
   OAUTH_CLIENT_ID: "bulwark-webmail"
   OAUTH_ISSUER_URL: "https://auth.winetree94.com"
-  OAUTH_SCOPES: "openid email profile"
+  OAUTH_SCOPES: "openid email profile offline_access"
   OAUTH_ALLOW_PRIVATE_ENDPOINTS: "true"
   AUTO_SSO_ENABLED: "true"
   SETTINGS_SYNC_ENABLED: "true"

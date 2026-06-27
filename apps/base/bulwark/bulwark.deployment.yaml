@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        bulwark.winetree94.com/config-revision: oidc-private-endpoints-20260624-1810
+        bulwark.winetree94.com/config-revision: oidc-offline-access-20260628-034940
       labels:
         app: bulwark
     spec:

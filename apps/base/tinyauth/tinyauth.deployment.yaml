@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        tinyauth.winetree94.com/config-revision: account-selection-always-20260625-071833
+        tinyauth.winetree94.com/config-revision: bulwark-offline-access-20260628-034940
       labels:
         app: tinyauth
     spec:

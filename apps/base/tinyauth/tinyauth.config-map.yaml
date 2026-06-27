@@ -172,7 +172,7 @@ data:
         grant_types:
           - authorization_code
           - refresh_token
-        scope: openid profile email
+        scope: openid profile email offline_access
         skip_consent: true
 
     users: []
