@@ -35,7 +35,7 @@ spec:
               mountPath: /app/data/telemetry
       containers:
         - name: bulwark
-          image: ghcr.io/bulwarkmail/webmail:1.7.5
+          image: ghcr.io/bulwarkmail/webmail:1.7.6
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
