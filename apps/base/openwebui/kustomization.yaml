@@ -7,5 +7,6 @@ resources:
   - openwebui.database.yaml
   - openwebui.secret.yaml
   - openwebui.oauth.secret.yaml
+  - openwebui.terminals.secret.yaml
   - openwebui.helm-release.yaml
   - openwebui.ingress-route.yaml

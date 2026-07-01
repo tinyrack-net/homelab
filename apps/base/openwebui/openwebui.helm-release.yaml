@@ -28,6 +28,28 @@ spec:
       enabled: true
       redis:
         enabled: true
+    terminals:
+      enabled: true
+      existingSecret: openwebui-terminals-api-key
+      crd:
+        install: true
+      operator:
+        image:
+          repository: ghcr.io/open-webui/terminals-operator
+          tag: "0.0.4"
+      orchestrator:
+        image:
+          repository: ghcr.io/open-webui/terminals
+          tag: "0.0.4"
+        backend: kubernetes-operator
+        terminalImage: "ghcr.io/open-webui/open-terminal:0.11.34"
+        terminalImagePullPolicy: IfNotPresent
+        idleTimeoutMinutes: 30
+      terminalDefaults:
+        persistence:
+          enabled: true
+          size: "5Gi"
+          storageClass: "longhorn"
     replicaCount: 2
     persistence:
       enabled: false
