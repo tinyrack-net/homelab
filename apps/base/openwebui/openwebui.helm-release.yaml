@@ -42,20 +42,32 @@ spec:
                     python - <<'PY'
                     from pathlib import Path
 
-                    path = Path('/app/terminals/backends/kubernetes_operator.py')
-                    text = path.read_text()
+                    paths = [
+                        Path('/app/terminals/backends/kubernetes_operator.py'),
+                        Path('/usr/local/lib/python3.12/site-packages/terminals/backends/kubernetes_operator.py'),
+                    ]
                     old_lines = [
                         'storage_size = s.get("storage")  # absent = ephemeral',
                         'storage_size = s.get("storage", settings.kubernetes_storage_size)  # default from env for persistent terminals',
                     ]
                     new = 'storage_size = s.get("storage") or settings.kubernetes_storage_size  # default from env for persistent terminals'
-                    for old in old_lines:
-                        if old in text:
-                            path.write_text(text.replace(old, new))
-                            break
-                    else:
-                        if new not in text:
-                            raise SystemExit('unexpected kubernetes_operator.py storage line')
+                    patched = False
+                    for path in paths:
+                        if not path.exists():
+                            continue
+                        text = path.read_text()
+                        for old in old_lines:
+                            if old in text:
+                                path.write_text(text.replace(old, new))
+                                patched = True
+                                break
+                        else:
+                            if new in text:
+                                patched = True
+                            else:
+                                raise SystemExit(f'unexpected kubernetes_operator.py storage line in {path}')
+                    if not patched:
+                        raise SystemExit('no kubernetes_operator.py file patched')
                     PY
                     exec /usr/local/bin/terminals serve
   chart:
