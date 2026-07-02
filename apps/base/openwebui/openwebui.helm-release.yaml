@@ -30,6 +30,28 @@ spec:
                 value:
                   name: TERMINALS_KUBERNETES_STORAGE_MODE
                   value: "per-user"
+              - op: add
+                path: /spec/template/spec/containers/0/command
+                value:
+                  - /bin/sh
+                  - -lc
+              - op: add
+                path: /spec/template/spec/containers/0/args
+                value:
+                  - |-
+                    python - <<'PY'
+                    from pathlib import Path
+
+                    path = Path('/app/terminals/backends/kubernetes_operator.py')
+                    text = path.read_text()
+                    old = 'storage_size = s.get("storage")  # absent = ephemeral'
+                    new = 'storage_size = s.get("storage", settings.kubernetes_storage_size)  # default from env for persistent terminals'
+                    if old in text:
+                        path.write_text(text.replace(old, new))
+                    elif new not in text:
+                        raise SystemExit('unexpected kubernetes_operator.py storage line')
+                    PY
+                    exec /usr/local/bin/terminals serve
   chart:
     spec:
       chart: open-webui
