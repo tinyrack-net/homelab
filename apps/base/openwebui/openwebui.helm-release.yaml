@@ -6,6 +6,30 @@ metadata:
 spec:
   releaseName: openwebui
   interval: 5m
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: openwebui-terminals-orchestrator
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: TERMINALS_KUBERNETES_STORAGE_SIZE
+                  value: "10Gi"
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: TERMINALS_KUBERNETES_STORAGE_CLASS
+                  value: "longhorn"
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: TERMINALS_KUBERNETES_STORAGE_MODE
+                  value: "per-user"
   chart:
     spec:
       chart: open-webui
@@ -48,7 +72,7 @@ spec:
       terminalDefaults:
         persistence:
           enabled: true
-          size: "5Gi"
+          size: "10Gi"
           storageClass: "longhorn"
     replicaCount: 2
     persistence:
