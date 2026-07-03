@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: proxer
-          image: ghcr.io/tinyrack-net/proxer:latest@sha256:17541412e8fdbdd846c8388bb4748de8d2950e073194bf8c748e8a9534b060b3 # {"$imagepolicy": "flux-system:proxer"}
+          image: ghcr.io/tinyrack-net/proxer:latest@sha256:0e795e73c8f3871756a6ba2c127dc6f1a6b4c1da786df81dd6bff713e07ca5b5 # {"$imagepolicy": "flux-system:proxer"}
           imagePullPolicy: Always
           command:
             - proxer
