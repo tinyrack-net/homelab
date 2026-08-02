@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: "86.2.3"
+      version: "86.3.2"
       sourceRef:
         kind: HelmRepository
         name: kube-prometheus-stack-repository
@@ -16,6 +16,9 @@ spec:
   timeout: 5m
   releaseName: kube-prometheus-stack
   values:
+    crds:
+      upgradeJob:
+        enabled: true
     alertmanager:
       config:
         global:
