@@ -17,12 +17,16 @@ spec:
         - env:
             - name: MEILI_NO_ANALYTICS
               value: "true"
+            - name: MEILI_DB_PATH
+              value: /meili_data/data-1.41.ms
+            - name: MEILI_IMPORT_DUMP
+              value: /meili_data/dumps/20260802-112923562.dump
           envFrom:
             - secretRef:
                 name: karakeep-secrets
             - configMapRef:
                 name: karakeep-config-map
-          image: getmeili/meilisearch:v1.11.1
+          image: getmeili/meilisearch:v1.41.0
           name: meilisearch
           volumeMounts:
             - mountPath: /meili_data
