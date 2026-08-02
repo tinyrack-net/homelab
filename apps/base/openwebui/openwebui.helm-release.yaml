@@ -114,7 +114,7 @@ spec:
           enabled: true
           size: "10Gi"
           storageClass: "longhorn"
-    replicaCount: 2
+    replicaCount: 1
     persistence:
       enabled: false
       provider: s3
