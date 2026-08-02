@@ -19,8 +19,6 @@ spec:
               value: "true"
             - name: MEILI_DB_PATH
               value: /meili_data/data-1.41.ms
-            - name: MEILI_IMPORT_DUMP
-              value: /meili_data/dumps/20260802-112923562.dump
           envFrom:
             - secretRef:
                 name: karakeep-secrets
