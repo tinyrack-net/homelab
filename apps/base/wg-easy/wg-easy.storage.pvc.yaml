@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: wg-easy-storage
+  name: wg-easy-data
   namespace: wg-easy-system
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
@@ -15,5 +15,5 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: longhorn
+  storageClassName: longhorn-strict-local
   volumeMode: Filesystem

@@ -75,7 +75,7 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: wg-easy-storage
+            claimName: wg-easy-data
         - name: modules
           hostPath:
             path: /lib/modules
