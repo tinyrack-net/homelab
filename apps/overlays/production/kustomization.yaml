@@ -14,3 +14,4 @@ resources:
   - tinyauth.yaml
   - bulwark.yaml
   - proxer.yaml
+  - wg-easy.yaml
