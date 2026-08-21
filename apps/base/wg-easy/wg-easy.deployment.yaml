@@ -23,6 +23,21 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: configure-host-shim-nat
+          image: ghcr.io/wg-easy/wg-easy:15.3.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -d 10.132.245.40/32 -o net1 -j MASQUERADE
+              iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -d 10.132.246.0/24 -o net1 -j MASQUERADE
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_ADMIN
       containers:
         - name: wg-easy
           image: ghcr.io/wg-easy/wg-easy:15.3.0
