@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - wg-easy.namespace.yaml
   - wg-easy.network-attachment.yaml
-  - wg-easy.macvlan-shim.daemon-set.yaml
   - wg-easy.storage.pvc.yaml
   - wg-easy.deployment.yaml
   - wg-easy.services.yaml

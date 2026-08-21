@@ -6,4 +6,4 @@ metadata:
 spec:
   autoAssign: false
   addresses:
-    - 10.132.246.1-10.132.246.252
+    - 10.132.246.1-10.132.246.253
