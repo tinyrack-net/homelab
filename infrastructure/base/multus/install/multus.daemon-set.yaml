@@ -26,15 +26,19 @@ spec:
         - operator: Exists
           effect: NoExecute
       initContainers:
-        - name: install-k3s-cni-links
+        - name: install-secondary-cni-plugins
           image: busybox:1.37.0
           command:
             - /bin/sh
             - -ec
             - |
-              test -L /host-cni/cni
-              ln -sfn cni /host-cni/macvlan
-              ln -sfn cni /host-cni/static
+              archive=/tmp/cni-plugins.tgz
+              wget -qO "$archive" https://github.com/containernetworking/plugins/releases/download/v1.9.1/cni-plugins-linux-amd64-v1.9.1.tgz
+              echo "b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303  $archive" | sha256sum -c -
+              tar -xzf "$archive" -C /tmp ./macvlan ./static
+              rm -f /host-cni/macvlan /host-cni/static
+              cp /tmp/macvlan /tmp/static /host-cni/
+              chmod 0755 /host-cni/macvlan /host-cni/static
           securityContext:
             privileged: true
           volumeMounts:
