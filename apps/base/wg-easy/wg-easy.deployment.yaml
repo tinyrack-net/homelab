@@ -24,14 +24,16 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        - name: configure-host-shim-nat
+        - name: configure-lan-policy-routing
           image: ghcr.io/wg-easy/wg-easy:15.4.0
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - -ec
             - |
-              iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -d 10.132.244.0/22 -o net1 -j MASQUERADE
+              ip route add table 100 10.132.244.1/32 dev net1
+              ip route add table 100 10.132.244.0/22 via 10.132.244.1 dev net1
+              ip rule add priority 100 from 10.8.0.0/24 to 10.132.244.0/22 lookup 100
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
