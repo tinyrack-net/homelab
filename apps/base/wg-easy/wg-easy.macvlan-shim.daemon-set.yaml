@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: wg-easy-macvlan-shim
+  namespace: wg-easy-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wg-easy-macvlan-shim
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wg-easy-macvlan-shim
+    spec:
+      automountServiceAccountToken: false
+      hostNetwork: true
+      terminationGracePeriodSeconds: 10
+      tolerations:
+        - operator: Exists
+          effect: NoSchedule
+        - operator: Exists
+          effect: NoExecute
+      containers:
+        - name: shim
+          image: nicolaka/netshoot:v0.14
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              cleanup() {
+                ip route del 10.132.246.254/32 dev wg-easy-shim 2>/dev/null || true
+                ip link del wg-easy-shim 2>/dev/null || true
+              }
+              trap cleanup EXIT INT TERM
+              cleanup
+              ip link add wg-easy-shim link enp6s0 type macvlan mode bridge
+              ip address add 10.132.246.253/32 dev wg-easy-shim
+              ip link set wg-easy-shim up
+              ip route add 10.132.246.254/32 dev wg-easy-shim
+              sleep infinity &
+              wait $!
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
