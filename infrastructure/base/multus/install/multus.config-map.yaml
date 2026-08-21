@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: multus-daemon-config
+  namespace: kube-system
+data:
+  daemon-config.json: |
+    {
+      "chrootDir": "/hostroot",
+      "cniVersion": "1.0.0",
+      "logLevel": "verbose",
+      "logToStderr": true,
+      "cniConfigDir": "/host/var/lib/rancher/k3s/agent/etc/cni/net.d",
+      "multusAutoconfigDir": "/host/var/lib/rancher/k3s/agent/etc/cni/net.d",
+      "multusConfigFile": "auto",
+      "socketDir": "/host/run/multus/"
+    }
