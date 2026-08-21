@@ -135,7 +135,7 @@ spec:
             - /bin/sh
             - -ec
             - |
-              test -x /host-cni/cni
+              test -L /host-cni/cni
               ln -sfn cni /host-cni/macvlan
               ln -sfn cni /host-cni/static
           securityContext:
