@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: ./infrastructure/base/multus
+  path: ./infrastructure/base/multus/install
   prune: true
   timeout: 5m
   wait: true
