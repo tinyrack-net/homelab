@@ -75,6 +75,9 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
           volumeMounts:
+            - name: k3s-data
+              mountPath: /var/lib/rancher/k3s/data
+              readOnly: true
             - name: cni-config
               mountPath: /host/var/lib/rancher/k3s/agent/etc/cni/net.d
             - name: host-run
@@ -98,6 +101,9 @@ spec:
             - name: multus-config
               mountPath: /etc/cni/multus/net.d
       volumes:
+        - name: k3s-data
+          hostPath:
+            path: /var/lib/rancher/k3s/data
         - name: cni-config
           hostPath:
             path: /var/lib/rancher/k3s/agent/etc/cni/net.d
