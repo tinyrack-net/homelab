@@ -25,7 +25,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: configure-host-shim-nat
-          image: ghcr.io/wg-easy/wg-easy:15.3.0
+          image: ghcr.io/wg-easy/wg-easy:15.4.0
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -39,7 +39,7 @@ spec:
                 - NET_ADMIN
       containers:
         - name: wg-easy
-          image: ghcr.io/wg-easy/wg-easy:15.3.0
+          image: ghcr.io/wg-easy/wg-easy:15.4.0
           imagePullPolicy: IfNotPresent
           env:
             - name: DISABLE_IPV6
