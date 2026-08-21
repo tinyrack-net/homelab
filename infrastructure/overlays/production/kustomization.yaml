@@ -10,6 +10,7 @@ resources:
   - longhorn.yaml
   - cert-manager.yaml
   - metallb.yaml
+  - multus.yaml
   - traefik.yaml
   - traefik-external.yaml
   - cloudnative-pg.yaml

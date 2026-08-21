@@ -13,6 +13,8 @@ spec:
       app.kubernetes.io/name: wg-easy
   template:
     metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[{"name":"wg-easy-lan","interface":"net1"}]'
       labels:
         app.kubernetes.io/name: wg-easy
     spec:
