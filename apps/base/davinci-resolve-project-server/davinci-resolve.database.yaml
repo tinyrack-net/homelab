@@ -24,6 +24,32 @@ spec:
       compression: gzip
       maxParallel: 8
 ---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: davinci-resolve-database-backup-store-pg18
+  namespace: davinci-resolve-system
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://tinyrack-homelab/apps/davinci-resolve/database-18
+    endpointURL: https://storage.winetree94.com
+    s3Credentials:
+      region:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_REGION
+      accessKeyId:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -33,12 +59,13 @@ metadata:
     cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:13-bookworm
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm@sha256:9446e83aa490df3f14ebf5bf2f6002a1347728690ff38f35dd7a85b925a62468
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: davinci-resolve-database-backup-store
+        barmanObjectName: davinci-resolve-database-backup-store-pg18
+        serverName: davinci-resolve-database-pg18
   managed:
     services:
       additional:
