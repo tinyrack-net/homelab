@@ -7,7 +7,7 @@ data:
   CRAWLER_FULL_PAGE_ARCHIVE: "true"
 #  DISABLE_SIGNUPS: "true"
   DISABLE_PASSWORD_AUTH: "true"
-  OAUTH_PROVIDER_NAME: "tinyauth"
+  OAUTH_PROVIDER_NAME: "Issuary"
   OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING: "true"
   OAUTH_WELLKNOWN_URL: "https://auth.winetree94.com/oauth/.well-known/openid-configuration"
 kind: ConfigMap

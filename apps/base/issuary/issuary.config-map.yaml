@@ -13,9 +13,9 @@ data:
     frontend:
       enabled: true
       mode: static
-      path: /opt/tinyauth/frontend
+      path: /opt/issuary/frontend
       html_variables:
-        APP_NAME: TinyAuth
+        APP_NAME: Issuary
 
     logging:
       level: info
@@ -25,13 +25,13 @@ data:
       type: postgres
       host: tinyauth-database-cluster-rw.tinyauth-system.svc.cluster.local
       port: 5432
-      user: ${TINYAUTH_DATABASE_USER}
-      password: ${TINYAUTH_DATABASE_PASSWORD}
+      user: ${ISSUARY_DATABASE_USER}
+      password: ${ISSUARY_DATABASE_PASSWORD}
       name: tinyauth
 
     security:
-      session_secret: ${TINYAUTH_SESSION_SECRET}
-      hash_secret: ${TINYAUTH_HASH_SECRET}
+      session_secret: ${ISSUARY_SESSION_SECRET}
+      hash_secret: ${ISSUARY_HASH_SECRET}
 
     registration:
       enabled: false
@@ -66,7 +66,7 @@ data:
       - id: 5f4d8c3b-2a1e-4b9f-8c7d-6e5a4f3b2c1d
         name: Homelab Test Client
         client_id: homelab-test-client
-        client_secret: ${TINYAUTH_TEST_CLIENT_SECRET:-homelab-test-secret}
+        client_secret: ${ISSUARY_TEST_CLIENT_SECRET:-homelab-test-secret}
         redirect_uris:
           - https://auth.winetree94.com/callback
         response_types:
@@ -79,7 +79,7 @@ data:
       - id: openwebui
         name: OpenWebUI
         client_id: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
-        client_secret: ${TINYAUTH_OPENWEBUI_CLIENT_SECRET}
+        client_secret: ${ISSUARY_OPENWEBUI_CLIENT_SECRET}
         redirect_uris:
           - https://ai.winetree94.com/oauth/oidc/callback
         response_types:
@@ -92,7 +92,7 @@ data:
       - id: karakeep
         name: Karakeep
         client_id: msWzYbh6iiGSsEsdTx5yh9cYSsNgJsQjZ9om4RLl
-        client_secret: ${TINYAUTH_KARAKEEP_CLIENT_SECRET}
+        client_secret: ${ISSUARY_KARAKEEP_CLIENT_SECRET}
         redirect_uris:
           - https://bookmarks.winetree94.com/api/auth/callback/custom
         response_types:
@@ -105,7 +105,7 @@ data:
       - id: immich
         name: Immich
         client_id: immich
-        client_secret: ${TINYAUTH_IMMICH_CLIENT_SECRET}
+        client_secret: ${ISSUARY_IMMICH_CLIENT_SECRET}
         redirect_uris:
           - https://photos.winetree94.com/auth/login
           - https://photos.winetree94.com/user-settings
@@ -120,7 +120,7 @@ data:
       - id: guacamole
         name: Guacamole
         client_id: ZELLU6czGfaVxzpot16ChKxy31bMnQUdUDXoMAl8
-        client_secret: ${TINYAUTH_GUACAMOLE_CLIENT_SECRET}
+        client_secret: ${ISSUARY_GUACAMOLE_CLIENT_SECRET}
         redirect_uris:
           - https://remote.intranet.winetree94.com/
         response_types:
@@ -135,7 +135,7 @@ data:
       - id: litellm
         name: LiteLLM Admin UI
         client_id: litellm-admin-ui
-        client_secret: ${TINYAUTH_LITELLM_CLIENT_SECRET}
+        client_secret: ${ISSUARY_LITELLM_CLIENT_SECRET}
         redirect_uris:
           - https://llm.winetree94.com/sso/callback
         response_types:
@@ -148,7 +148,7 @@ data:
       - id: bulwark-webmail
         name: Bulwark Webmail
         client_id: bulwark-webmail
-        client_secret: ${TINYAUTH_BULWARK_WEBMAIL_CLIENT_SECRET}
+        client_secret: ${ISSUARY_BULWARK_WEBMAIL_CLIENT_SECRET}
         redirect_uris:
           - https://webmail.winetree94.com/cs/auth/callback
           - https://webmail.winetree94.com/da/auth/callback

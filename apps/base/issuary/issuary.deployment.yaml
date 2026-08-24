@@ -11,13 +11,13 @@ spec:
   template:
     metadata:
       annotations:
-        tinyauth.winetree94.com/config-revision: bulwark-offline-access-20260628-034940
+        issuary.winetree94.com/config-revision: rebrand-20260825
       labels:
         app: tinyauth
     spec:
       containers:
-        - name: tinyauth
-          image: ghcr.io/tinyrack-net/tinyauth:0.19.0 # {"$imagepolicy": "flux-system:tinyauth"}
+        - name: issuary
+          image: ghcr.io/tinyrack-net/issuary:0.21.0 # {"$imagepolicy": "flux-system:issuary"}
           imagePullPolicy: IfNotPresent
           command:
             - node
@@ -33,13 +33,13 @@ spec:
                 name: tinyauth-secrets
           env:
             - name: NODE_EXTRA_CA_CERTS
-              value: /etc/tinyauth/database-ca/ca.crt
-            - name: TINYAUTH_DATABASE_USER
+              value: /etc/issuary/database-ca/ca.crt
+            - name: ISSUARY_DATABASE_USER
               valueFrom:
                 secretKeyRef:
                   name: tinyauth-database-user-secret
                   key: username
-            - name: TINYAUTH_DATABASE_PASSWORD
+            - name: ISSUARY_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: tinyauth-database-user-secret
@@ -57,7 +57,7 @@ spec:
               subPath: config.yaml
               readOnly: true
             - name: database-ca
-              mountPath: /etc/tinyauth/database-ca
+              mountPath: /etc/issuary/database-ca
               readOnly: true
           livenessProbe:
             httpGet:
