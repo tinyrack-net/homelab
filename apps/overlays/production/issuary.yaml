@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: tinyauth-deployment
+  name: issuary-deployment
   namespace: flux-system
 spec:
   interval: 30m0s
-  path: ./apps/base/tinyauth
+  path: ./apps/base/issuary
   prune: true
   retryInterval: 2m0s
   sourceRef:

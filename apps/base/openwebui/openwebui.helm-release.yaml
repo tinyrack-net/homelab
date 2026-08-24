@@ -135,7 +135,7 @@ spec:
         clientExistingSecretKey: client_secret
         clientId: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
         enabled: true
-        providerName: "tinyauth"
+        providerName: "Issuary"
         providerUrl: "https://auth.winetree94.com/oauth/.well-known/openid-configuration"
     extraEnvVars:
       # DB

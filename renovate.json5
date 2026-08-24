@@ -85,7 +85,7 @@
       description: 'Keep Flux image automation authoritative for first-party images',
       matchPackageNames: [
         'ghcr.io/tinyrack-net/proxer',
-        'ghcr.io/tinyrack-net/tinyauth',
+        'ghcr.io/tinyrack-net/issuary',
       ],
       enabled: false,
     },
