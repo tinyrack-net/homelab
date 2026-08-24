@@ -30,4 +30,4 @@ spec:
                   name: n8n-secrets
                   key: N8N_RUNNERS_AUTH_TOKEN
             - name: N8N_RUNNERS_TASK_BROKER_URI
-              value: "http://n8n-service.n8n-system.svc.cluster.local:5679"
+              value: "http://n8n-service.n8n-system.svc.cluster.local.:5679"

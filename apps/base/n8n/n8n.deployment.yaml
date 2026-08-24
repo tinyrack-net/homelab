@@ -44,7 +44,7 @@ spec:
             - name: DB_TYPE
               value: postgresdb
             - name: DB_POSTGRESDB_HOST
-              value: n8n-database-cluster-rw.n8n-system.svc.cluster.local
+              value: n8n-database-cluster-rw.n8n-system.svc.cluster.local.
             - name: DB_POSTGRESDB_PORT
               value: "5432"
             - name: DB_POSTGRESDB_DATABASE
