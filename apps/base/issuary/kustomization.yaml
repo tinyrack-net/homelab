@@ -6,7 +6,6 @@ resources:
   - issuary.database.user.secret.yaml
   - issuary.storage.secret.yaml
   - issuary.database.yaml
-  - issuary.database.rename.job.yaml
   - issuary.config-map.yaml
   - issuary.secrets.yaml
   - issuary.deployment.yaml
