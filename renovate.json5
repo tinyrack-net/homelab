@@ -1,0 +1,125 @@
+{
+  extends: [
+    'config:recommended',
+    ':dependencyDashboard',
+    ':semanticCommitTypeAll(chore)',
+  ],
+  timezone: 'Asia/Seoul',
+  schedule: ['before 6am on saturday'],
+  minimumReleaseAge: '3 days',
+  prConcurrentLimit: 5,
+  automerge: false,
+  labels: ['dependencies', 'gitops'],
+  ignorePaths: [
+    '**/*.secret.yaml',
+    '**/*.secrets.yaml',
+  ],
+  flux: {
+    managerFilePatterns: ['/(?:^|/)(?:apps|infrastructure|clusters)/.+\\.ya?ml$/'],
+  },
+  kubernetes: {
+    managerFilePatterns: ['/(?:^|/)(?:apps|infrastructure|clusters)/.+\\.ya?ml$/'],
+  },
+  customManagers: [
+    {
+      customType: 'regex',
+      description: 'CloudNativePG PostgreSQL operand images',
+      managerFilePatterns: ['/apps/base/.+\\.database\\.yaml$/'],
+      matchStrings: [
+        'imageName: (?<depName>[^\\s:]+):(?<currentValue>[^\\s@]+)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?',
+      ],
+      datasourceTemplate: 'docker',
+      versioningTemplate: 'regex:^(?<major>\\d+)\\.(?<minor>\\d+)-(?<compatibility>\\S+)$',
+      autoReplaceStringTemplate: 'imageName: {{{depName}}}:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}',
+    },
+    {
+      customType: 'regex',
+      description: 'Redis operands managed by the OT Redis Operator',
+      managerFilePatterns: ['/apps/base/(?:infisical|searxng)/.+\\.redis\\.yaml$/'],
+      matchStrings: [
+        'image: (?<depName>quay\\.io/opstree/redis):(?<currentValue>[^\\s@]+)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?',
+      ],
+      datasourceTemplate: 'docker',
+      autoReplaceStringTemplate: 'image: {{{depName}}}:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}',
+    },
+    {
+      customType: 'regex',
+      description: 'K3s version used by the system-upgrade-controller Plan',
+      managerFilePatterns: ['/infrastructure/base/k3s-upgrade/k3s-server-plan\\.yaml$/'],
+      matchStrings: ['version: (?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)'],
+      depNameTemplate: 'k3s-io/k3s',
+      datasourceTemplate: 'github-releases',
+      versioningTemplate: 'loose',
+    },
+    {
+      customType: 'regex',
+      description: 'CloudNativePG release manifest',
+      managerFilePatterns: ['/infrastructure/base/cloudnative-pg/kustomization\\.yaml$/'],
+      matchStrings: [
+        'https://github\\.com/cloudnative-pg/cloudnative-pg/releases/download/v(?<currentValue>\\d+\\.\\d+\\.\\d+)/cnpg-\\d+\\.\\d+\\.\\d+\\.yaml',
+      ],
+      depNameTemplate: 'cloudnative-pg/cloudnative-pg',
+      datasourceTemplate: 'github-releases',
+      extractVersionTemplate: '^v(?<version>.*)$',
+      autoReplaceStringTemplate: 'https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v{{{newValue}}}/cnpg-{{{newValue}}}.yaml',
+    },
+    {
+      customType: 'regex',
+      description: 'Barman Cloud plugin release manifest',
+      managerFilePatterns: ['/infrastructure/base/cloudnative-pg/kustomization\\.yaml$/'],
+      matchStrings: [
+        'https://github\\.com/cloudnative-pg/plugin-barman-cloud/releases/download/(?<currentValue>v\\d+\\.\\d+\\.\\d+)/manifest\\.yaml',
+      ],
+      depNameTemplate: 'cloudnative-pg/plugin-barman-cloud',
+      datasourceTemplate: 'github-releases',
+      autoReplaceStringTemplate: 'https://github.com/cloudnative-pg/plugin-barman-cloud/releases/download/{{{newValue}}}/manifest.yaml',
+    },
+  ],
+  packageRules: [
+    {
+      description: 'Pin direct container references to immutable digests',
+      matchDatasources: ['docker'],
+      pinDigests: true,
+    },
+    {
+      description: 'Keep Flux image automation authoritative for first-party images',
+      matchPackageNames: [
+        'ghcr.io/tinyrack-net/proxer',
+        'ghcr.io/tinyrack-net/tinyauth',
+      ],
+      enabled: false,
+    },
+    {
+      description: 'Require approval for all major updates',
+      matchUpdateTypes: ['major'],
+      dependencyDashboardApproval: true,
+    },
+    {
+      description: 'Require approval for stateful and cluster-critical components',
+      matchPackageNames: [
+        'k3s-io/k3s',
+        'cloudnative-pg/cloudnative-pg',
+        'cloudnative-pg/plugin-barman-cloud',
+        'ghcr.io/cloudnative-pg/postgresql',
+        'longhorn',
+        'redis-operator',
+        'quay.io/opstree/redis',
+        'getmeili/meilisearch',
+        'n8nio/n8n',
+        'n8nio/runners',
+        'ghcr.io/berriai/litellm-database',
+      ],
+      dependencyDashboardApproval: true,
+    },
+    {
+      description: 'Treat calendar-based SearXNG tags as loose versions',
+      matchPackageNames: ['searxng/searxng'],
+      versioning: 'loose',
+    },
+    {
+      description: 'Refresh system-upgrade-controller vendored CRD and RBAC manually',
+      matchPackageNames: ['rancher/system-upgrade-controller'],
+      enabled: false,
+    },
+  ],
+}
