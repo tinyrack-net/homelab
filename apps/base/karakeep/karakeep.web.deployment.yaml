@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        karakeep.winetree94.com/auth-migration: tinyauth-auth-domain-20260619
+        karakeep.winetree94.com/auth-migration: issuary-auth-domain-20260825
       labels:
         app: karakeep-web
     spec:
