@@ -38,6 +38,10 @@ data:
       enable_http2: true
 
     engines:
+      - name: ahmia
+        inactive: true
+      - name: torch
+        inactive: true
       - name: startpage
         disabled: true
       - name: startpage news
@@ -45,7 +49,7 @@ data:
       - name: startpage images
         disabled: true
       - name: wikidata
-        disabled: true
+        inactive: true
       - name: google
         disabled: true
       - name: google images
