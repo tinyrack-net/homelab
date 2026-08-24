@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: litellm-container
-          image: ghcr.io/berriai/litellm-database:v1.94.0
+          image: ghcr.io/berriai/litellm-database:v1.98.0@sha256:5ead13edd4efd89f32dab349c1f19447d395affca53f3aeae00f5e6e01b8c08d
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
