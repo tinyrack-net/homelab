@@ -65,12 +65,10 @@ spec:
               value: "Asia/Seoul"
             - name: TZ
               value: "Asia/Seoul"
-            - name: WEBHOOK_URL
+            - name: N8N_WEBHOOK_URL
               value: "https://n8n.winetree94.com"
             - name: N8N_PROXY_HOPS
               value: "1"
-            - name: N8N_RUNNERS_ENABLED
-              value: "true"
             - name: N8N_BLOCK_ENV_ACCESS_IN_NODE
               value: "true"
             - name: N8N_GIT_NODE_DISABLE_BARE_REPOS
