@@ -30,7 +30,7 @@ kubectl cnpg backup --context homelab -n infisical-system infisical-database-clu
 kubectl cnpg backup --context homelab -n litellm-system litellm-database-cluster --method=plugin --plugin-name=barman-cloud.cloudnative-pg.io
 kubectl cnpg backup --context homelab -n n8n-system n8n-database-cluster --method=plugin --plugin-name=barman-cloud.cloudnative-pg.io
 kubectl cnpg backup --context homelab -n openwebui-system openwebui-database-cluster --method=plugin --plugin-name=barman-cloud.cloudnative-pg.io
-kubectl cnpg backup --context homelab -n tinyauth-system tinyauth-database-cluster --method=plugin --plugin-name=barman-cloud.cloudnative-pg.io
+kubectl cnpg backup --context homelab -n issuary-system issuary-database-cluster --method=plugin --plugin-name=barman-cloud.cloudnative-pg.io
 kubectl --context homelab get backups.postgresql.cnpg.io -A --sort-by=.metadata.creationTimestamp
 ```
 

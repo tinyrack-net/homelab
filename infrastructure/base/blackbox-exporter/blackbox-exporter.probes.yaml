@@ -27,5 +27,5 @@ spec:
         - https://proxmox.intranet.winetree94.com
         - https://remote.intranet.winetree94.com
         - https://router.intranet.winetree94.com
-        - https://tinyauth.intranet.winetree94.com
+        - https://auth.winetree94.com
         - https://xeon.nanokvm.intranet.winetree94.com
