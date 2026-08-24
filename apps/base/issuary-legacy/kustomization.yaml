@@ -11,4 +11,3 @@ resources:
   - issuary.secrets.yaml
   - issuary.deployment.yaml
   - issuary.service.yaml
-  - issuary.ingress-route.yaml
