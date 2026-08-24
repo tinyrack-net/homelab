@@ -11,7 +11,6 @@ resources:
   - n8n.yaml
   - infisical.yaml
   - searxng.yaml
-  - issuary.yaml
   - issuary-final.yaml
   - bulwark.yaml
   - proxer.yaml
