@@ -35,7 +35,7 @@ spec:
       auth_enabled: false
       ingester:
         wal:
-          replay_memory_ceiling: 8GB
+          replay_memory_ceiling: 16GB
       commonConfig:
         replication_factor: 1
       compactor:
