@@ -56,9 +56,9 @@ spec:
       storage:
         type: s3
         bucketNames:
-          chunks: tinyrack-homelab-loki
-          ruler: tinyrack-homelab-loki
-          admin: tinyrack-homelab-loki
+          chunks: tinyrack-homelab
+          ruler: tinyrack-homelab
+          admin: tinyrack-homelab
         s3:
           endpoint: ${AWS_ENDPOINTS}
           region: ${AWS_REGION}
