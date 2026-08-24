@@ -12,6 +12,7 @@ resources:
   - infisical.yaml
   - searxng.yaml
   - issuary.yaml
+  - issuary-final.yaml
   - bulwark.yaml
   - proxer.yaml
   - wg-easy.yaml
