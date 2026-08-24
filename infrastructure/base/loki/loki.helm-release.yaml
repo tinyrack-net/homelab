@@ -33,11 +33,14 @@ spec:
       enabled: false
     loki:
       auth_enabled: false
+      ingester:
+        wal:
+          replay_memory_ceiling: 8GB
       commonConfig:
         replication_factor: 1
       compactor:
         compaction_interval: 10m
-        delete_request_store: filesystem
+        delete_request_store: s3
         retention_delete_delay: 2h
         retention_delete_worker_count: 150
         retention_enabled: true
