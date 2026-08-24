@@ -60,16 +60,15 @@ spec:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: tinyauth-database-backup-store
-          serverName: tinyauth-database
+          serverName: tinyauth-database-cluster
 
   enableSuperuserAccess: true
   superuserSecret:
     name: tinyauth-database-superuser-secret
 
   bootstrap:
-    initdb:
-      database: tinyauth
-      owner: tinyauth
+    recovery:
+      source: tinyauth-database
       secret:
         name: tinyauth-database-user-secret
 ---
