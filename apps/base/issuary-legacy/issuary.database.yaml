@@ -1,35 +1,10 @@
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:
-  name: issuary-database-backup-store
-  namespace: issuary-system
+  name: tinyauth-database-backup-store
+  namespace: tinyauth-system
 spec:
   retentionPolicy: 30d
-  configuration:
-    destinationPath: s3://tinyrack-homelab/apps/issuary/database-17
-    endpointURL: https://storage.winetree94.com
-    s3Credentials:
-      region:
-        name: tinyrack-homelab-s3-secret
-        key: AWS_REGION
-      accessKeyId:
-        name: tinyrack-homelab-s3-secret
-        key: AWS_ACCESS_KEY_ID
-      secretAccessKey:
-        name: tinyrack-homelab-s3-secret
-        key: AWS_SECRET_ACCESS_KEY
-    data:
-      compression: gzip
-    wal:
-      compression: gzip
-      maxParallel: 8
----
-apiVersion: barmancloud.cnpg.io/v1
-kind: ObjectStore
-metadata:
-  name: issuary-database-recovery-store
-  namespace: issuary-system
-spec:
   configuration:
     destinationPath: s3://tinyrack-homelab/apps/tinyauth/database-17
     endpointURL: https://storage.winetree94.com
@@ -52,8 +27,8 @@ spec:
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: issuary-database-cluster
-  namespace: issuary-system
+  name: tinyauth-database-cluster
+  namespace: tinyauth-system
   annotations:
     cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
@@ -63,7 +38,7 @@ spec:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: issuary-database-backup-store
+        barmanObjectName: tinyauth-database-backup-store
   postgresql:
     parameters:
       max_connections: "500"
@@ -80,28 +55,28 @@ spec:
     enablePodMonitor: true
 
   externalClusters:
-    - name: issuary-recovery-source
+    - name: tinyauth-database
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
-          barmanObjectName: issuary-database-recovery-store
+          barmanObjectName: tinyauth-database-backup-store
           serverName: tinyauth-database-cluster
 
   enableSuperuserAccess: true
   superuserSecret:
-    name: issuary-database-superuser-secret
+    name: tinyauth-database-superuser-secret
 
   bootstrap:
     recovery:
-      source: issuary-recovery-source
+      source: tinyauth-database
       secret:
-        name: issuary-database-user-secret
+        name: tinyauth-database-user-secret
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: issuary-backup
-  namespace: issuary-system
+  name: tinyauth-backup
+  namespace: tinyauth-system
 spec:
   schedule: "0 0 */4 * * *"
   backupOwnerReference: self
@@ -109,4 +84,4 @@ spec:
   pluginConfiguration:
     name: barman-cloud.cloudnative-pg.io
   cluster:
-    name: issuary-database-cluster
+    name: tinyauth-database-cluster

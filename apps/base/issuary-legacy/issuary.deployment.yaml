@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: issuary
-  namespace: issuary-system
+  name: tinyauth
+  namespace: tinyauth-system
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
-      app: issuary
+      app: tinyauth
   template:
     metadata:
       annotations:
         issuary.winetree94.com/config-revision: rebrand-20260825
       labels:
-        app: issuary
+        app: tinyauth
     spec:
       containers:
         - name: issuary
@@ -30,19 +30,19 @@ spec:
               protocol: TCP
           envFrom:
             - secretRef:
-                name: issuary-secrets
+                name: tinyauth-secrets
           env:
             - name: NODE_EXTRA_CA_CERTS
               value: /etc/issuary/database-ca/ca.crt
             - name: ISSUARY_DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: issuary-database-user-secret
+                  name: tinyauth-database-user-secret
                   key: username
             - name: ISSUARY_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: issuary-database-user-secret
+                  name: tinyauth-database-user-secret
                   key: password
           resources:
             requests:
@@ -78,10 +78,10 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: issuary-config
+            name: tinyauth-config
         - name: database-ca
           secret:
-            secretName: issuary-database-cluster-ca
+            secretName: tinyauth-database-cluster-ca
             items:
               - key: ca.crt
                 path: ca.crt
