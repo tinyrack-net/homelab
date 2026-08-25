@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        issuary.winetree94.com/config-revision: rebrand-20260825
+        issuary.winetree94.com/config-revision: retire-v1-20260825
       labels:
         app: issuary
     spec:
