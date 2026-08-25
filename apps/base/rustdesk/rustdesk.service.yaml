@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustdesk
+  namespace: rustdesk-system
+  annotations:
+    metallb.io/loadBalancerIPs: "10.132.246.5"
+spec:
+  type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
+  externalTrafficPolicy: Local
+  selector:
+    app.kubernetes.io/name: rustdesk
+  ports:
+    - name: nat-test
+      port: 21115
+      protocol: TCP
+      targetPort: nat-test
+    - name: rendezvous-tcp
+      port: 21116
+      protocol: TCP
+      targetPort: rendezvous-tcp
+    - name: rendezvous-udp
+      port: 21116
+      protocol: UDP
+      targetPort: rendezvous-udp
+    - name: relay
+      port: 21117
+      protocol: TCP
+      targetPort: relay
+    - name: ws-rendezvous
+      port: 21118
+      protocol: TCP
+      targetPort: ws-rendezvous
+    - name: ws-relay
+      port: 21119
+      protocol: TCP
+      targetPort: ws-relay

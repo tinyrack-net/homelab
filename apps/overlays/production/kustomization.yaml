@@ -15,3 +15,4 @@ resources:
   - bulwark.yaml
   - proxer.yaml
   - wg-easy.yaml
+  - rustdesk.yaml

@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - rustdesk.namespace.yaml
+  - rustdesk.secret.yaml
+  - rustdesk.storage.pvc.yaml
+  - rustdesk.deployment.yaml
+  - rustdesk.service.yaml

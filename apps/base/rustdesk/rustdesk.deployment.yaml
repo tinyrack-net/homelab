@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rustdesk
+  namespace: rustdesk-system
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rustdesk
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rustdesk
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: rustdesk-server
+          image: rustdesk/rustdesk-server-s6:1.1.16@sha256:5974cd791a5aca6fbf01a167b37e7427db1d136e95b2710c33a34fdc9fea724c
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RELAY
+              value: rustdesk.winetree94.com:21117
+            - name: ENCRYPTED_ONLY
+              value: "1"
+            - name: RUST_LOG
+              value: info
+            - name: KEY_PRIV
+              valueFrom:
+                secretKeyRef:
+                  name: rustdesk-server-key
+                  key: KEY_PRIV
+            - name: KEY_PUB
+              valueFrom:
+                secretKeyRef:
+                  name: rustdesk-server-key
+                  key: KEY_PUB
+          ports:
+            - name: nat-test
+              containerPort: 21115
+              protocol: TCP
+            - name: rendezvous-tcp
+              containerPort: 21116
+              protocol: TCP
+            - name: rendezvous-udp
+              containerPort: 21116
+              protocol: UDP
+            - name: relay
+              containerPort: 21117
+              protocol: TCP
+            - name: ws-rendezvous
+              containerPort: 21118
+              protocol: TCP
+            - name: ws-relay
+              containerPort: 21119
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          startupProbe:
+            exec:
+              command:
+                - /usr/bin/healthcheck.sh
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command:
+                - /usr/bin/healthcheck.sh
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - /usr/bin/healthcheck.sh
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rustdesk-data
