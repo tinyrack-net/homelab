@@ -60,6 +60,14 @@ data:
         disabled: true
       - name: google scholar
         disabled: true
+      - name: bing
+        disabled: false
+      - name: naver
+        disabled: false
+      - name: mwmbl
+        disabled: false
+      - name: privacywall
+        disabled: false
 
     ui:
       default_theme: simple
