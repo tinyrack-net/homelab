@@ -6,70 +6,6 @@ metadata:
 spec:
   releaseName: openwebui
   interval: 5m
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              group: apps
-              version: v1
-              kind: Deployment
-              name: openwebui-terminals-orchestrator
-            patch: |-
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: TERMINALS_KUBERNETES_STORAGE_SIZE
-                  value: "10Gi"
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: TERMINALS_KUBERNETES_STORAGE_CLASS
-                  value: "longhorn"
-              - op: add
-                path: /spec/template/spec/containers/0/env/-
-                value:
-                  name: TERMINALS_KUBERNETES_STORAGE_MODE
-                  value: "per-user"
-              - op: add
-                path: /spec/template/spec/containers/0/command
-                value:
-                  - /bin/sh
-                  - -lc
-              - op: add
-                path: /spec/template/spec/containers/0/args
-                value:
-                  - |-
-                    python - <<'PY'
-                    from pathlib import Path
-
-                    paths = [
-                        Path('/app/terminals/backends/kubernetes_operator.py'),
-                        Path('/usr/local/lib/python3.12/site-packages/terminals/backends/kubernetes_operator.py'),
-                    ]
-                    old_lines = [
-                        'storage_size = s.get("storage")  # absent = ephemeral',
-                        'storage_size = s.get("storage", settings.kubernetes_storage_size)  # default from env for persistent terminals',
-                    ]
-                    new = 'storage_size = s.get("storage") or settings.kubernetes_storage_size  # default from env for persistent terminals'
-                    patched = False
-                    for path in paths:
-                        if not path.exists():
-                            continue
-                        text = path.read_text()
-                        for old in old_lines:
-                            if old in text:
-                                path.write_text(text.replace(old, new))
-                                patched = True
-                                break
-                        else:
-                            if new in text:
-                                patched = True
-                            else:
-                                raise SystemExit(f'unexpected kubernetes_operator.py storage line in {path}')
-                    if not patched:
-                        raise SystemExit('no kubernetes_operator.py file patched')
-                    PY
-                    exec /usr/local/bin/terminals serve
   chart:
     spec:
       chart: open-webui
@@ -93,27 +29,7 @@ spec:
       redis:
         enabled: true
     terminals:
-      enabled: true
-      existingSecret: openwebui-terminals-api-key
-      crd:
-        install: true
-      operator:
-        image:
-          repository: ghcr.io/open-webui/terminals-operator
-          tag: "0.0.4"
-      orchestrator:
-        image:
-          repository: ghcr.io/open-webui/terminals
-          tag: "0.0.4"
-        backend: kubernetes-operator
-        terminalImage: "ghcr.io/open-webui/open-terminal:0.11.34"
-        terminalImagePullPolicy: IfNotPresent
-        idleTimeoutMinutes: 30
-      terminalDefaults:
-        persistence:
-          enabled: true
-          size: "10Gi"
-          storageClass: "longhorn"
+      enabled: false
     replicaCount: 2
     persistence:
       enabled: false
