@@ -89,14 +89,6 @@ spec:
         value: "false"
       - name: ENABLE_FORWARD_USER_INFO_HEADERS
         value: "True"
-      - name: WEB_LOADER_ENGINE
-        value: "playwright"
-      - name: PLAYWRIGHT_WS_URL
-        value: "ws://openwebui-playwright:3000"
-      - name: PLAYWRIGHT_TIMEOUT
-        value: "30000"
-      - name: WEB_LOADER_CONCURRENT_REQUESTS
-        value: "2"
       - name: WEBUI_SECRET_KEY
         valueFrom:
           secretKeyRef:
