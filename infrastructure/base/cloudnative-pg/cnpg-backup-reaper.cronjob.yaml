@@ -17,7 +17,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: reaper
-              image: bitnamilegacy/kubectl:1.33.4-debian-12-r0
+              image: bitnamilegacy/kubectl:1.33.4-debian-12-r0@sha256:ed0b31a0508da84ee655c5c6e01bd3897fc56ad6cf69debb27fa1893a06d2246
               imagePullPolicy: IfNotPresent
               env:
                 - name: STALE_RUNNING_HOURS

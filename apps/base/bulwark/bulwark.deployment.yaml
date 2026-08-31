@@ -19,7 +19,7 @@ spec:
     spec:
       initContainers:
         - name: fix-data-permissions
-          image: busybox:1.38.0
+          image: busybox:1.38.0@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
           command:
             - sh
             - -c
@@ -35,7 +35,7 @@ spec:
               mountPath: /app/data/telemetry
       containers:
         - name: bulwark
-          image: ghcr.io/bulwarkmail/webmail:1.8.1@sha256:97d9d96adfb7c1d221b71b90b8380b98e2e5623f64ba62b090e45911f4ee0b3b
+          image: ghcr.io/bulwarkmail/webmail:1.9.2@sha256:0e8d1339277033b6569a76c6f8192396e6edd66fd917d64d9ed505e8b81dac6d
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
