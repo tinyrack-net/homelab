@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: n8n-task-runner
-          image: n8nio/runners:2.35.7@sha256:0fdd4a56f501881f2f3c567f798c86a2b31a6c8cd629e8f91b710321f6abd823
+          image: n8nio/runners:2.36.8@sha256:11b7406a38f220e23f8c0c1e5d5368b6e837bf65a7a8c8e69782e597835c0896
           resources:
             requests:
               cpu: "250m"
