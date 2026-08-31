@@ -27,7 +27,7 @@ spec:
           effect: NoExecute
       initContainers:
         - name: install-secondary-cni-plugins
-          image: busybox:1.37.0
+          image: busybox:1.38.0@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
           command:
             - /bin/sh
             - -ec
@@ -45,7 +45,7 @@ spec:
             - name: cni-bin
               mountPath: /host-cni
         - name: install-multus-binary
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick@sha256:2b9671447f3ea4e7e56730843dbf59445b9307246f393b61386b896d56ae51c9
           command:
             - /usr/src/multus-cni/bin/install_multus
             - -d
@@ -60,7 +60,7 @@ spec:
               mountPropagation: Bidirectional
       containers:
         - name: kube-multus
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick@sha256:2b9671447f3ea4e7e56730843dbf59445b9307246f393b61386b896d56ae51c9
           command:
             - /usr/src/multus-cni/bin/multus-daemon
           securityContext:
