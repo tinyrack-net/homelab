@@ -19,12 +19,14 @@ spec:
               value: "true"
             - name: MEILI_DB_PATH
               value: /meili_data/data-1.41.ms
+            - name: MEILI_UPGRADE_DB
+              value: "true"
           envFrom:
             - secretRef:
                 name: karakeep-secrets
             - configMapRef:
                 name: karakeep-config-map
-          image: getmeili/meilisearch:v1.41.0
+          image: getmeili/meilisearch:v1.53.1@sha256:8d6643d86d71fad6ad3cba92cde7ccfce9e4d6c384bda67598eb553571c32431
           name: meilisearch
           volumeMounts:
             - mountPath: /meili_data
