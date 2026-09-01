@@ -13,7 +13,6 @@ resources:
   - multus.yaml
   - traefik.yaml
   - traefik-external.yaml
-  - beszel.yaml
   - cloudnative-pg.yaml
   - mariadb-operator.yaml
   - ot-redis-operator.yaml
