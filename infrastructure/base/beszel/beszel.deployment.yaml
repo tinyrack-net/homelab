@@ -39,17 +39,7 @@ spec:
             - name: SHARE_ALL_SYSTEMS
               value: "false"
             - name: DISABLE_PASSWORD_AUTH
-              value: "false"
-            - name: USER_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: beszel-bootstrap
-                  key: USER_EMAIL
-            - name: USER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: beszel-bootstrap
-                  key: USER_PASSWORD
+              value: "true"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

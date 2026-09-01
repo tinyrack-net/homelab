@@ -18,8 +18,4 @@ resources:
   - mariadb-operator.yaml
   - ot-redis-operator.yaml
   - cloudflared.yaml
-  - kube-prometheus-stack.yaml
-  - loki.yaml
-  - alloy.yaml
-  - blackbox-exporter.yaml
   - tailscale.yaml
