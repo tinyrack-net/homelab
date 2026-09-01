@@ -63,17 +63,9 @@ spec:
   superuserSecret:
     name: n8n-database-superuser-secret
 
-  # 재해 복구 시 recovery overlay에서 initdb를 이 설정으로 교체한다.
-  # bootstrap:
-  #   recovery:
-  #     source: n8n-database-recovery-source
-
   bootstrap:
-    initdb:
-      database: n8n
-      owner: n8n
-      secret:
-        name: n8n-database-user-secret
+    recovery:
+      source: n8n-database-recovery-source
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
