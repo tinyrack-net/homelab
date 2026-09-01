@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        issuary.winetree94.com/config-revision: remove-v1-20260825
+        issuary.winetree94.com/config-revision: beszel-oidc-v1-20260901
       labels:
         app: issuary
     spec:
