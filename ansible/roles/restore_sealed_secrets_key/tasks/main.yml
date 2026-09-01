@@ -1,0 +1,53 @@
+---
+- name: Run Sealed Secrets recovery key preflight checks
+  ansible.builtin.import_tasks: preflight.yml
+
+- name: Inspect the K3s executable
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s
+  register: restore_sealed_secrets_key_k3s_executable
+
+- name: Wait for the K3s node to become ready
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/k3s
+      - kubectl
+      - wait
+      - --for=condition=Ready
+      - node
+      - --all
+      - "--timeout={{ restore_sealed_secrets_key_ready_timeout }}"
+  when: not ansible_check_mode or restore_sealed_secrets_key_k3s_executable.stat.exists
+  changed_when: false
+  check_mode: false
+
+- name: Restore the Sealed Secrets recovery key
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/k3s
+      - kubectl
+      - apply
+      - -f
+      - "-"
+  args:
+    stdin: "{{ lookup('ansible.builtin.template', 'sealed-secrets-key.yaml.j2') }}"
+    stdin_add_newline: false
+  when: not ansible_check_mode or restore_sealed_secrets_key_k3s_executable.stat.exists
+  register: restore_sealed_secrets_key_apply
+  failed_when: false
+  changed_when: >-
+    restore_sealed_secrets_key_apply.stdout_lines
+    | select('search', ' (created|configured)$')
+    | list
+    | length > 0
+  no_log: true
+
+- name: Require the Sealed Secrets recovery key restore to succeed
+  ansible.builtin.assert:
+    that:
+      - restore_sealed_secrets_key_apply.rc == 0
+    fail_msg: >-
+      kubectl could not restore the Sealed Secrets recovery key:
+      {{ restore_sealed_secrets_key_apply.stderr
+         | regex_replace('[A-Za-z0-9+/=]{32,}', '[redacted]') }}
+  when: not ansible_check_mode or restore_sealed_secrets_key_k3s_executable.stat.exists

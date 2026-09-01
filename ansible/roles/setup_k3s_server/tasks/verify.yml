@@ -1,0 +1,74 @@
+---
+- name: Run preflight checks before verification
+  ansible.builtin.import_tasks: preflight.yml
+
+- name: Gather installed package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Read the persisted K3s inotify limits
+  ansible.builtin.slurp:
+    src: "{{ setup_k3s_server_inotify_sysctl_path }}"
+  register: setup_k3s_server_inotify_sysctl_file
+
+- name: Read the active K3s inotify limits
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/sysctl
+      - -n
+      - "{{ item.key }}"
+  loop: "{{ setup_k3s_server_inotify_settings | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: setup_k3s_server_active_inotify_settings
+  changed_when: false
+
+- name: Verify the persisted and active K3s inotify limits
+  ansible.builtin.assert:
+    that:
+      - >-
+        (item.item.key ~ ' = ' ~ item.item.value)
+        in (setup_k3s_server_inotify_sysctl_file.content | b64decode).splitlines()
+      - item.stdout | int == item.item.value
+    fail_msg: "The {{ item.item.key }} inotify limit does not match the managed value."
+  loop: "{{ setup_k3s_server_active_inotify_settings.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+
+- name: Read the installed K3s version
+  ansible.builtin.command:
+    cmd: /usr/local/bin/k3s --version
+  register: setup_k3s_server_verified_version
+  changed_when: false
+
+- name: Read the K3s configuration
+  ansible.builtin.slurp:
+    src: "{{ setup_k3s_server_config_path }}"
+  register: setup_k3s_server_config_file
+
+- name: Query the K3s node
+  ansible.builtin.command:
+    cmd: /usr/local/bin/k3s kubectl get node --no-headers
+  register: setup_k3s_server_node
+  changed_when: false
+
+- name: Decode the K3s configuration
+  ansible.builtin.set_fact:
+    setup_k3s_server_verified_config: >-
+      {{ setup_k3s_server_config_file.content | b64decode | from_yaml }}
+
+- name: Verify the K3s server state
+  ansible.builtin.assert:
+    that:
+      - setup_k3s_server_packages | difference(ansible_facts.packages.keys() | list) | length == 0
+      - setup_k3s_server_version in setup_k3s_server_verified_version.stdout
+      - ansible_facts.services["k3s.service"].state == "running"
+      - setup_k3s_server_verified_config["cluster-init"] is true
+      - setup_k3s_server_verified_config["cluster-cidr"] == setup_k3s_server_cluster_cidr
+      - setup_k3s_server_verified_config["service-cidr"] == setup_k3s_server_service_cidr
+      - setup_k3s_server_verified_config.disable == setup_k3s_server_disabled_components
+      - "' Ready ' in (' ' ~ setup_k3s_server_node.stdout ~ ' ')"
+    fail_msg: The K3s server does not match the managed configuration.

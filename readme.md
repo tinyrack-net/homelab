@@ -21,6 +21,7 @@ It runs Flux on K3s and uses the manifests under `apps` and `infrastructure` to 
 - `apps/overlays/production` contains homelab application configuration.
 - `apps/base/*` and `infrastructure/base/*` hold the workload manifests.
 - Secrets are encrypted with Sealed Secrets before they are committed.
+- `ansible/` prepares the replacement machine used for cluster migration.
 
 ## Disaster Recovery
 
@@ -37,9 +38,9 @@ git commit -m "chore: pause applications for cluster recovery"
 git push
 ```
 
-Install K3s, restore the Sealed Secrets private key, and bootstrap Flux from
-`clusters/production`. Wait until the infrastructure and Longhorn backup target
-are ready. Access Longhorn without ingress if necessary:
+Use `ansible/` to install K3s and restore the Sealed Secrets private key before
+bootstrapping Flux from `clusters/production`. Wait until the infrastructure and
+Longhorn backup target are ready. Access Longhorn without ingress if necessary:
 
 ```bash
 kubectl -n longhorn-system port-forward service/longhorn-frontend 8000:80
@@ -76,38 +77,25 @@ core application data.
 
 ## Bootstrap
 
-### K3s
+### K3s and Sealed Secrets key
 
-On amd64 Ubuntu 24.04, install the Longhorn prerequisites and the pinned K3s
-version with the production network ranges:
-
-```bash
-sudo apt-get update
-sudo apt-get install -y curl ca-certificates jq open-iscsi nfs-common cryptsetup
-sudo systemctl enable --now iscsid.socket
-sudo systemctl start iscsid
-
-curl -sfL https://get.k3s.io | \
-sudo env INSTALL_K3S_VERSION='v1.36.4+k3s1' sh -s - server \
-  --cluster-init \
-  --cluster-cidr=10.61.0.0/16 \
-  --service-cidr=10.62.0.0/16 \
-  --disable traefik \
-  --disable servicelb
-```
-
-### Sealed Secrets key
+Store the become password and Sealed Secrets TLS certificate/private key in the
+Ansible Vault, then let Ansible prepare everything up to the Flux boundary:
 
 ```bash
-export PRIVATEKEY="tinyrack-homelab-secret-key.key"
-export PUBLICKEY="tinyrack-homelab-secret-key.crt"
-export NAMESPACE="sealed-secrets"
-export SECRETNAME="sealed-secrets-key"
-
-kubectl create namespace "$NAMESPACE"
-kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY"
-kubectl -n "$NAMESPACE" label secret "$SECRETNAME" sealedsecrets.bitnami.com/sealed-secrets-key=active
+cd ansible
+make vault-edit
+make preflight
+make check
+make apply
+make apply
+make verify
+cd ..
 ```
+
+See `ansible/README.md` for the Vault variable format. Do not bootstrap Flux
+until `make verify` confirms that the recovery key in the new cluster matches
+the Vault values.
 
 ### Flux
 

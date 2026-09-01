@@ -1,0 +1,14 @@
+---
+- name: Restart K3s
+  ansible.builtin.systemd_service:
+    name: k3s.service
+    state: restarted
+  when: setup_k3s_server_installed_version.rc == 0
+
+- name: Apply K3s inotify limits
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/sysctl
+      - --load
+      - "{{ setup_k3s_server_inotify_sysctl_path }}"
+  changed_when: true

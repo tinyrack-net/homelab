@@ -1,0 +1,16 @@
+---
+- name: Validate K3s server hosts
+  hosts: k3s_servers
+  gather_facts: true
+  become: false
+
+  tasks:
+    - name: Run K3s server preflight checks
+      ansible.builtin.include_role:
+        name: setup_k3s_server
+        tasks_from: preflight
+
+    - name: Validate the Sealed Secrets recovery key
+      ansible.builtin.include_role:
+        name: restore_sealed_secrets_key
+        tasks_from: preflight

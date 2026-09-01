@@ -1,0 +1,22 @@
+---
+setup_k3s_server_version: v1.36.4+k3s1
+setup_k3s_server_cluster_cidr: 10.61.0.0/16
+setup_k3s_server_service_cidr: 10.62.0.0/16
+setup_k3s_server_disabled_components:
+  - traefik
+  - servicelb
+setup_k3s_server_inotify_settings:
+  fs.inotify.max_queued_events: 32768
+  fs.inotify.max_user_instances: 8192
+  fs.inotify.max_user_watches: 1048576
+setup_k3s_server_inotify_sysctl_path: /etc/sysctl.d/90-k3s-inotify.conf
+setup_k3s_server_packages:
+  - ca-certificates
+  - cryptsetup
+  - curl
+  - jq
+  - nfs-common
+  - open-iscsi
+setup_k3s_server_install_script_url: https://get.k3s.io
+setup_k3s_server_install_script_path: /usr/local/src/k3s-install.sh
+setup_k3s_server_config_path: /etc/rancher/k3s/config.yaml

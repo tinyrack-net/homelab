@@ -1,0 +1,20 @@
+---
+- name: Validate the K3s server operating system and architecture
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == "Ubuntu"
+      - ansible_facts.distribution_version == "24.04"
+      - ansible_facts.architecture == "x86_64"
+    fail_msg: This role supports only Ubuntu 24.04 amd64 hosts.
+
+- name: Validate the K3s network configuration
+  ansible.builtin.assert:
+    that:
+      - setup_k3s_server_version | length > 0
+      - setup_k3s_server_cluster_cidr != setup_k3s_server_service_cidr
+      - setup_k3s_server_disabled_components | length > 0
+      - >-
+        ['fs.inotify.max_queued_events', 'fs.inotify.max_user_instances', 'fs.inotify.max_user_watches']
+        | difference(setup_k3s_server_inotify_settings.keys() | list)
+        | length == 0
+    fail_msg: K3s version, distinct network ranges, and disabled components are required.

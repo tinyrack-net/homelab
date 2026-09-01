@@ -1,0 +1,37 @@
+---
+argument_specs:
+  main:
+    short_description: Configure a single-node K3s server
+    options:
+      setup_k3s_server_version:
+        type: str
+        required: true
+      setup_k3s_server_cluster_cidr:
+        type: str
+        required: true
+      setup_k3s_server_service_cidr:
+        type: str
+        required: true
+      setup_k3s_server_disabled_components:
+        type: list
+        elements: str
+        required: true
+      setup_k3s_server_inotify_settings:
+        type: dict
+        required: true
+      setup_k3s_server_inotify_sysctl_path:
+        type: str
+        required: true
+      setup_k3s_server_packages:
+        type: list
+        elements: str
+        required: true
+      setup_k3s_server_install_script_url:
+        type: str
+        required: true
+      setup_k3s_server_install_script_path:
+        type: str
+        required: true
+      setup_k3s_server_config_path:
+        type: str
+        required: true

@@ -1,0 +1,8 @@
+---
+cluster-init: true
+cluster-cidr: {{ setup_k3s_server_cluster_cidr }}
+service-cidr: {{ setup_k3s_server_service_cidr }}
+disable:
+{% for component in setup_k3s_server_disabled_components %}
+  - {{ component }}
+{% endfor %}
