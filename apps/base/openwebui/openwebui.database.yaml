@@ -48,8 +48,6 @@ spec:
           storage: 10Gi
       storageClassName: local-path
       volumeMode: Filesystem
-  monitoring:
-    enablePodMonitor: true
   externalClusters:
     - name: openwebui-database
       plugin:

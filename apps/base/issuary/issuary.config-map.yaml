@@ -89,6 +89,19 @@ data:
           - refresh_token
         scope: openid profile email
         skip_consent: true
+      - id: beszel
+        name: Beszel
+        client_id: beszel
+        client_secret: ${ISSUARY_BESZEL_CLIENT_SECRET}
+        redirect_uris:
+          - https://monitor.winetree94.com/api/oauth2-redirect
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
+        skip_consent: true
       - id: karakeep
         name: Karakeep
         client_id: msWzYbh6iiGSsEsdTx5yh9cYSsNgJsQjZ9om4RLl
