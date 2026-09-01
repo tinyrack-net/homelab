@@ -60,17 +60,9 @@ spec:
   superuserSecret:
     name: litellm-database-superuser-secret
 
-  # 재해 복구 시 recovery overlay에서 initdb를 이 설정으로 교체한다.
-  # bootstrap:
-  #   recovery:
-  #     source: litellm-database-recovery-source
-
   bootstrap:
-    initdb:
-      database: litellm
-      owner: litellm
-      secret:
-        name: litellm-database-user-secret
+    recovery:
+      source: litellm-database-recovery-source
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
