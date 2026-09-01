@@ -93,9 +93,8 @@ make verify
 cd ..
 ```
 
-See `ansible/README.md` for the Vault variable format. Do not bootstrap Flux
-until `make verify` confirms that the recovery key in the new cluster matches
-the Vault values.
+Do not bootstrap Flux until `make verify` confirms that the recovery key in the
+new cluster matches the Vault values.
 
 ### Flux
 
