@@ -1,0 +1,47 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: beszel-http
+  namespace: beszel-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`monitor.winetree94.com`)
+      kind: Rule
+      middlewares:
+        - name: redirect-to-https
+      services:
+        - name: beszel
+          port: 8090
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: beszel-https
+  namespace: beszel-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`monitor.winetree94.com`)
+      kind: Rule
+      services:
+        - name: beszel
+          port: 8090
+  tls:
+    secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-to-https
+  namespace: beszel-system
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

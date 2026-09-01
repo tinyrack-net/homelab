@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beszel
+  namespace: beszel-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: beszel
+  template:
+    metadata:
+      labels:
+        app: beszel
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: beszel
+          image: docker.io/henrygd/beszel:0.18.8@sha256:4c51486968efa0b0a702c1b0967966a2e06fb250b7418f3072d2488faea27c51
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8090
+              protocol: TCP
+          env:
+            - name: APP_URL
+              value: https://monitor.winetree94.com
+            - name: CHECK_UPDATES
+              value: "false"
+            - name: USER_CREATION
+              value: "false"
+            - name: SHARE_ALL_SYSTEMS
+              value: "false"
+            - name: DISABLE_PASSWORD_AUTH
+              value: "false"
+            - name: USER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: beszel-bootstrap
+                  key: USER_EMAIL
+            - name: USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: beszel-bootstrap
+                  key: USER_PASSWORD
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /beszel_data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: beszel-data

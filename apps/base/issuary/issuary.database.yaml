@@ -51,9 +51,6 @@ spec:
           storage: 32Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
-  monitoring:
-    enablePodMonitor: true
-
   externalClusters:
     - name: issuary-recovery-source
       plugin:

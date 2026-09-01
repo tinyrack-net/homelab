@@ -48,8 +48,6 @@ spec:
           storage: 10Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
-  monitoring:
-    enablePodMonitor: true
   externalClusters:
     - name: guacamole-database
       plugin:
