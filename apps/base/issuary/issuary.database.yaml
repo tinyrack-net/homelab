@@ -52,7 +52,7 @@ spec:
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
   externalClusters:
-    - name: issuary-recovery-source
+    - name: issuary-database-recovery-source
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
@@ -63,9 +63,13 @@ spec:
   superuserSecret:
     name: issuary-database-superuser-secret
 
+  # 재해 복구 시 recovery overlay에서 initdb를 recovery로 교체한다.
   bootstrap:
-    recovery:
-      source: issuary-recovery-source
+    initdb:
+      database: issuary
+      owner: issuary
+      secret:
+        name: issuary-database-user-secret
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup

@@ -4,7 +4,6 @@ resources:
   - issuary.namespace.yaml
   - issuary.database.superuser.secret.yaml
   - issuary.database.user.secret.yaml
-  - issuary.storage.secret.yaml
   - issuary.database.yaml
   - issuary.config-map.yaml
   - issuary.secrets.yaml

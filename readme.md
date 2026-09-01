@@ -44,14 +44,18 @@ DR guidelines:
 
 ### K3s
 
+For a reproducible Ubuntu 24.04 installation, run the versioned bootstrap script
+from this repository. It pins K3s and verifies the installer checksum before it
+changes the host:
+
 ```bash
-curl -fL https://get.k3s.io | \
-sh -s - server \
-  --cluster-init \
-  --cluster-cidr=10.61.0.0/16 \
-  --service-cidr=10.62.0.0/16 \
-  --disable traefik
+sudo ./scripts/bootstrap-node.sh --install
 ```
+
+The resulting server disables both bundled Traefik and ServiceLB. Run
+`./scripts/bootstrap-node.sh --check` after installation. See
+`docs/cluster-recovery-runbook.md` before bootstrapping Flux on replacement
+hardware.
 
 ### Sealed Secrets key
 
