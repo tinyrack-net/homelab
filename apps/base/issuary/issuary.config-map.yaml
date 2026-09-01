@@ -95,6 +95,7 @@ data:
         client_secret: ${ISSUARY_BESZEL_CLIENT_SECRET}
         redirect_uris:
           - https://monitor.winetree94.com/api/oauth2-redirect
+          - https://monitor.winetree94.com
         response_types:
           - code
         grant_types:

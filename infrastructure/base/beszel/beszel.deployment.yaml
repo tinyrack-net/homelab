@@ -40,6 +40,8 @@ spec:
               value: "false"
             - name: DISABLE_PASSWORD_AUTH
               value: "true"
+            - name: OAUTH_DISABLE_POPUP
+              value: "true"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
