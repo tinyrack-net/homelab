@@ -52,21 +52,21 @@ spec:
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
   externalClusters:
-    - name: n8n-database
+    - name: n8n-database-recovery-source
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: n8n-database-backup-store
-          serverName: n8n-database
+          serverName: n8n-database-cluster
 
   enableSuperuserAccess: true
   superuserSecret:
     name: n8n-database-superuser-secret
 
-  # 신규 클러스터 프로비저닝 시 주석 처리
+  # 재해 복구 시 recovery overlay에서 initdb를 이 설정으로 교체한다.
   # bootstrap:
   #   recovery:
-  #     source: n8n-database
+  #     source: n8n-database-recovery-source
 
   bootstrap:
     initdb:

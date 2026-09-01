@@ -1,0 +1,50 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: recovery-infisical-database
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./apps/base/infisical
+  prune: true
+  wait: true
+  timeout: 60m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  patches:
+    - target:
+        group: postgresql.cnpg.io
+        kind: Cluster
+        name: infisical-database-cluster
+      patch: |-
+        - op: replace
+          path: /spec/bootstrap
+          value:
+            recovery:
+              source: infisical-database-recovery-source
+    - target:
+        group: helm.toolkit.fluxcd.io
+        kind: HelmRelease
+        name: infisical-helm-release
+      patch: |-
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: infisical-helm-release
+          namespace: infisical-system
+        $patch: delete
+    - target:
+        group: redis.redis.opstreelabs.in
+        kind: Redis
+        name: infisical-redis
+      patch: |-
+        apiVersion: redis.redis.opstreelabs.in/v1beta2
+        kind: Redis
+        metadata:
+          name: infisical-redis
+          namespace: infisical-system
+        $patch: delete
+  dependsOn:
+    - name: cloudnative-pg
+    - name: configs

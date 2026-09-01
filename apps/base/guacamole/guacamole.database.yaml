@@ -49,21 +49,21 @@ spec:
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
   externalClusters:
-    - name: guacamole-database
+    - name: guacamole-database-recovery-source
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: guacamole-database-backup-store
-          serverName: guacamole-database
+          serverName: guacamole-database-cluster
 
   enableSuperuserAccess: true
   superuserSecret:
     name: guacamole-database-superuser-secret
 
-  # 신규 클러스터 프로비저닝 시 주석 처리
+  # 재해 복구 시 recovery overlay에서 initdb를 이 설정으로 교체한다.
   # bootstrap:
   #   recovery:
-  #     source: guacamole-database
+  #     source: guacamole-database-recovery-source
 
   bootstrap:
     initdb:

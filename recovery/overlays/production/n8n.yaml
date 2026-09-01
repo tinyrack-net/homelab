@@ -1,0 +1,57 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: recovery-n8n-database
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./apps/base/n8n
+  prune: true
+  wait: true
+  timeout: 60m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  patches:
+    - target:
+        group: postgresql.cnpg.io
+        kind: Cluster
+        name: n8n-database-cluster
+      patch: |-
+        - op: replace
+          path: /spec/bootstrap
+          value:
+            recovery:
+              source: n8n-database-recovery-source
+    - target:
+        group: apps
+        kind: Deployment
+      patch: |-
+        - op: add
+          path: /spec/replicas
+          value: 0
+    - target:
+        version: v1
+        kind: PersistentVolumeClaim
+        name: n8n-storage
+      patch: |-
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: n8n-storage
+          namespace: n8n-system
+        $patch: delete
+    - target:
+        group: traefik.io
+        kind: IngressRoute
+        name: n8n-ingress-route
+      patch: |-
+        apiVersion: traefik.io/v1alpha1
+        kind: IngressRoute
+        metadata:
+          name: n8n-ingress-route
+          namespace: n8n-system
+        $patch: delete
+  dependsOn:
+    - name: cloudnative-pg
+    - name: configs
