@@ -4,6 +4,7 @@ metadata:
   name: beszel
   namespace: flux-system
 spec:
+  deletionPolicy: Orphan
   interval: 15m
   path: ./infrastructure/base/beszel
   prune: true
