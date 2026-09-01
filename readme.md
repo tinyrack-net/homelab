@@ -24,38 +24,77 @@ It runs Flux on K3s and uses the manifests under `apps` and `infrastructure` to 
 
 ## Disaster Recovery
 
-The recovery goal is to install K3s on a new node, restore the Sealed Secrets key, and let Flux recreate the cluster state from this repository.
+Recovery uses the normal production path. There is no separate recovery Flux
+installation or recovery overlay.
 
-1. Install K3s without Traefik.
-2. Restore the Sealed Secrets private key first.
-3. Bootstrap Flux from `clusters/production`.
-4. Wait for `infrastructure` to become ready, then verify `apps` reconciliation.
-5. Restore required data from Longhorn backups or application-specific backups.
+Before bootstrapping a replacement cluster, temporarily remove the application
+entry point from Flux and push that change:
 
-DR guidelines:
+```bash
+mv clusters/production/apps.yaml clusters/production/apps.yaml.bak
+git add clusters/production/apps.yaml clusters/production/apps.yaml.bak
+git commit -m "chore: pause applications for cluster recovery"
+git push
+```
 
-- Git is the source of truth for declarative infrastructure.
-- Keep the Sealed Secrets key backed up separately and securely.
-- Data volumes are not restored from Git; verify backup policy per service.
-- Exclude DB/Redis volumes from Longhorn volume backups when they have their own backup flow.
-- After recovery, verify Flux, certificates, ingress, storage, and core apps in that order.
+Install K3s, restore the Sealed Secrets private key, and bootstrap Flux from
+`clusters/production`. Wait until the infrastructure and Longhorn backup target
+are ready. Access Longhorn without ingress if necessary:
+
+```bash
+kubectl -n longhorn-system port-forward service/longhorn-frontend 8000:80
+```
+
+In the Longhorn UI, restore the latest `Ready` system backup created by the same
+Longhorn minor version. The system backup restores application volumes from
+their latest volume backups.
+
+PostgreSQL is restored by CloudNativePG from Barman S3 backups, not from
+Longhorn volume backups. Before enabling applications, remove any CNPG data
+PVCs restored by an old Longhorn backup and confirm their PVs and Longhorn
+volumes are gone:
+
+```bash
+kubectl get pvc -A -l cnpg.io/pvcRole=PG_DATA
+kubectl delete pvc -A -l cnpg.io/pvcRole=PG_DATA
+kubectl get pv
+```
+
+Enable applications again and push the change:
+
+```bash
+mv clusters/production/apps.yaml.bak clusters/production/apps.yaml
+git add clusters/production/apps.yaml clusters/production/apps.yaml.bak
+git commit -m "chore: resume applications after cluster recovery"
+git push
+```
+
+All seven CNPG manifests use `bootstrap.recovery`; they recreate their databases
+from S3 when Flux applies the application manifests. Verify CNPG recovery before
+allowing external traffic, then check Flux, certificates, ingress, storage, and
+core application data.
 
 ## Bootstrap
 
 ### K3s
 
-For a reproducible Ubuntu 24.04 installation, run the versioned bootstrap script
-from this repository. It pins K3s and verifies the installer checksum before it
-changes the host:
+On amd64 Ubuntu 24.04, install the Longhorn prerequisites and the pinned K3s
+version with the production network ranges:
 
 ```bash
-sudo ./scripts/bootstrap-node.sh --install
-```
+sudo apt-get update
+sudo apt-get install -y curl ca-certificates jq open-iscsi nfs-common cryptsetup
+sudo systemctl enable --now iscsid.socket
+sudo systemctl start iscsid
 
-The resulting server disables both bundled Traefik and ServiceLB. Run
-`./scripts/bootstrap-node.sh --check` after installation. See
-`docs/cluster-recovery-runbook.md` before bootstrapping Flux on replacement
-hardware.
+curl -sfL https://get.k3s.io | \
+sudo env INSTALL_K3S_VERSION='v1.36.4+k3s1' sh -s - server \
+  --cluster-init \
+  --cluster-cidr=10.61.0.0/16 \
+  --service-cidr=10.62.0.0/16 \
+  --disable traefik \
+  --disable servicelb
+```
 
 ### Sealed Secrets key
 
@@ -63,7 +102,7 @@ hardware.
 export PRIVATEKEY="tinyrack-homelab-secret-key.key"
 export PUBLICKEY="tinyrack-homelab-secret-key.crt"
 export NAMESPACE="sealed-secrets"
-export SECRETNAME="tinyrack-homelab-s3-secret"
+export SECRETNAME="sealed-secrets-key"
 
 kubectl create namespace "$NAMESPACE"
 kubectl -n "$NAMESPACE" create secret tls "$SECRETNAME" --cert="$PUBLICKEY" --key="$PRIVATEKEY"
