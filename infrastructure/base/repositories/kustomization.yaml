@@ -10,5 +10,3 @@ resources:
   - reflector.yaml
   - jetstack.yaml
   - ot-container-kit.yaml
-  - kube-prometheus-stack.yaml
-  - grafana.yaml
