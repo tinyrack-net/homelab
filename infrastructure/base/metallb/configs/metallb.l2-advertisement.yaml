@@ -7,7 +7,7 @@ spec:
   ipAddressPools:
     - metallb-ip-pool
   interfaces:
-    - enp6s0
+    - enp6s18
   # nodeSelectors:
   #   - matchLabels:
   #       node-role.kubernetes.io/control-plane: ""

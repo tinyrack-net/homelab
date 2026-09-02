@@ -8,7 +8,7 @@ spec:
     {
       "cniVersion": "1.0.0",
       "type": "macvlan",
-      "master": "enp6s0",
+      "master": "enp6s18",
       "mode": "bridge",
       "ipam": {
         "type": "static",
