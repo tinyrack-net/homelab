@@ -16,3 +16,4 @@ spec:
       storage: 1Gi
   storageClassName: longhorn
   volumeMode: Filesystem
+  volumeName: pvc-df81dac6-4a89-434a-b313-4877585c6ad8

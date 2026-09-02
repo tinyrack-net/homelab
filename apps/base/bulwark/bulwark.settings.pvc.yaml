@@ -16,3 +16,4 @@ spec:
       storage: 5Gi
   storageClassName: longhorn
   volumeMode: Filesystem
+  volumeName: pvc-b8b15c50-51fd-491a-9bb4-e218b4ff7269
