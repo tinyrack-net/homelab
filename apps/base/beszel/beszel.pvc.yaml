@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: beszel-data
   namespace: beszel-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     recurring-job.longhorn.io/source: enabled
     recurring-job-group.longhorn.io/longhorn-backup: enabled
@@ -13,3 +15,4 @@ spec:
     requests:
       storage: 5Gi
   storageClassName: longhorn-strict-local
+  volumeName: pvc-3e8afd31-540b-41ec-a8d2-45c461898c58
