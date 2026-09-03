@@ -10,8 +10,6 @@ resources:
   - macmini-nanokvm.proxy.yaml
   - xeon-nanokvm.proxy.yaml
   - openmediavault-nanokvm.proxy.yaml
-  - llamacpp.proxy.yaml
   - openclaw.proxy.yaml
   - auth-test.proxy.yaml
   - photos.proxy.yaml
-
