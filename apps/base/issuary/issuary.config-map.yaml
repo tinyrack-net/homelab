@@ -10,13 +10,6 @@ data:
       listen_port: 8080
       trust_proxy: true
 
-    frontend:
-      enabled: true
-      mode: static
-      path: /opt/issuary/frontend
-      html_variables:
-        APP_NAME: Issuary
-
     logging:
       level: info
       format: json
