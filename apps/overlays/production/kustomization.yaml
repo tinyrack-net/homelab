@@ -18,7 +18,6 @@ resources:
   - rustdesk.yaml
   - network-policy-wave-1.yaml
   - network-policy-wave-2.yaml
-  # Enable only after wave 2 is healthy and Hubble drops have been reviewed.
-  # - network-policy-wave-3.yaml
+  - network-policy-wave-3.yaml
   # Enable only after wave 3 is healthy and Hubble drops have been reviewed.
   # - network-policy-wave-4.yaml
