@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
   - tailscale.network-policy.yaml
   - install.yaml
-  - config.yaml
