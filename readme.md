@@ -118,11 +118,7 @@ delegates the primary Pod network to Cilium while continuing to provide the
 ## CNI migration
 
 The production cluster was migrated from Flannel and kube-proxy to Cilium. The
-one-time migration playbook was removed after verification. The rollback
-playbook remains available as `make cni-rollback`; it suspends Cilium
-reconciliation, removes Cilium host state, restores the saved pre-migration K3s
-configuration, and brings Multus back on Flannel. Revert and push the Cilium
-GitOps declarations before using it.
+one-time migration and rollback playbooks were removed after verification.
 
 ## Sealed Secrets
 
