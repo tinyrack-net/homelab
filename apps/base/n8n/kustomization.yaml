@@ -11,5 +11,4 @@ resources:
   - n8n.service.yaml
   - n8n.task-runner.deployment.yaml
   - n8n.ingress-route.yaml
-  - n8n.network-policy.yaml
   - n8n.cilium-network-policy.yaml

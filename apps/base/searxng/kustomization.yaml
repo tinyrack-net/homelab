@@ -11,5 +11,4 @@ resources:
   - searxng.service.yaml
   - searxng.ingress-route.yaml
   - searxng.secrets.yaml
-  - searxng.network-policy.yaml
   - searxng.cilium-network-policy.yaml

@@ -1,6 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - ingress.cilium-clusterwide-network-policy.yaml
-  - controllers.cilium-clusterwide-network-policy.yaml
-  - storage.cilium-clusterwide-network-policy.yaml

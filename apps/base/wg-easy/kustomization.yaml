@@ -7,5 +7,4 @@ resources:
   - wg-easy.deployment.yaml
   - wg-easy.services.yaml
   - wg-easy.ingress-route.yaml
-  - wg-easy.cilium-network-policy.yaml
   - wg-easy.network-policy.yaml

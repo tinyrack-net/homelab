@@ -11,5 +11,4 @@ resources:
   - litellm.deployment.yaml
   - litellm.service.yaml
   - litellm.ingress.yaml
-  - litellm.network-policy.yaml
   - litellm.cilium-network-policy.yaml

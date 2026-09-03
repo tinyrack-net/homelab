@@ -10,5 +10,4 @@ resources:
   - guacamole.deployment.yaml
   - guacamole.service.yaml
   - guacamole.ingress-route.yaml
-  - guacamole.network-policy.yaml
   - guacamole.cilium-network-policy.yaml
