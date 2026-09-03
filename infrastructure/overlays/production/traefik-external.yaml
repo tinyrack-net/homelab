@@ -13,4 +13,4 @@ spec:
     name: flux-system
   dependsOn:
     - name: infrastructure-repositories
-
+    - name: cilium-load-balancer
