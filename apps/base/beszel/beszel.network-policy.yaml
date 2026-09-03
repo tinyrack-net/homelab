@@ -17,11 +17,29 @@ specs:
           - ports:
               - port: "8090"
                 protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
         k8s:io.kubernetes.pod.namespace: traefik-external-system
         app.kubernetes.io/name: traefik
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: beszel-system
+              app: beszel
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
     egress:
       - toEndpoints:
           - matchLabels:

@@ -34,6 +34,14 @@ specs:
           - ports:
               - port: "5432"
                 protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -108,4 +116,18 @@ specs:
         toPorts:
           - ports:
               - port: "8080"
+                protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: traefik-external-system
+        app.kubernetes.io/name: traefik
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: guacamole-system
+              app: guacamole-guacamole
+        toPorts:
+          - ports:
+              - port: "8443"
                 protocol: TCP
