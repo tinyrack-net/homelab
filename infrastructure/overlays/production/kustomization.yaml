@@ -4,6 +4,7 @@ resources:
   - repositories.yaml
   - kyverno.yaml
   - cilium.yaml
+  - cilium-load-balancer.yaml
   - system-upgrade-controller.yaml
   - k3s-upgrade-plan.yaml
   - sealed-secrets.yaml

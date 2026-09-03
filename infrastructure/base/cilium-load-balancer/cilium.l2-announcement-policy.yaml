@@ -1,0 +1,12 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: homelab-l2
+spec:
+  serviceSelector:
+    matchLabels:
+      networking.tinyrack.net/load-balancer: cilium-l2
+  interfaces:
+    - ^enp6s18$
+  externalIPs: false
+  loadBalancerIPs: true

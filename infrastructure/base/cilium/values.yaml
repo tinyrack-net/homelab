@@ -20,6 +20,11 @@ bpf:
 egressGateway:
   enabled: false
 devices: enp6s18
+l2announcements:
+  enabled: true
+k8sClientRateLimit:
+  qps: 10
+  burst: 20
 cni:
   binPath: /var/lib/rancher/k3s/data/cni
   confPath: /var/lib/rancher/k3s/agent/etc/cni/net.d

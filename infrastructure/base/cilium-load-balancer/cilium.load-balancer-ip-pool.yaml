@@ -1,0 +1,11 @@
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: homelab-l2
+spec:
+  blocks:
+    - start: 10.132.246.1
+      stop: 10.132.246.253
+  serviceSelector:
+    matchLabels:
+      networking.tinyrack.net/load-balancer: cilium-l2
