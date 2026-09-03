@@ -148,7 +148,7 @@
           - "{{ item.metadata.name }}"
           - --wait=false
       delegate_to: localhost
-      loop: "{{ (cni_migrate_pods.stdout | from_json).items }}"
+      loop: "{{ (cni_migrate_pods.stdout | from_json)['items'] }}"
       loop_control:
         label: "{{ item.metadata.namespace }}/{{ item.metadata.name }}"
       when: not (item.spec.hostNetwork | default(false) | bool)
