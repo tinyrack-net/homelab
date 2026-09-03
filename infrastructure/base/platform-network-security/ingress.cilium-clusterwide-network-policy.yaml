@@ -27,6 +27,14 @@ specs:
                 protocol: TCP
       - fromEndpoints:
           - matchLabels:
+              k8s:io.kubernetes.pod.namespace: karakeep-system
+              app: karakeep-web
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
               app.kubernetes.io/name: postgresql
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: longhorn-system
