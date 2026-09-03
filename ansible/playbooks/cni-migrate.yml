@@ -76,6 +76,12 @@
       delegate_to: localhost
       changed_when: false
 
+    - name: Wait for Multus to write its generated CNI configuration
+      ansible.builtin.wait_for:
+        path: /var/lib/rancher/k3s/agent/etc/cni/net.d/00-multus.conf
+        timeout: 60
+      become: true
+
     - name: Read the generated Multus CNI configuration
       ansible.builtin.slurp:
         src: /var/lib/rancher/k3s/agent/etc/cni/net.d/00-multus.conf
