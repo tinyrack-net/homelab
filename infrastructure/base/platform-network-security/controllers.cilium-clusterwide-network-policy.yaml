@@ -25,18 +25,8 @@ specs:
               - port: "6443"
                 protocol: TCP
       - toEndpoints:
-          - matchExpressions:
-              - key: k8s:io.kubernetes.pod.namespace
-                operator: In
-                values:
-                  - openwebui-system
-                  - litellm-system
-                  - guacamole-system
-                  - n8n-system
-                  - infisical-system
-                  - issuary-system
-                  - davinci-resolve-system
-            matchLabels:
+          - matchLabels:
+              io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
               app.kubernetes.io/name: postgresql
         toPorts:
           - ports:
