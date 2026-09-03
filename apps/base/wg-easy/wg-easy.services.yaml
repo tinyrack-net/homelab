@@ -22,7 +22,6 @@ metadata:
     networking.tinyrack.net/load-balancer: cilium-l2
   annotations:
     lbipam.cilium.io/ips: "10.132.246.4"
-    metallb.io/loadBalancerIPs: "10.132.246.4"
 spec:
   type: LoadBalancer
   allocateLoadBalancerNodePorts: false
