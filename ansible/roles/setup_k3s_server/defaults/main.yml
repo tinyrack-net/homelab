@@ -23,3 +23,7 @@ setup_k3s_server_packages:
 setup_k3s_server_install_script_url: https://get.k3s.io
 setup_k3s_server_install_script_path: /usr/local/src/k3s-install.sh
 setup_k3s_server_config_path: /etc/rancher/k3s/config.yaml
+setup_k3s_server_containerd_config_directory: /var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.d
+setup_k3s_server_containerd_cni_config_path: "{{ setup_k3s_server_containerd_config_directory }}/10-cni.toml"
+setup_k3s_server_cni_bin_directory: /var/lib/rancher/k3s/data/cni
+setup_k3s_server_cni_config_directory: /var/lib/rancher/k3s/agent/etc/cni/net.d

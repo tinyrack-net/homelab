@@ -52,6 +52,23 @@
     group: root
     mode: "0755"
 
+- name: Create the K3s containerd configuration drop-in directory
+  ansible.builtin.file:
+    path: "{{ setup_k3s_server_containerd_config_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure the K3s containerd CNI paths
+  ansible.builtin.template:
+    src: containerd-cni.toml.j2
+    dest: "{{ setup_k3s_server_containerd_cni_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart K3s
+
 - name: Create the K3s installer directory
   ansible.builtin.file:
     path: "{{ setup_k3s_server_install_script_path | dirname }}"

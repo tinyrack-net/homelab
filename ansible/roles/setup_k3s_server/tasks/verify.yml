@@ -1,4 +1,17 @@
 ---
+- name: Read the containerd CNI runtime status
+  ansible.builtin.command:
+    argv: [/usr/local/bin/k3s, crictl, info]
+  register: setup_k3s_server_crictl_info
+  changed_when: false
+
+- name: Verify the containerd CNI paths
+  ansible.builtin.assert:
+    that:
+      - (setup_k3s_server_crictl_info.stdout | from_json).config.cni.binDirs == [setup_k3s_server_cni_bin_directory]
+      - (setup_k3s_server_crictl_info.stdout | from_json).config.cni.confDir == setup_k3s_server_cni_config_directory
+      - (setup_k3s_server_crictl_info.stdout | from_json).lastCNILoadStatus == "OK"
+
 - name: Run preflight checks before verification
   ansible.builtin.import_tasks: preflight.yml
 
