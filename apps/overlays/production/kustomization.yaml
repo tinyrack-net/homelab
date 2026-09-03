@@ -16,7 +16,3 @@ resources:
   - proxer.yaml
   - wg-easy.yaml
   - rustdesk.yaml
-  - network-policy-wave-1.yaml
-  - network-policy-wave-2.yaml
-  - network-policy-wave-3.yaml
-  - network-policy-wave-4.yaml
