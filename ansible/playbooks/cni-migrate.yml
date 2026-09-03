@@ -32,6 +32,20 @@
         apply:
           become: true
 
+    - name: Restart Multus to discover the Cilium primary configuration
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - --context
+          - homelab
+          - rollout
+          - restart
+          - --namespace
+          - kube-system
+          - daemonset/kube-multus-ds
+      delegate_to: localhost
+      changed_when: true
+
     - name: Wait for Multus before migration
       ansible.builtin.command:
         argv:
