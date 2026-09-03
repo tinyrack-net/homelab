@@ -13,7 +13,6 @@ resources:
   - infisical.yaml
   - searxng.yaml
   - issuary.yaml
-  - bulwark.yaml
   - proxer.yaml
   - wg-easy.yaml
   - rustdesk.yaml

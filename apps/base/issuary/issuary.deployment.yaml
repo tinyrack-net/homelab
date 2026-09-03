@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       annotations:
-        issuary.winetree94.com/config-revision: beszel-oidc-v3-20260901
+        issuary.winetree94.com/config-revision: oidc-clients-20260903
       labels:
         app: issuary
     spec:
