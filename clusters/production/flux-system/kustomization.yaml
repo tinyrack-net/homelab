@@ -4,3 +4,12 @@ resources:
 - gotk-components.yaml
 - gotk-sync.yaml
 - image-automation.yaml
+patches:
+  - target:
+      version: v1
+      kind: Namespace
+      name: flux-system
+    patch: |-
+      - op: add
+        path: /metadata/labels/networking.tinyrack.net~1isolation
+        value: enabled

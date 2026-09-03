@@ -5,6 +5,14 @@ resources:
   - https://github.com/cloudnative-pg/plugin-barman-cloud/releases/download/v0.14.0/manifest.yaml
 patches:
   - target:
+      version: v1
+      kind: Namespace
+      name: cnpg-system
+    patch: |-
+      - op: add
+        path: /metadata/labels/networking.tinyrack.net~1isolation
+        value: enabled
+  - target:
       group: apps
       version: v1
       kind: Deployment
