@@ -16,6 +16,7 @@ resources:
   - traefik.yaml
   - traefik-external.yaml
   - cloudnative-pg.yaml
+  - backup-cleanup.yaml
   - mariadb-operator.yaml
   - ot-redis-operator.yaml
   - cloudflared.yaml
