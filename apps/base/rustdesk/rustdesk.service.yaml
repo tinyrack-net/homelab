@@ -3,12 +3,15 @@ kind: Service
 metadata:
   name: rustdesk
   namespace: rustdesk-system
+  labels:
+    networking.tinyrack.net/load-balancer: cilium-l2
   annotations:
+    lbipam.cilium.io/ips: "10.132.246.5"
     metallb.io/loadBalancerIPs: "10.132.246.5"
 spec:
   type: LoadBalancer
   allocateLoadBalancerNodePorts: false
-  externalTrafficPolicy: Local
+  externalTrafficPolicy: Cluster
   selector:
     app.kubernetes.io/name: rustdesk
   ports:
