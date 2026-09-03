@@ -117,18 +117,12 @@ delegates the primary Pod network to Cilium while continuing to provide the
 
 ## CNI migration
 
-The one-time migration playbook replaces Flannel and kube-proxy after the Flux
-Cilium HelmRelease is Ready. It saves an etcd snapshot and the original K3s
-configuration before cordoning the node and recreating Pods:
-
-```bash
-cd ansible
-make cni-migrate
-```
-
-If migration fails, revert and push the Cilium GitOps changes, then run
-`make cni-rollback`. The rollback suspends reconciliation, removes Cilium host
-state, restores the saved K3s configuration, and brings Multus back on Flannel.
+The production cluster was migrated from Flannel and kube-proxy to Cilium. The
+one-time migration playbook was removed after verification. The rollback
+playbook remains available as `make cni-rollback`; it suspends Cilium
+reconciliation, removes Cilium host state, restores the saved pre-migration K3s
+configuration, and brings Multus back on Flannel. Revert and push the Cilium
+GitOps declarations before using it.
 
 ## Sealed Secrets
 
