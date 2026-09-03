@@ -25,8 +25,8 @@ resources:
   - tailscale.yaml
   # These policies are inert until a platform wave labels its namespaces.
   - platform-network-security.yaml
-  # Enable after all application waves are healthy, one wave at a time.
-  # - platform-network-policy-wave-1.yaml
+  # Application waves are healthy; enable platform isolation one wave at a time.
+  - platform-network-policy-wave-1.yaml
   # - platform-network-policy-wave-2.yaml
   # - platform-network-policy-wave-3.yaml
   # Enable only after the 24-hour host policy audit described in the runbook.
