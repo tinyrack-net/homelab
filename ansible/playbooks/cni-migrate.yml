@@ -25,12 +25,27 @@
       ansible.builtin.meta: end_play
       when: cni_migrate_marker.stat.exists
 
+    - name: Read the current K3s configuration
+      ansible.builtin.slurp:
+        src: /etc/rancher/k3s/config.yaml
+      become: true
+      register: cni_migrate_current_k3s_config_file
+
+    - name: Detect a migration resuming after the K3s switch
+      ansible.builtin.set_fact:
+        cni_migrate_k3s_already_switched: >-
+          {{
+            (cni_migrate_current_k3s_config_file.content | b64decode | from_yaml)['flannel-backend']
+            | default('') == 'none'
+          }}
+
     - name: Verify Cilium before disabling Flannel
       ansible.builtin.include_role:
         name: setup_cilium
         tasks_from: verify
         apply:
           become: true
+      when: not (cni_migrate_k3s_already_switched | bool)
 
     - name: Restart Multus to discover the Cilium primary configuration
       ansible.builtin.command:
