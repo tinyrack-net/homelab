@@ -73,10 +73,13 @@ spec:
           serviceTemplate:
             metadata:
               name: davinci-resolve-additional-lb
+              labels:
+                networking.tinyrack.net/load-balancer: cilium-l2
               annotations:
-                metallb.io/loadBalancerIPs: "10.132.246.3"
+                lbipam.cilium.io/ips: "10.132.246.3"
             spec:
               type: LoadBalancer
+              loadBalancerClass: io.cilium/l2-announcer
               externalTrafficPolicy: Cluster
   storage:
     pvcTemplate:
