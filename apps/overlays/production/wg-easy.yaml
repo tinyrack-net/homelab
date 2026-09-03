@@ -16,3 +16,4 @@ spec:
   dependsOn:
     - name: load-repositories
     - name: multus-deployment
+    - name: cilium-load-balancer
