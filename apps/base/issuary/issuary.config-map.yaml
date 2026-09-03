@@ -124,34 +124,6 @@ data:
           - refresh_token
         scope: openid profile email
         skip_consent: true
-      - id: guacamole
-        name: Guacamole
-        client_id: ZELLU6czGfaVxzpot16ChKxy31bMnQUdUDXoMAl8
-        client_secret: ${ISSUARY_GUACAMOLE_CLIENT_SECRET}
-        redirect_uris:
-          - https://remote.intranet.winetree94.com/
-        response_types:
-          - code
-          - id_token
-        grant_types:
-          - authorization_code
-          - implicit
-          - refresh_token
-        scope: openid profile email
-        skip_consent: true
-      - id: litellm
-        name: LiteLLM Admin UI
-        client_id: litellm-admin-ui
-        client_secret: ${ISSUARY_LITELLM_CLIENT_SECRET}
-        redirect_uris:
-          - https://llm.winetree94.com/sso/callback
-        response_types:
-          - code
-        grant_types:
-          - authorization_code
-          - refresh_token
-        scope: openid profile email
-        skip_consent: true
       - id: stalwart-webui
         name: Stalwart WebUI
         client_id: stalwart-webui

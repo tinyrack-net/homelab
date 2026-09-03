@@ -6,7 +6,6 @@ resources:
   - longhorn.yaml
   - traefik.yaml
   - sealed-secrets.yaml
-  - tailscale.yaml
   - reflector.yaml
   - jetstack.yaml
   - kyverno.yaml

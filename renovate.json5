@@ -35,7 +35,7 @@
     {
       customType: 'regex',
       description: 'Redis operands managed by the OT Redis Operator',
-      managerFilePatterns: ['/apps/base/(?:infisical|searxng)/.+\\.redis\\.yaml$/'],
+      managerFilePatterns: ['/apps/base/searxng/.+\\.redis\\.yaml$/'],
       matchStrings: [
         'image: (?<depName>quay\\.io/opstree/redis):(?<currentValue>[^\\s@]+)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?',
       ],
@@ -107,7 +107,6 @@
         'getmeili/meilisearch',
         'n8nio/n8n',
         'n8nio/runners',
-        'ghcr.io/berriai/litellm-database',
       ],
       dependencyDashboardApproval: true,
     },

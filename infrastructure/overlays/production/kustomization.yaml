@@ -22,5 +22,4 @@ resources:
   - mariadb-operator.yaml
   - ot-redis-operator.yaml
   - cloudflared.yaml
-  - tailscale.yaml
   - cilium-host-firewall.yaml
