@@ -29,5 +29,5 @@ resources:
   - platform-network-policy-wave-1.yaml
   - platform-network-policy-wave-2.yaml
   - platform-network-policy-wave-3.yaml
-  # Enable only after the 24-hour host policy audit described in the runbook.
-  # - cilium-host-firewall.yaml
+  # Keep the host endpoint recovery procedure in the runbook available.
+  - cilium-host-firewall.yaml
