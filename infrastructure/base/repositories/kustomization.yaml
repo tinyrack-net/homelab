@@ -10,4 +10,5 @@ resources:
   - tailscale.yaml
   - reflector.yaml
   - jetstack.yaml
+  - kyverno.yaml
   - ot-container-kit.yaml
