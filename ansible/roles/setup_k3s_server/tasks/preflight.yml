@@ -13,8 +13,11 @@
       - setup_k3s_server_version | length > 0
       - setup_k3s_server_cluster_cidr != setup_k3s_server_service_cidr
       - setup_k3s_server_disabled_components | length > 0
+      - setup_k3s_server_flannel_backend == "none"
+      - setup_k3s_server_disable_network_policy | bool
+      - setup_k3s_server_disable_kube_proxy | bool
       - >-
         ['fs.inotify.max_queued_events', 'fs.inotify.max_user_instances', 'fs.inotify.max_user_watches']
         | difference(setup_k3s_server_inotify_settings.keys() | list)
         | length == 0
-    fail_msg: K3s version, distinct network ranges, and disabled components are required.
+    fail_msg: K3s version, distinct network ranges, disabled components, and Cilium settings are required.

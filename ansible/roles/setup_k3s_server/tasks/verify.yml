@@ -70,5 +70,8 @@
       - setup_k3s_server_verified_config["cluster-cidr"] == setup_k3s_server_cluster_cidr
       - setup_k3s_server_verified_config["service-cidr"] == setup_k3s_server_service_cidr
       - setup_k3s_server_verified_config.disable == setup_k3s_server_disabled_components
+      - setup_k3s_server_verified_config["flannel-backend"] == setup_k3s_server_flannel_backend
+      - setup_k3s_server_verified_config["disable-network-policy"] | bool
+      - setup_k3s_server_verified_config["disable-kube-proxy"] | bool
       - "' Ready ' in (' ' ~ setup_k3s_server_node.stdout ~ ' ')"
     fail_msg: The K3s server does not match the managed configuration.

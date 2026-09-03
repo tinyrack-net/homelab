@@ -1,0 +1,30 @@
+cluster:
+  name: homelab
+  id: 0
+k8sServiceHost: 127.0.0.1
+k8sServicePort: 6443
+kubeProxyReplacement: true
+identityAllocationMode: crd
+operator:
+  replicas: 1
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - 10.61.0.0/16
+    clusterPoolIPv4MaskSize: 24
+routingMode: tunnel
+tunnelProtocol: vxlan
+bpf:
+  masquerade: true
+egressGateway:
+  enabled: false
+devices: enp6s18
+cni:
+  binPath: /var/lib/rancher/k3s/data/cni
+  confPath: /var/lib/rancher/k3s/agent/etc/cni/net.d
+  exclusive: false
+  uninstall: false
+policyEnforcementMode: default
+hubble:
+  enabled: false

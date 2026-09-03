@@ -1,0 +1,235 @@
+---
+- name: Migrate the single-node K3s cluster to Cilium
+  hosts: k3s_servers
+  gather_facts: true
+  become: false
+  vars:
+    cni_migrate_marker_path: /etc/rancher/k3s/cilium-migrated
+    cni_migrate_backup_directory: /var/lib/rancher/k3s/server/cni-migration
+    cni_migrate_backup_config_path: /var/lib/rancher/k3s/server/cni-migration/config.yaml.pre-cilium
+
+  pre_tasks:
+    - name: Require the homelab become password
+      ansible.builtin.assert:
+        that:
+          - ansible_become_password is defined
+          - ansible_become_password != "CHANGE_ME"
+
+    - name: Check whether Cilium migration is complete
+      ansible.builtin.stat:
+        path: "{{ cni_migrate_marker_path }}"
+      become: true
+      register: cni_migrate_marker
+
+    - name: Stop when migration has already completed
+      ansible.builtin.meta: end_play
+      when: cni_migrate_marker.stat.exists
+
+    - name: Verify Cilium before disabling Flannel
+      ansible.builtin.include_role:
+        name: setup_cilium
+        tasks_from: verify
+        apply:
+          become: true
+
+    - name: Wait for Multus before migration
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - --context
+          - homelab
+          - --namespace
+          - kube-system
+          - rollout
+          - status
+          - daemonset/kube-multus-ds
+          - --timeout=5m
+      delegate_to: localhost
+      changed_when: false
+
+    - name: Read the generated Multus CNI configuration
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/k3s/agent/etc/cni/net.d/00-multus.conf
+      become: true
+      register: cni_migrate_multus_config_before
+
+    - name: Require Multus to delegate the primary network to Cilium
+      ansible.builtin.assert:
+        that:
+          - >-
+            '05-cilium.conflist'
+            in ((cni_migrate_multus_config_before.content | b64decode | from_json).clusterNetwork)
+        fail_msg: Multus has not switched its primary delegate to Cilium.
+
+    - name: Save an etcd snapshot before CNI migration
+      ansible.builtin.command:
+        argv: [/usr/local/bin/k3s, etcd-snapshot, save, --name, pre-cilium-migration]
+      become: true
+      changed_when: true
+
+    - name: Create the CNI migration backup directory
+      ansible.builtin.file:
+        path: "{{ cni_migrate_backup_directory }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+      become: true
+
+    - name: Back up the pre-Cilium K3s configuration
+      ansible.builtin.copy:
+        src: /etc/rancher/k3s/config.yaml
+        dest: "{{ cni_migrate_backup_config_path }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0600"
+        force: false
+      become: true
+
+  tasks:
+    - name: Cordon the single K3s node
+      ansible.builtin.command:
+        argv: [kubectl, --context, homelab, cordon, homelab]
+      delegate_to: localhost
+      register: cni_migrate_cordon
+      changed_when: "'cordoned' in cni_migrate_cordon.stdout"
+
+    - name: Apply the Cilium K3s configuration
+      ansible.builtin.include_role:
+        name: setup_k3s_server
+        apply:
+          become: true
+
+    - name: Apply the pending K3s restart
+      ansible.builtin.meta: flush_handlers
+
+    - name: Wait for the Kubernetes API after the K3s restart
+      ansible.builtin.command:
+        argv: [kubectl, --context, homelab, get, node, homelab]
+      delegate_to: localhost
+      register: cni_migrate_api
+      until: cni_migrate_api.rc == 0
+      retries: 30
+      delay: 5
+      changed_when: false
+
+    - name: List Pods created by the old CNI
+      ansible.builtin.command:
+        argv: [kubectl, --context, homelab, get, pods, --all-namespaces, --output, json]
+      delegate_to: localhost
+      register: cni_migrate_pods
+      changed_when: false
+
+    - name: Recreate non-host-network Pods under Cilium
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - --context
+          - homelab
+          - delete
+          - pod
+          - --namespace
+          - "{{ item.metadata.namespace }}"
+          - "{{ item.metadata.name }}"
+          - --wait=false
+      delegate_to: localhost
+      loop: "{{ (cni_migrate_pods.stdout | from_json).items }}"
+      loop_control:
+        label: "{{ item.metadata.namespace }}/{{ item.metadata.name }}"
+      when: not (item.spec.hostNetwork | default(false) | bool)
+      changed_when: true
+
+    - name: Remove the legacy Flannel CNI configuration
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s/agent/etc/cni/net.d/10-flannel.conflist
+        state: absent
+      become: true
+
+    - name: Remove legacy Flannel interfaces after Pod evacuation
+      ansible.builtin.command:
+        argv: [/usr/sbin/ip, link, delete, "{{ item }}"]
+      become: true
+      loop:
+        - flannel.1
+        - cni0
+      register: cni_migrate_legacy_link_removal
+      changed_when: cni_migrate_legacy_link_removal.rc == 0
+      failed_when:
+        - cni_migrate_legacy_link_removal.rc != 0
+        - "'Cannot find device' not in cni_migrate_legacy_link_removal.stderr"
+
+    - name: Restart Cilium after legacy datapath cleanup
+      ansible.builtin.command:
+        argv: [kubectl, --context, homelab, rollout, restart, --namespace, kube-system, daemonset/cilium]
+      delegate_to: localhost
+      changed_when: true
+
+    - name: Restart Multus after the primary CNI switch
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - --context
+          - homelab
+          - rollout
+          - restart
+          - --namespace
+          - kube-system
+          - daemonset/kube-multus-ds
+      delegate_to: localhost
+      changed_when: true
+
+    - name: Wait for the Cilium and Multus daemon sets
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - --context
+          - homelab
+          - --namespace
+          - kube-system
+          - rollout
+          - status
+          - "daemonset/{{ item }}"
+          - --timeout=10m
+      delegate_to: localhost
+      loop:
+        - cilium
+        - kube-multus-ds
+      changed_when: false
+
+    - name: Read the final Multus CNI configuration
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/k3s/agent/etc/cni/net.d/00-multus.conf
+      become: true
+      register: cni_migrate_multus_config_after
+
+    - name: Verify the final Multus primary delegate
+      ansible.builtin.assert:
+        that:
+          - >-
+            '05-cilium.conflist'
+            in ((cni_migrate_multus_config_after.content | b64decode | from_json).clusterNetwork)
+        fail_msg: Multus no longer delegates the primary network to Cilium.
+
+    - name: Uncordon the K3s node
+      ansible.builtin.command:
+        argv: [kubectl, --context, homelab, uncordon, homelab]
+      delegate_to: localhost
+      register: cni_migrate_uncordon
+      changed_when: "'uncordoned' in cni_migrate_uncordon.stdout"
+
+    - name: Verify Cilium after Pod recreation
+      ansible.builtin.include_role:
+        name: setup_cilium
+        tasks_from: verify
+        apply:
+          become: true
+
+    - name: Record successful Cilium migration
+      ansible.builtin.copy:
+        content: "Cilium 1.20.1 migration completed\n"
+        dest: "{{ cni_migrate_marker_path }}"
+        owner: root
+        group: root
+        mode: "0600"
+      become: true

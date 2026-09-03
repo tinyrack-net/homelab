@@ -5,6 +5,9 @@ setup_k3s_server_service_cidr: 10.62.0.0/16
 setup_k3s_server_disabled_components:
   - traefik
   - servicelb
+setup_k3s_server_flannel_backend: none
+setup_k3s_server_disable_network_policy: true
+setup_k3s_server_disable_kube_proxy: true
 setup_k3s_server_inotify_settings:
   fs.inotify.max_queued_events: 32768
   fs.inotify.max_user_instances: 8192

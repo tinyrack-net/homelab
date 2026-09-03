@@ -15,6 +15,11 @@
         name: setup_k3s_server
         tasks_from: preflight
 
+    - name: Run Cilium preflight checks
+      ansible.builtin.include_role:
+        name: setup_cilium
+        tasks_from: preflight
+
     - name: Validate the Sealed Secrets recovery key
       ansible.builtin.include_role:
         name: restore_sealed_secrets_key

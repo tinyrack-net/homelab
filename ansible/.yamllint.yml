@@ -7,6 +7,7 @@ ignore: |
   inventories/production/group_vars/all/vault.yml
   roles/restore_sealed_secrets_key/templates/
   roles/setup_k3s_server/templates/
+  roles/setup_cilium/templates/
   roles_galaxy/
 
 rules:

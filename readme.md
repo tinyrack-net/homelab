@@ -38,9 +38,11 @@ git commit -m "chore: pause applications for cluster recovery"
 git push
 ```
 
-Use `ansible/` to install K3s and restore the Sealed Secrets private key before
-bootstrapping Flux from `clusters/production`. Wait until the infrastructure and
-Longhorn backup target are ready. Access Longhorn without ingress if necessary:
+Use `ansible/` to install K3s, bootstrap Cilium, and restore the Sealed Secrets
+private key before bootstrapping Flux from `clusters/production`. The bootstrap
+uses the same `cilium` Helm release and values that Flux adopts later. Wait until
+the infrastructure and Longhorn backup target are ready. Access Longhorn without
+ingress if necessary:
 
 ```bash
 kubectl -n longhorn-system port-forward service/longhorn-frontend 8000:80
@@ -77,7 +79,7 @@ core application data.
 
 ## Bootstrap
 
-### K3s and Sealed Secrets key
+### K3s, Cilium, and Sealed Secrets key
 
 Store the become password and Sealed Secrets TLS certificate/private key in the
 Ansible Vault, then let Ansible prepare everything up to the Flux boundary:
@@ -93,8 +95,10 @@ make verify
 cd ..
 ```
 
-Do not bootstrap Flux until `make verify` confirms that the recovery key in the
-new cluster matches the Vault values.
+Do not bootstrap Flux until `make verify` confirms that Cilium is healthy and
+that the recovery key in the new cluster matches the Vault values. K3s starts
+with Flannel, its network-policy controller, and kube-proxy disabled; Cilium must
+therefore be running before Flux controllers and workloads can start.
 
 ### Flux
 
@@ -105,6 +109,26 @@ flux bootstrap github \
   --path=./clusters/production \
   --owner=tinyrack-net
 ```
+
+Flux reconciles the `cilium` HelmRelease in `kube-system` and takes over the
+release installed by Ansible. Multus remains the first CNI configuration and
+delegates the primary Pod network to Cilium while continuing to provide the
+`wg-easy` macvlan attachment.
+
+## CNI migration
+
+The one-time migration playbook replaces Flannel and kube-proxy after the Flux
+Cilium HelmRelease is Ready. It saves an etcd snapshot and the original K3s
+configuration before cordoning the node and recreating Pods:
+
+```bash
+cd ansible
+make cni-migrate
+```
+
+If migration fails, revert and push the Cilium GitOps changes, then run
+`make cni-rollback`. The rollback suspends reconciliation, removes Cilium host
+state, restores the saved K3s configuration, and brings Multus back on Flannel.
 
 ## Sealed Secrets
 
