@@ -1,36 +1,31 @@
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: app-proxer
+  name: proxy-garage
 specs:
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-        k8s:io.kubernetes.pod.namespace: proxer-system
-        app: proxer
-    ingress:
-      - fromEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: traefik-system
-              app.kubernetes.io/name: traefik
-        toPorts:
-          - ports:
-              - port: "8080"
-                protocol: TCP
+        k8s:io.kubernetes.pod.namespace: traefik-external-system
+        app.kubernetes.io/name: traefik
     egress:
       - toCIDR:
-          - 10.132.244.0/22
+          - 10.132.245.8/32
+        toPorts:
+          - ports:
+              - port: "3900"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
         k8s:io.kubernetes.pod.namespace: traefik-system
         app.kubernetes.io/name: traefik
     egress:
-      - toEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: proxer-system
-              app: proxer
+      - toCIDR:
+          - 10.132.245.8/32
         toPorts:
           - ports:
-              - port: "8080"
+              - port: "3902"
+                protocol: TCP
+              - port: "3909"
                 protocol: TCP
