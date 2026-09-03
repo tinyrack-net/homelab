@@ -37,5 +37,8 @@ spec:
       isDefaultClass: true
       name: "traefik"
     service:
+      labels:
+        networking.tinyrack.net/load-balancer: cilium-l2
       annotations:
+        lbipam.cilium.io/ips: "10.132.246.1"
         metallb.io/loadBalancerIPs: "10.132.246.1"
