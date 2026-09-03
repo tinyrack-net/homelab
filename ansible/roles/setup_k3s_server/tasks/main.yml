@@ -31,6 +31,28 @@
     state: present
     update_cache: true
 
+- name: Inspect multipath systemd units
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/systemctl
+      - show
+      - "{{ item }}"
+      - --property=LoadState
+  loop: "{{ setup_k3s_server_disabled_multipath_units }}"
+  register: setup_k3s_server_multipath_units
+  changed_when: false
+  check_mode: false
+
+- name: Disable multipath services that conflict with Longhorn
+  ansible.builtin.systemd_service:
+    name: "{{ item.item }}"
+    enabled: false
+    state: stopped
+  loop: "{{ setup_k3s_server_multipath_units.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.stdout == "LoadState=loaded"
+
 - name: Enable the iSCSI socket
   ansible.builtin.systemd_service:
     name: iscsid.socket

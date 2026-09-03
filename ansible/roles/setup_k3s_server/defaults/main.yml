@@ -20,6 +20,9 @@ setup_k3s_server_packages:
   - jq
   - nfs-common
   - open-iscsi
+setup_k3s_server_disabled_multipath_units:
+  - multipathd.socket
+  - multipathd.service
 setup_k3s_server_install_script_url: https://get.k3s.io
 setup_k3s_server_install_script_path: /usr/local/src/k3s-install.sh
 setup_k3s_server_config_path: /etc/rancher/k3s/config.yaml
