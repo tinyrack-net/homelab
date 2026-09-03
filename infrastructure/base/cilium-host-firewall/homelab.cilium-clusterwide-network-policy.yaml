@@ -5,7 +5,7 @@ metadata:
 spec:
   nodeSelector:
     matchLabels:
-      kubernetes.io/hostname: homelab
+      node-role.kubernetes.io/control-plane: "true"
   ingress:
     - fromCIDR:
         - 10.132.244.0/22
