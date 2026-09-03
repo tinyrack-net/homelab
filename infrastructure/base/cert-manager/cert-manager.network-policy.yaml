@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: platform-cert-manager
+  namespace: cert-manager-system
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: cert-manager-system
+    ingress:
+      - fromEntities:
+          - kube-apiserver
+        toPorts:
+          - ports:
+              - port: "10250"
+                protocol: TCP
+    egress:
+      - toEntities:
+          - kube-apiserver
+        toPorts:
+          - ports:
+              - port: "6443"
+                protocol: TCP

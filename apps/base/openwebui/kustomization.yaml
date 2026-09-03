@@ -10,3 +10,4 @@ resources:
   - openwebui.helm-release.yaml
   - openwebui.ingress-route.yaml
   - openwebui.network-policy.yaml
+  - openwebui.cilium-network-policy.yaml

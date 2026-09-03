@@ -10,3 +10,4 @@ resources:
   - infisical.redis.yaml
   - infisical.helm-release.yaml
   - infisical.network-policy.yaml
+  - infisical.cilium-network-policy.yaml

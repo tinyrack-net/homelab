@@ -1,0 +1,20 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: platform-cloudflared
+  namespace: cloudflared-system
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: cloudflared-system
+        pod: cloudflared
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP

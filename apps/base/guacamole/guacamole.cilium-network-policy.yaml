@@ -1,0 +1,106 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-guacamole
+  namespace: guacamole-system
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: guacamole-system
+        app: guacamole-guacamole
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: guacamole-system
+              app: guacamole-guacd
+        toPorts:
+          - ports:
+              - port: "4822"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: guacamole-system
+              cnpg.io/cluster: guacamole-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: guacamole-system
+        app: guacamole-guacd
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: guacamole-system
+              app: guacamole-guacamole
+        toPorts:
+          - ports:
+              - port: "4822"
+                protocol: TCP
+    egress:
+      - toCIDR:
+          - 10.132.244.0/22
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: guacamole-system
+        cnpg.io/cluster: guacamole-database-cluster
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: guacamole-system
+              app: guacamole-guacamole
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+              - port: "9187"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: guacamole-system
+              cnpg.io/cluster: guacamole-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: guacamole-system
+              cnpg.io/cluster: guacamole-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP

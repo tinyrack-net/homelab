@@ -1,0 +1,28 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-rustdesk
+  namespace: rustdesk-system
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: rustdesk-system
+      app.kubernetes.io/name: rustdesk
+  ingress:
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "21115"
+              protocol: TCP
+            - port: "21116"
+              protocol: TCP
+            - port: "21116"
+              protocol: UDP
+            - port: "21117"
+              protocol: TCP
+            - port: "21118"
+              protocol: TCP
+            - port: "21119"
+              protocol: TCP

@@ -7,3 +7,4 @@ resources:
   - beszel.service.yaml
   - beszel.ingress-route.yaml
   - beszel.network-policy.yaml
+  - beszel.cilium-network-policy.yaml
