@@ -67,7 +67,7 @@ spec:
             privileged: true
           resources:
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 50Mi
             limits:
               cpu: 100m
