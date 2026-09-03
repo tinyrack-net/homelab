@@ -77,7 +77,6 @@ spec:
                 networking.tinyrack.net/load-balancer: cilium-l2
               annotations:
                 lbipam.cilium.io/ips: "10.132.246.3"
-                metallb.io/loadBalancerIPs: "10.132.246.3"
             spec:
               type: LoadBalancer
               externalTrafficPolicy: Cluster
