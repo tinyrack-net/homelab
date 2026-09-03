@@ -1,0 +1,4 @@
+---
+setup_qemu_guest_agent_package: qemu-guest-agent
+setup_qemu_guest_agent_service: qemu-guest-agent.service
+setup_qemu_guest_agent_channel_path: /dev/virtio-ports/org.qemu.guest_agent.0

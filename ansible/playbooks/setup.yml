@@ -18,6 +18,8 @@
         tasks_from: preflight
 
   roles:
+    - role: setup_qemu_guest_agent
+      become: true
     - role: setup_k3s_server
       become: true
     - role: restore_sealed_secrets_key

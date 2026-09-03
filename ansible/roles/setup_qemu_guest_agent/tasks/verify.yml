@@ -1,0 +1,19 @@
+---
+- name: Run QEMU guest agent preflight checks before verification
+  ansible.builtin.import_tasks: preflight.yml
+
+- name: Gather installed package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Verify the QEMU guest agent state
+  ansible.builtin.assert:
+    that:
+      - setup_qemu_guest_agent_package in ansible_facts.packages
+      - setup_qemu_guest_agent_service in ansible_facts.services
+      - ansible_facts.services[setup_qemu_guest_agent_service].state == "running"
+      - ansible_facts.services[setup_qemu_guest_agent_service].status in ["enabled", "static", "indirect"]
+    fail_msg: The QEMU guest agent is not installed and running as configured.

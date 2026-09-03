@@ -5,6 +5,11 @@
   become: false
 
   tasks:
+    - name: Validate the QEMU guest agent host
+      ansible.builtin.include_role:
+        name: setup_qemu_guest_agent
+        tasks_from: preflight
+
     - name: Run K3s server preflight checks
       ansible.builtin.include_role:
         name: setup_k3s_server

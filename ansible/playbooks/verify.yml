@@ -13,6 +13,13 @@
         fail_msg: Run `make vault-edit` and replace the become password placeholder before verifying.
 
   tasks:
+    - name: Verify the QEMU guest agent
+      ansible.builtin.include_role:
+        name: setup_qemu_guest_agent
+        tasks_from: verify
+        apply:
+          become: true
+
     - name: Verify K3s server configuration
       ansible.builtin.include_role:
         name: setup_k3s_server

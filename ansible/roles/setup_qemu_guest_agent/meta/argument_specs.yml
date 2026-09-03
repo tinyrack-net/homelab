@@ -1,0 +1,14 @@
+---
+argument_specs:
+  main:
+    short_description: Install and run the QEMU guest agent
+    options:
+      setup_qemu_guest_agent_package:
+        type: str
+        required: true
+      setup_qemu_guest_agent_service:
+        type: str
+        required: true
+      setup_qemu_guest_agent_channel_path:
+        type: path
+        required: true

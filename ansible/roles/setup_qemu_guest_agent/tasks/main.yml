@@ -1,0 +1,20 @@
+---
+- name: Run QEMU guest agent preflight checks
+  ansible.builtin.import_tasks: preflight.yml
+
+- name: Gather installed package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Install the QEMU guest agent
+  ansible.builtin.apt:
+    name: "{{ setup_qemu_guest_agent_package }}"
+    state: present
+    update_cache: true
+
+- name: Enable and start the QEMU guest agent
+  ansible.builtin.systemd_service:
+    name: "{{ setup_qemu_guest_agent_service }}"
+    enabled: true
+    state: started
+  when: not ansible_check_mode or setup_qemu_guest_agent_package in ansible_facts.packages

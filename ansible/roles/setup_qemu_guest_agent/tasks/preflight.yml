@@ -1,0 +1,16 @@
+---
+- name: Inspect the QEMU guest agent channel
+  ansible.builtin.stat:
+    path: "{{ setup_qemu_guest_agent_channel_path }}"
+  register: setup_qemu_guest_agent_channel
+
+- name: Validate the QEMU guest environment
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == "Ubuntu"
+      - ansible_facts.virtualization_role == "guest"
+      - ansible_facts.virtualization_type in ["kvm", "qemu"]
+      - setup_qemu_guest_agent_channel.stat.exists
+      - setup_qemu_guest_agent_package | length > 0
+      - setup_qemu_guest_agent_service | length > 0
+    fail_msg: This role requires an Ubuntu QEMU/KVM guest with the guest agent channel enabled.
