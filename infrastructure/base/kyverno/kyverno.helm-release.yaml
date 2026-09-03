@@ -33,12 +33,11 @@ spec:
       enabled: false
     cleanupController:
       replicas: 1
-      container:
-        resources:
-          requests:
-            cpu: 50m
-            memory: 64Mi
-          limits:
-            memory: 128Mi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
     reportsController:
       enabled: false
