@@ -4,6 +4,7 @@ resources:
   - repositories.yaml
   - kyverno.yaml
   - cilium.yaml
+  - network-security.yaml
   - cilium-load-balancer.yaml
   - system-upgrade-controller.yaml
   - k3s-upgrade-plan.yaml
@@ -15,9 +16,18 @@ resources:
   - multus.yaml
   - traefik.yaml
   - traefik-external.yaml
+  - hubble-ui.yaml
   - cloudnative-pg.yaml
   - backup-cleanup.yaml
   - mariadb-operator.yaml
   - ot-redis-operator.yaml
   - cloudflared.yaml
   - tailscale.yaml
+  # These policies are inert until a platform wave labels its namespaces.
+  - platform-network-security.yaml
+  # Enable after all application waves are healthy, one wave at a time.
+  # - platform-network-policy-wave-1.yaml
+  # - platform-network-policy-wave-2.yaml
+  # - platform-network-policy-wave-3.yaml
+  # Enable only after the 24-hour host policy audit described in the runbook.
+  # - cilium-host-firewall.yaml

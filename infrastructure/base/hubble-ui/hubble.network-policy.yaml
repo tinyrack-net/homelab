@@ -1,0 +1,20 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: hubble-ui-ingress
+  namespace: kube-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: hubble-ui
+  ingress:
+    - fromEntities:
+        - host
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP

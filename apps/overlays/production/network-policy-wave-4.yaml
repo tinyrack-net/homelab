@@ -1,0 +1,20 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: network-policy-wave-4
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/network-policy-wave-4
+  # Namespace activation resources must never be pruned.
+  prune: false
+  timeout: 5m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: network-policy-wave-3
+    - name: davinci-resolve-project-server-deployment
+    - name: wg-easy-deployment
+    - name: rustdesk-deployment

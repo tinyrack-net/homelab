@@ -1,0 +1,96 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: app-n8n
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: n8n-system
+        app: n8n
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "5678"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: n8n-system
+              app: n8n-task-runner
+        toPorts:
+          - ports:
+              - port: "5679"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: n8n-system
+              cnpg.io/cluster: n8n-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - toCIDR:
+          - 10.132.244.0/22
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: n8n-system
+        app: n8n-task-runner
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: n8n-system
+              app: n8n
+        toPorts:
+          - ports:
+              - port: "5679"
+                protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: n8n-system
+        cnpg.io/cluster: n8n-database-cluster
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: n8n-system
+              app: n8n
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+              - port: "9187"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: n8n-system
+              cnpg.io/cluster: n8n-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: n8n-system
+              cnpg.io/cluster: n8n-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP

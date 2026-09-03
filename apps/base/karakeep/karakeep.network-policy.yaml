@@ -1,0 +1,64 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: app-karakeep
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: karakeep-system
+        app: karakeep-web
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "3000"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: karakeep-system
+              app: meilisearch
+        toPorts:
+          - ports:
+              - port: "7700"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: karakeep-system
+              app: chrome
+        toPorts:
+          - ports:
+              - port: "9222"
+                protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: karakeep-system
+        app: meilisearch
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: karakeep-system
+              app: karakeep-web
+        toPorts:
+          - ports:
+              - port: "7700"
+                protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: karakeep-system
+        app: chrome
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: karakeep-system
+              app: karakeep-web
+        toPorts:
+          - ports:
+              - port: "9222"
+                protocol: TCP

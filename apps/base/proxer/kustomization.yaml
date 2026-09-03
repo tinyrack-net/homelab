@@ -6,3 +6,4 @@ resources:
   - proxer.deployment.yaml
   - proxer.service.yaml
   - proxer.ingress-route.yaml
+  - proxer.network-policy.yaml

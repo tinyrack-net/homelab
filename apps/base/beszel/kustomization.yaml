@@ -6,3 +6,4 @@ resources:
   - beszel.deployment.yaml
   - beszel.service.yaml
   - beszel.ingress-route.yaml
+  - beszel.network-policy.yaml

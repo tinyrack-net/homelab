@@ -10,3 +10,4 @@ resources:
   - issuary.deployment.yaml
   - issuary.service.yaml
   - issuary.ingress-route.yaml
+  - issuary.network-policy.yaml

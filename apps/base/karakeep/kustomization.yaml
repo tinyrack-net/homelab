@@ -13,4 +13,4 @@ resources:
   - karakeep.web.deployment.yaml
   - karakeep.web.service.yaml
   - karakeep.ingress-route.yaml
-
+  - karakeep.network-policy.yaml

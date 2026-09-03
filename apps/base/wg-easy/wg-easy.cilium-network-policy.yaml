@@ -1,0 +1,25 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: app-wg-easy
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: wg-easy-system
+      app.kubernetes.io/name: wg-easy
+  ingress:
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "51820"
+              protocol: UDP
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "51821"
+              protocol: TCP

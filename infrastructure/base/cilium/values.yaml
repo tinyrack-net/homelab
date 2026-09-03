@@ -33,5 +33,13 @@ cni:
   exclusive: false
   uninstall: false
 policyEnforcementMode: default
+hostFirewall:
+  enabled: true
 hubble:
-  enabled: false
+  enabled: true
+  relay:
+    enabled: true
+    service:
+      type: ClusterIP
+  ui:
+    enabled: true
