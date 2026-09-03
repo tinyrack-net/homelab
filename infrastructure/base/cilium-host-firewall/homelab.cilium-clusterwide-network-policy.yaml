@@ -29,6 +29,8 @@ spec:
         - ports:
             - port: "4240"
               protocol: TCP
+            - port: "4244"
+              protocol: TCP
             - port: "6443"
               protocol: TCP
             - port: "8472"
