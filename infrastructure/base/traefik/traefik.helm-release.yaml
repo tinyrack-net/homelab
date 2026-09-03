@@ -37,5 +37,5 @@ spec:
       isDefaultClass: true
       name: "traefik"
     service:
-      externalIPs:
-        - 10.132.246.1
+      annotations:
+        metallb.io/loadBalancerIPs: "10.132.246.1"
