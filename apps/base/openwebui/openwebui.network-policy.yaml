@@ -42,6 +42,14 @@ specs:
           - ports:
               - port: "9998"
                 protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
       - toCIDR:
           - 10.132.247.37/32
         toPorts:
@@ -125,6 +133,15 @@ specs:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
         k8s:io.kubernetes.pod.namespace: traefik-external-system
         app.kubernetes.io/name: traefik
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: openwebui-system
+              app.kubernetes.io/component: open-webui
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
     egress:
       - toEndpoints:
           - matchLabels:
