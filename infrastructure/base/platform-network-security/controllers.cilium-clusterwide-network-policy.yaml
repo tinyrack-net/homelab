@@ -10,6 +10,13 @@ specs:
     ingress:
       - fromEntities:
           - kube-apiserver
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "9090"
+                protocol: TCP
     egress:
       - toEntities:
           - kube-apiserver
