@@ -5,7 +5,6 @@ resources:
   - mariadb-operator.yaml
   - longhorn.yaml
   - traefik.yaml
-  - metallb.yaml
   - sealed-secrets.yaml
   - tailscale.yaml
   - reflector.yaml

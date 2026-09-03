@@ -12,7 +12,6 @@ resources:
   - configs.yaml
   - longhorn.yaml
   - cert-manager.yaml
-  - metallb.yaml
   - multus.yaml
   - traefik.yaml
   - traefik-external.yaml
