@@ -28,6 +28,14 @@ specs:
                 protocol: TCP
       - fromEndpoints:
           - matchLabels:
+              k8s:io.kubernetes.pod.namespace: wg-easy-system
+              app.kubernetes.io/name: wg-easy
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
               io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
               app.kubernetes.io/name: postgresql
           - matchLabels:

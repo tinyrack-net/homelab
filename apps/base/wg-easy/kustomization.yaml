@@ -4,6 +4,7 @@ resources:
   - wg-easy.namespace.yaml
   - wg-easy.network-attachment.yaml
   - wg-easy.storage.pvc.yaml
+  - wg-easy.oidc.secret.yaml
   - wg-easy.deployment.yaml
   - wg-easy.services.yaml
   - wg-easy.ingress-route.yaml

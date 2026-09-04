@@ -142,6 +142,20 @@ data:
           - refresh_token
         scope: openid profile email offline_access
         skip_consent: true
+      - id: wg-easy
+        name: wg-easy
+        client_id: wg-easy
+        client_secret: ${ISSUARY_WG_EASY_CLIENT_SECRET}
+        redirect_uris:
+          - https://vpn.intranet.winetree94.com/api/auth/oidc/callback
+          - https://vpn.intranet.winetree94.com/api/auth/oidc/link
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+          - refresh_token
+        scope: openid profile email
+        skip_consent: true
 
     users: []
 

@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       annotations:
-        issuary.winetree94.com/config-revision: oidc-clients-20260903
+        issuary.winetree94.com/config-revision: oidc-wg-easy-20260904
       labels:
         app: issuary
     spec:
