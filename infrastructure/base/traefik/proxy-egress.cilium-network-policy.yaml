@@ -83,7 +83,7 @@ specs:
         app.kubernetes.io/name: traefik
     egress:
       - toCIDR:
-          - 10.132.244.24/32
+          - 10.132.245.40/32
         toPorts:
           - ports:
               - port: "8006"
