@@ -50,7 +50,9 @@ spec:
             - name: OAUTH_PROVIDERS
               value: oidc
             - name: OAUTH_AUTO_REGISTER
-              value: "true"
+              value: "false"
+            - name: OAUTH_AUTO_LAUNCH
+              value: oidc
             - name: OAUTH_ALLOWED_DOMAINS
               value: winetree94.com
             - name: OAUTH_OIDC_SERVER
@@ -65,7 +67,7 @@ spec:
             - name: OAUTH_OIDC_NAME
               value: Issuary
             - name: DISABLE_PASSWORD_AUTH
-              value: "false"
+              value: "true"
           ports:
             - name: wireguard
               containerPort: 51820
