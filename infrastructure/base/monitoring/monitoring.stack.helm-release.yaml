@@ -186,7 +186,8 @@ spec:
           auto_assign_org: true
           auto_assign_org_role: Viewer
         smtp:
-          enabled: true
+          # Enable after the monitoring mailbox is provisioned in Stalwart.
+          enabled: false
           host: mail.winetree94.com:587
           user: $__env{GF_SMTP_USER}
           password: $__env{GF_SMTP_PASSWORD}
