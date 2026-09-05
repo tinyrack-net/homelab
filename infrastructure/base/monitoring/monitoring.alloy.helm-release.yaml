@@ -346,10 +346,8 @@ spec:
           }
 
           otelcol.auth.basic "central" {
-            client_auth {
-              username = sys.env("TELEMETRY_USERNAME")
-              password = sys.env("TELEMETRY_PASSWORD")
-            }
+            username = sys.env("TELEMETRY_USERNAME")
+            password = sys.env("TELEMETRY_PASSWORD")
           }
 
           otelcol.receiver.otlp "local" {
