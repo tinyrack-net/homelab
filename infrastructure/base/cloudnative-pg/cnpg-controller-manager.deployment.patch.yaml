@@ -1,0 +1,5 @@
+- op: add
+  path: /spec/template/spec/containers/0/env/-
+  value:
+    name: CLUSTERS_ROLLOUT_DELAY
+    value: "120"

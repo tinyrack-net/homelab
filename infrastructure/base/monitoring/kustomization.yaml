@@ -8,10 +8,45 @@ resources:
   - monitoring.ingress-route.yaml
   - monitoring.cilium-network-policy.yaml
   - monitoring.grafana-oidc.cilium-network-policy.yaml
-  - monitoring.fleet-dashboard.config-map.yaml
-  - monitoring.explore-dashboard.config-map.yaml
   - monitoring.grafana.secret.yaml
   - monitoring.grafana-env.secret.yaml
   - monitoring.telemetry.secret.yaml
   - monitoring.telemetry-auth.secret.yaml
   - monitoring.issuary.secret.yaml
+configMapGenerator:
+  - name: monitoring-alloy-config
+    namespace: monitoring-system
+    files:
+      - config.alloy=monitoring.alloy.config.alloy
+    options:
+      disableNameSuffixHash: true
+  - name: grafana-fleet-overview
+    namespace: monitoring-system
+    files:
+      - fleet-overview.json=monitoring.fleet-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+  - name: grafana-kubernetes-observability
+    namespace: monitoring-system
+    files:
+      - kubernetes-observability.json=monitoring.explore-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+  - name: monitoring-alloy-values
+    files:
+      - values.yaml=monitoring.alloy.values.yaml
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled
+    namespace: monitoring-system
+  - name: monitoring-stack-values
+    files:
+      - values.yaml=monitoring.stack.values.yaml
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled
+    namespace: monitoring-system

@@ -7,5 +7,8 @@ configMapGenerator:
   - name: cilium-values
     files:
       - values.yaml
-generatorOptions:
-  disableNameSuffixHash: true
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled
+    namespace: "null"

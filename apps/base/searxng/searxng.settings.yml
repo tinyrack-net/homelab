@@ -1,0 +1,73 @@
+use_default_settings: true
+
+general:
+  instance_name: "SearXNG"
+  enable_metrics: false
+
+server:
+  port: 8080
+  bind_address: "0.0.0.0"
+  secret_key:
+  base_url:
+  limiter: true
+  public_instance: true
+  image_proxy: false
+  method: "POST"
+  http_protocol_version: "1.1"
+
+search:
+  safe_search: 0
+  default_lang: "en"
+  formats:
+    - html
+    - json
+
+outgoing:
+  request_timeout: 3.0
+  max_request_timeout: 6.0
+  pool_connections: 200
+  pool_maxsize: 50
+  keepalive_expiry: 30.0
+  enable_http2: true
+
+engines:
+  - name: ahmia
+    inactive: true
+  - name: torch
+    inactive: true
+  - name: startpage
+    disabled: true
+  - name: startpage news
+    disabled: true
+  - name: startpage images
+    disabled: true
+  - name: wikidata
+    inactive: true
+  - name: google
+    disabled: true
+  - name: google images
+    disabled: true
+  - name: google news
+    disabled: true
+  - name: google videos
+    disabled: true
+  - name: google scholar
+    disabled: true
+  - name: bing
+    disabled: false
+  - name: naver
+    disabled: false
+  - name: mwmbl
+    disabled: false
+  - name: privacywall
+    disabled: false
+
+ui:
+  default_theme: simple
+  default_locale: "en"
+  theme_args:
+    simple_style: black
+  query_in_title: false
+
+valkey:
+  url:

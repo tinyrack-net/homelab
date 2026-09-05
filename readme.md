@@ -115,6 +115,20 @@ release installed by Ansible. Multus remains the first CNI configuration and
 delegates the primary Pod network to Cilium while continuing to provide the
 `wg-easy` macvlan attachment.
 
+## Configuration files
+
+- Keep a HelmRelease focused on chart lifecycle and load chart configuration
+  from a sibling `<component>.values.yaml` through `spec.valuesFrom`.
+- Generate Helm values ConfigMaps with a stable name, the
+  `reconcile.fluxcd.io/watch: Enabled` label, and `values.yaml` as the data key.
+- Keep application-native YAML, TOML, JSON, ENV, and Alloy River configuration
+  in files named for the owning component. Use Kustomize's default name hash
+  when a Pod directly mounts or imports a ConfigMap so changes roll the Pod.
+- Disable the name hash only when the consumer requires a stable name, such as
+  Helm values and Alloy's externally managed, dynamically reloaded ConfigMap.
+- Keep credentials out of values and configuration files. Secrets remain
+  encrypted SealedSecret manifests or references to existing Secrets.
+
 ## CNI migration
 
 The production cluster was migrated from Flannel and kube-proxy to Cilium. The

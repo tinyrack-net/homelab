@@ -5,3 +5,12 @@ resources:
   - traefik.cilium-network-policy.yaml
   - traefik.namespace.yaml
   - traefik.helm-release.yaml
+configMapGenerator:
+  - name: traefik-values
+    files:
+      - values.yaml=traefik.values.yaml
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled
+    namespace: traefik-system

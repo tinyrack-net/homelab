@@ -19,25 +19,7 @@ spec:
   interval: 5m
   timeout: 10m
   releaseName: kyverno
-  values:
-    admissionController:
-      replicas: 1
-      container:
-        resources:
-          requests:
-            cpu: 50m
-            memory: 128Mi
-          limits:
-            memory: 384Mi
-    backgroundController:
-      enabled: false
-    cleanupController:
-      replicas: 1
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-        limits:
-          memory: 128Mi
-    reportsController:
-      enabled: false
+  valuesFrom:
+    - kind: ConfigMap
+      name: kyverno-values
+      valuesKey: values.yaml

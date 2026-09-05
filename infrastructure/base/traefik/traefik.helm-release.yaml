@@ -15,47 +15,7 @@ spec:
   interval: 5m
   timeout: 5m
   releaseName: traefik
-  values:
-    providers:
-      kubernetesCRD:
-        allowExternalNameServices: true
-        ingressClass: "traefik"
-      kubernetesIngress:
-        allowExternalNameServices: true
-        ingressClass: "traefik"
-    deployment:
-      replicas: 2
-      podAnnotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9100"
-        prometheus.io/path: /metrics
-    accessLog:
-      enabled: true
-      format: json
-      fields:
-        defaultMode: keep
-        headers:
-          defaultMode: drop
-          names:
-            traceparent: keep
-        queryParameters:
-          defaultMode: drop
-    tracing:
-      serviceName: traefik-internal
-      sampleRate: 0.1
-      resourceAttributes:
-        cluster: homelab
-      otlp:
-        enabled: true
-        http:
-          enabled: true
-          endpoint: http://monitoring-alloy.monitoring-system.svc:4318/v1/traces
-    ingressClass:
-      enabled: true
-      isDefaultClass: true
-      name: "traefik"
-    service:
-      labels:
-        networking.tinyrack.net/load-balancer: cilium-l2
-      annotations:
-        lbipam.cilium.io/ips: "10.132.246.1"
+  valuesFrom:
+    - kind: ConfigMap
+      name: traefik-values
+      valuesKey: values.yaml

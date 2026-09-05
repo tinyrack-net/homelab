@@ -10,19 +10,11 @@ patches:
       version: v1
       kind: Namespace
       name: cnpg-system
-    patch: |-
-      - op: add
-        path: /metadata/labels/networking.tinyrack.net~1isolation
-        value: enabled
+    path: cnpg-system.namespace.patch.yaml
   - target:
       group: apps
       version: v1
       kind: Deployment
       name: cnpg-controller-manager
       namespace: cnpg-system
-    patch: |-
-      - op: add
-        path: /spec/template/spec/containers/0/env/-
-        value:
-          name: CLUSTERS_ROLLOUT_DELAY
-          value: "120"
+    path: cnpg-controller-manager.deployment.patch.yaml

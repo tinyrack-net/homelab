@@ -5,5 +5,9 @@ resources:
   - multus.service-account.yaml
   - multus.cluster-role.yaml
   - multus.cluster-role-binding.yaml
-  - multus.config-map.yaml
   - multus.daemon-set.yaml
+configMapGenerator:
+  - name: multus-daemon-config
+    namespace: kube-system
+    files:
+      - daemon-config.json=multus.daemon-config.json

@@ -12,8 +12,6 @@ spec:
       app: searxng
   template:
     metadata:
-      annotations:
-        searxng.tinyrack.net/config-revision: "2026-08-28-engine-pool-v1"
       labels:
         app: searxng
     spec:

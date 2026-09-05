@@ -1,0 +1,64 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "graphTooltip": 1,
+  "links": [
+    {"title": "Explore traces", "type": "link", "url": "/explore?left=%7B%22datasource%22:%22VictoriaTraces%22%7D"},
+    {"title": "Explore all logs", "type": "link", "url": "/explore?left=%7B%22datasource%22:%22VictoriaLogs%22%7D"}
+  ],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "reqps"}},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "id": 1,
+      "targets": [{"expr": "sum by (cluster, service) (rate(traefik_service_requests_total{cluster=~\"$cluster\"}[5m]))", "legendFormat": "{{cluster}} / {{service}}", "refId": "A"}],
+      "title": "Traefik request rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "percentunit"}},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+      "id": 2,
+      "targets": [{"expr": "sum by (cluster) (rate(traefik_service_requests_total{cluster=~\"$cluster\",code=~\"5..\"}[5m])) / clamp_min(sum by (cluster) (rate(traefik_service_requests_total{cluster=~\"$cluster\"}[5m])), 1e-9)", "legendFormat": "{{cluster}}", "refId": "A"}],
+      "title": "Traefik 5xx ratio",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+      "id": 3,
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (cluster, le) (rate(traefik_service_request_duration_seconds_bucket{cluster=~\"$cluster\"}[5m])))", "legendFormat": "{{cluster}}", "refId": "A"}],
+      "title": "Traefik p95 latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "victoriametrics-logs-datasource", "uid": "VictoriaLogs"},
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 8},
+      "id": 4,
+      "options": {"dedupStrategy": "none", "enableLogDetails": true, "showCommonLabels": false, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"datasource": {"type": "victoriametrics-logs-datasource", "uid": "VictoriaLogs"}, "editorMode": "code", "expr": "cluster:~\"$cluster\" AND app:=\"traefik\" | sort by (_time) desc limit 500", "queryType": "instant", "refId": "A"}],
+      "title": "Traefik access logs",
+      "type": "logs"
+    },
+    {
+      "datasource": {"type": "victoriametrics-logs-datasource", "uid": "VictoriaLogs"},
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 8},
+      "id": 5,
+      "options": {"dedupStrategy": "none", "enableLogDetails": true, "showCommonLabels": false, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"datasource": {"type": "victoriametrics-logs-datasource", "uid": "VictoriaLogs"}, "editorMode": "code", "expr": "cluster:~\"$cluster\" AND job:=\"kubernetes-events\" | sort by (_time) desc limit 500", "queryType": "instant", "refId": "A"}],
+      "title": "Kubernetes events",
+      "type": "logs"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["homelab", "kubernetes", "logs", "tracing", "traefik"],
+  "templating": {"list": [{"allValue": ".*", "current": {"text": "All", "value": "$__all"}, "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"}, "definition": "label_values(up, cluster)", "includeAll": true, "label": "Cluster", "name": "cluster", "query": {"query": "label_values(up, cluster)", "refId": "StandardVariableQuery"}, "refresh": 1, "type": "query"}]},
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "Kubernetes Observability",
+  "uid": "homelab-kubernetes-observability",
+  "version": 1
+}

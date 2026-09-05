@@ -4,3 +4,12 @@ resources:
   - sealed-secrets.cilium-network-policy.yaml
   - sealed-secrets.namespace.yaml
   - sealed-secrets.helm-release.yaml
+configMapGenerator:
+  - name: sealed-secrets-values
+    files:
+      - values.yaml=sealed-secrets.values.yaml
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled
+    namespace: sealed-secrets
