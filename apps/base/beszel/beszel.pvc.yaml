@@ -15,4 +15,4 @@ spec:
     requests:
       storage: 5Gi
   storageClassName: longhorn-strict-local
-  volumeName: pvc-3e8afd31-540b-41ec-a8d2-45c461898c58
+  volumeName: beszel-data

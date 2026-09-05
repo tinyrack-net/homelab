@@ -17,4 +17,4 @@ spec:
       storage: 1Gi
   storageClassName: longhorn-strict-local
   volumeMode: Filesystem
-  volumeName: pvc-05629bef-d817-4839-b569-4870e143b669
+  volumeName: wg-easy-data
