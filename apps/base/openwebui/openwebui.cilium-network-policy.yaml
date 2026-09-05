@@ -52,7 +52,7 @@ specs:
               - port: "8443"
                 protocol: TCP
       - toCIDR:
-          - 10.132.247.37/32
+          - 10.132.245.37/32
         toPorts:
           - ports:
               - port: "8080"
