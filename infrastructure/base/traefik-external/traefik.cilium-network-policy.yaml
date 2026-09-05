@@ -51,6 +51,21 @@ specs:
           - ports:
               - port: "6443"
                 protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+        toPorts:
+          - ports:
+              - port: "3000"
+                protocol: TCP
+              - port: "8428"
+                protocol: TCP
+              - port: "9428"
+                protocol: TCP
+              - port: "10428"
+                protocol: TCP
+              - port: "4318"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

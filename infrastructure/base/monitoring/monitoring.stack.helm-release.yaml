@@ -1,0 +1,407 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: monitoring-stack
+  namespace: monitoring-system
+spec:
+  interval: 15m
+  timeout: 15m
+  releaseName: monitoring
+  chart:
+    spec:
+      chart: victoria-metrics-k8s-stack
+      version: "0.91.2"
+      sourceRef:
+        kind: HelmRepository
+        name: victoria-metrics-repository
+        namespace: flux-system
+  values:
+    victoria-metrics-operator:
+      serviceMonitor:
+        enabled: false
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+    vmcluster:
+      enabled: false
+    vlcluster:
+      enabled: false
+    vldistributed:
+      enabled: false
+    vtcluster:
+      enabled: false
+    vmagent:
+      enabled: false
+    vlagent:
+      enabled: false
+    vmalert:
+      enabled: false
+    alertmanager:
+      enabled: false
+    prometheus-node-exporter:
+      enabled: false
+    kube-state-metrics:
+      enabled: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 192Mi
+    vmsingle:
+      enabled: true
+      spec:
+        retentionPeriod: 30d
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        storage:
+          storageClassName: longhorn-strict-local
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 30Gi
+    vlsingle:
+      enabled: true
+      spec:
+        retentionPeriod: 7d
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        storage:
+          storageClassName: longhorn-strict-local
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 40Gi
+    vtsingle:
+      enabled: true
+      spec:
+        retentionPeriod: 3d
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        storage:
+          storageClassName: longhorn-strict-local
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+    defaultDashboards:
+      enabled: true
+      dashboards:
+        victoriametrics-vmalert:
+          enabled: false
+        node-exporter-full:
+          enabled: true
+      sources:
+        node-exporter-full:
+          enabled: true
+    defaultDatasources:
+      victorialogs:
+        datasources:
+          - name: VictoriaLogs (DS)
+            access: proxy
+            uid: VictoriaLogs
+            type: victoriametrics-logs-datasource
+            jsonData:
+              maxLines: 1000
+              derivedFields:
+                - name: trace_id
+                  matcherType: regex
+                  matcherRegex: '00-([0-9a-f]{32})-[0-9a-f]{16}-[0-9a-f]{2}'
+                  url: '${__value.raw}'
+                  urlDisplayLabel: View trace
+                  datasourceUid: VictoriaTraces
+    grafana:
+      enabled: true
+      plugins:
+        - victoriametrics-metrics-datasource
+        - victoriametrics-logs-datasource
+      sidecar:
+        dashboards:
+          multicluster: true
+      admin:
+        existingSecret: grafana-admin
+        userKey: admin-user
+        passwordKey: admin-password
+      envFromSecret: grafana-env
+      persistence:
+        enabled: true
+        storageClassName: longhorn-strict-local
+        size: 5Gi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      testFramework:
+        enabled: false
+      grafana.ini:
+        analytics:
+          check_for_updates: false
+          reporting_enabled: false
+        server:
+          domain: grafana.winetree94.com
+          root_url: https://grafana.winetree94.com
+        auth:
+          disable_login_form: false
+          oauth_auto_login: false
+        auth.generic_oauth:
+          enabled: true
+          name: Issuary
+          allow_sign_up: true
+          auto_login: false
+          client_id: grafana
+          client_secret: $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
+          scopes: openid profile email
+          auth_url: https://auth.winetree94.com/oauth/authorize
+          token_url: https://auth.winetree94.com/oauth/token
+          api_url: https://auth.winetree94.com/oauth/userinfo
+          signout_redirect_url: https://auth.winetree94.com/oauth/end_session
+          use_pkce: true
+        users:
+          auto_assign_org: true
+          auto_assign_org_role: Viewer
+        smtp:
+          enabled: true
+          host: mail.winetree94.com:587
+          user: $__env{GF_SMTP_USER}
+          password: $__env{GF_SMTP_PASSWORD}
+          from_address: monitoring@winetree94.com
+          from_name: Homelab Monitoring
+          startTLS_policy: MandatoryStartTLS
+        unified_alerting:
+          enabled: true
+      alerting:
+        contactpoints.yaml:
+          apiVersion: 1
+          contactPoints:
+            - orgId: 1
+              name: homelab-email
+              receivers:
+                - uid: homelab-email
+                  type: email
+                  settings:
+                    addresses: admin@winetree94.com
+                    singleEmail: false
+        policies.yaml:
+          apiVersion: 1
+          policies:
+            - orgId: 1
+              receiver: homelab-email
+              group_by:
+                - grafana_folder
+                - alertname
+              group_wait: 30s
+              group_interval: 5m
+              repeat_interval: 6h
+        rules.yaml:
+          apiVersion: 1
+          groups:
+            - orgId: 1
+              name: homelab-infrastructure
+              folder: Infrastructure
+              interval: 1m
+              rules:
+                - uid: cluster-missing
+                  title: Cluster telemetry missing
+                  condition: B
+                  data:
+                    - refId: A
+                      relativeTimeRange: {from: 600, to: 0}
+                      datasourceUid: VictoriaMetrics
+                      model:
+                        datasource: {type: prometheus, uid: VictoriaMetrics}
+                        editorMode: code
+                        expr: (label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) count by(cluster) (up)
+                        instant: true
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: A
+                    - refId: B
+                      relativeTimeRange: {from: 0, to: 0}
+                      datasourceUid: __expr__
+                      model:
+                        conditions:
+                          - evaluator: {params: [0], type: gt}
+                            operator: {type: and}
+                            query: {params: [A]}
+                            reducer: {params: [], type: last}
+                            type: query
+                        datasource: {type: __expr__, uid: __expr__}
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: B
+                        type: classic_conditions
+                  noDataState: OK
+                  execErrState: Error
+                  for: 5m
+                  annotations:
+                    summary: One or more clusters stopped reporting telemetry
+                  labels: {severity: critical}
+                - uid: node-not-ready
+                  title: Kubernetes node not ready
+                  condition: B
+                  data:
+                    - refId: A
+                      relativeTimeRange: {from: 600, to: 0}
+                      datasourceUid: VictoriaMetrics
+                      model:
+                        datasource: {type: prometheus, uid: VictoriaMetrics}
+                        editorMode: code
+                        expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+                        instant: true
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: A
+                    - refId: B
+                      relativeTimeRange: {from: 0, to: 0}
+                      datasourceUid: __expr__
+                      model:
+                        conditions:
+                          - evaluator: {params: [0], type: gt}
+                            operator: {type: and}
+                            query: {params: [A]}
+                            reducer: {params: [], type: last}
+                            type: query
+                        datasource: {type: __expr__, uid: __expr__}
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: B
+                        type: classic_conditions
+                  noDataState: OK
+                  execErrState: Error
+                  for: 5m
+                  annotations: {summary: A Kubernetes node is not Ready}
+                  labels: {severity: critical}
+                - uid: workload-failure
+                  title: Kubernetes workload failure
+                  condition: B
+                  data:
+                    - refId: A
+                      relativeTimeRange: {from: 600, to: 0}
+                      datasourceUid: VictoriaMetrics
+                      model:
+                        datasource: {type: prometheus, uid: VictoriaMetrics}
+                        editorMode: code
+                        expr: (kube_pod_container_status_waiting_reason{reason=~"CrashLoopBackOff|ImagePullBackOff|ErrImagePull"} > 0) or ((kube_pod_status_ready{condition="true"} == 0) and on(cluster,namespace,pod) (kube_pod_status_phase{phase="Running"} == 1))
+                        instant: true
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: A
+                    - refId: B
+                      relativeTimeRange: {from: 0, to: 0}
+                      datasourceUid: __expr__
+                      model:
+                        conditions:
+                          - evaluator: {params: [0], type: gt}
+                            operator: {type: and}
+                            query: {params: [A]}
+                            reducer: {params: [], type: last}
+                            type: query
+                        datasource: {type: __expr__, uid: __expr__}
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: B
+                        type: classic_conditions
+                  noDataState: OK
+                  execErrState: Error
+                  for: 10m
+                  annotations:
+                    summary: A pod is not Ready or a container is stuck waiting
+                  labels: {severity: warning}
+                - uid: node-resource-high
+                  title: Node or volume capacity high
+                  condition: B
+                  data:
+                    - refId: A
+                      relativeTimeRange: {from: 600, to: 0}
+                      datasourceUid: VictoriaMetrics
+                      model:
+                        datasource: {type: prometheus, uid: VictoriaMetrics}
+                        editorMode: code
+                        expr: (1 - avg by(cluster,instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.90) or (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes > 0.90) or ((1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"}) > 0.85) or (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes > 0.85)
+                        instant: true
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: A
+                    - refId: B
+                      relativeTimeRange: {from: 0, to: 0}
+                      datasourceUid: __expr__
+                      model:
+                        conditions:
+                          - evaluator: {params: [0], type: gt}
+                            operator: {type: and}
+                            query: {params: [A]}
+                            reducer: {params: [], type: last}
+                            type: query
+                        datasource: {type: __expr__, uid: __expr__}
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: B
+                        type: classic_conditions
+                  noDataState: OK
+                  execErrState: Error
+                  for: 10m
+                  annotations:
+                    summary: "CPU or memory is above 90%, or storage is above 85%"
+                  labels: {severity: warning}
+                - uid: telemetry-pipeline-failure
+                  title: Telemetry pipeline failure
+                  condition: B
+                  data:
+                    - refId: A
+                      relativeTimeRange: {from: 600, to: 0}
+                      datasourceUid: VictoriaMetrics
+                      model:
+                        datasource: {type: prometheus, uid: VictoriaMetrics}
+                        editorMode: code
+                        expr: (up{job=~"victoriametrics|victorialogs|victoriatraces"} == 0) or (increase(prometheus_remote_storage_samples_failed_total[10m]) > 0)
+                        instant: true
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: A
+                    - refId: B
+                      relativeTimeRange: {from: 0, to: 0}
+                      datasourceUid: __expr__
+                      model:
+                        conditions:
+                          - evaluator: {params: [0], type: gt}
+                            operator: {type: and}
+                            query: {params: [A]}
+                            reducer: {params: [], type: last}
+                            type: query
+                        datasource: {type: __expr__, uid: __expr__}
+                        intervalMs: 1000
+                        maxDataPoints: 43200
+                        refId: B
+                        type: classic_conditions
+                  noDataState: Alerting
+                  execErrState: Error
+                  for: 5m
+                  annotations:
+                    summary: A telemetry backend or remote-write pipeline is failing
+                  labels: {severity: critical}

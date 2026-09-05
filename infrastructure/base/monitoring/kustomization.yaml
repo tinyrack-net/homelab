@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - monitoring.namespace.yaml
+  - monitoring.stack.helm-release.yaml
+  - monitoring.alloy.pvc.yaml
+  - monitoring.alloy.helm-release.yaml
+  - monitoring.ingress-route.yaml
+  - monitoring.cilium-network-policy.yaml
+  - monitoring.fleet-dashboard.config-map.yaml
+  - monitoring.explore-dashboard.config-map.yaml
+  - monitoring.grafana.secret.yaml
+  - monitoring.grafana-env.secret.yaml
+  - monitoring.telemetry.secret.yaml
+  - monitoring.telemetry-auth.secret.yaml
+  - monitoring.issuary.secret.yaml

@@ -33,6 +33,14 @@ specs:
           - ports:
               - port: "8081"
                 protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "4318"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

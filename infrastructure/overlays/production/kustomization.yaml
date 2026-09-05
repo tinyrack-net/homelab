@@ -23,3 +23,4 @@ resources:
   - ot-redis-operator.yaml
   - cloudflared.yaml
   - cilium-host-firewall.yaml
+  - monitoring.yaml
