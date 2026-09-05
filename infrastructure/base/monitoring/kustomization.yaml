@@ -7,6 +7,7 @@ resources:
   - monitoring.alloy.helm-release.yaml
   - monitoring.ingress-route.yaml
   - monitoring.cilium-network-policy.yaml
+  - monitoring.grafana-oidc.cilium-network-policy.yaml
   - monitoring.fleet-dashboard.config-map.yaml
   - monitoring.explore-dashboard.config-map.yaml
   - monitoring.grafana.secret.yaml

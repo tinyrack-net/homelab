@@ -18,6 +18,14 @@ specs:
           - ports:
               - port: "8080"
                 protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: grafana
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
     egress:
       - toEndpoints:
           - matchLabels:

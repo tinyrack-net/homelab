@@ -178,8 +178,8 @@ spec:
           client_secret: $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
           scopes: openid profile email
           auth_url: https://auth.winetree94.com/oauth/authorize
-          token_url: https://auth.winetree94.com/oauth/token
-          api_url: https://auth.winetree94.com/oauth/userinfo
+          token_url: http://issuary-service.issuary-system.svc:8080/oauth/token
+          api_url: http://issuary-service.issuary-system.svc:8080/oauth/userinfo
           signout_redirect_url: https://auth.winetree94.com/oauth/end_session
           use_pkce: true
         users:
