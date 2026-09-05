@@ -176,6 +176,9 @@ spec:
           name: Issuary
           allow_sign_up: true
           auto_login: true
+          role_attribute_path: "email == 'admin@winetree94.com' && 'GrafanaAdmin' || 'Viewer'"
+          allow_assign_grafana_admin: true
+          skip_org_role_sync: false
           client_id: grafana
           client_secret: $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
           scopes: openid profile email
