@@ -17,4 +17,3 @@ spec:
       storage: 20Gi
   storageClassName: longhorn-strict-local
   volumeMode: Filesystem
-  volumeName: home-assistant-data
