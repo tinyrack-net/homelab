@@ -1,0 +1,21 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: home-assistant-lan
+  namespace: home-assistant-system
+spec:
+  config: |-
+    {
+      "cniVersion": "1.0.0",
+      "type": "macvlan",
+      "master": "enp6s18",
+      "mode": "bridge",
+      "ipam": {
+        "type": "static",
+        "addresses": [
+          {
+            "address": "10.132.246.253/22"
+          }
+        ]
+      }
+    }

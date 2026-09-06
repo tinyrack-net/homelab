@@ -13,3 +13,4 @@ resources:
   - proxer.yaml
   - wg-easy.yaml
   - rustdesk.yaml
+  - home-assistant.yaml

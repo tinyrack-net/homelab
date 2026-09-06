@@ -201,3 +201,17 @@ specs:
           - ports:
               - port: "8080"
                 protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: traefik-external-system
+        app.kubernetes.io/name: traefik
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: home-assistant-system
+              app: home-assistant
+        toPorts:
+          - ports:
+              - port: "8123"
+                protocol: TCP

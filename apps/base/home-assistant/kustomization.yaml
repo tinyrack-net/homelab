@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - home-assistant.namespace.yaml
+  - home-assistant.storage.pvc.yaml
+  - home-assistant.network-attachment.yaml
+  - home-assistant.deployment.yaml
+  - home-assistant.service.yaml
+  - home-assistant.ingress-route.yaml
+  - home-assistant.cilium-network-policy.yaml
