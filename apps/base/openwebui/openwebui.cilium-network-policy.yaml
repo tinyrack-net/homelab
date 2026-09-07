@@ -45,7 +45,7 @@ specs:
                 protocol: TCP
       - toEndpoints:
           - matchLabels:
-              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              k8s:io.kubernetes.pod.namespace: traefik-system
               app.kubernetes.io/name: traefik
         toPorts:
           - ports:
@@ -128,4 +128,12 @@ specs:
               - port: "5432"
                 protocol: TCP
               - port: "8000"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
                 protocol: TCP

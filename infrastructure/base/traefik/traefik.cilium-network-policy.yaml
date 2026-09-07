@@ -34,6 +34,26 @@ specs:
                 protocol: TCP
               - port: "21119"
                 protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: n8n-system
+              cnpg.io/cluster: n8n-database-cluster
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: issuary-system
+              cnpg.io/cluster: issuary-database-cluster
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: openwebui-system
+              cnpg.io/cluster: openwebui-database-cluster
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: openwebui-system
+              app.kubernetes.io/component: open-webui
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: davinci-resolve-system
+              cnpg.io/cluster: davinci-resolve-database-cluster
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
     egress:
       - toEntities:
           - kube-apiserver
