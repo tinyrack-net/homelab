@@ -13,6 +13,13 @@ spec:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
+  ingress:
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
   egress:
     - toServices:
         - k8sService:

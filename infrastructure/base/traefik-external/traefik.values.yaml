@@ -43,6 +43,12 @@ ingressClass:
   isDefaultClass: false
   name: "traefik-external"
 ports:
+  postgres:
+    port: 5432
+    exposedPort: 5432
+    expose:
+      default: true
+    protocol: TCP
   cloudflare:
     port: 8444
     exposedPort: 443

@@ -5,6 +5,6 @@ resources:
   - davinci-resolve.database.superuser.secret.yaml
   - davinci-resolve.database.user.secret.yaml
   - davinci-resolve.database.yaml
-  # - davinci-resolve.ingress-route-tcp.yaml
-  # - davinci-resolve.traefik.cilium-network-policy.yaml
+  - davinci-resolve.ingress-route-tcp.yaml
+  - davinci-resolve.traefik.cilium-network-policy.yaml
   - davinci-resolve.cilium-network-policy.yaml
