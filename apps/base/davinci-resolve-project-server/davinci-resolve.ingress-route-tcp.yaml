@@ -4,7 +4,7 @@ metadata:
   name: davinci-resolve-ingress-route-tcp
   namespace: davinci-resolve-system
 spec:
-  ingressClassName: traefik-external
+  ingressClassName: traefik
   entryPoints:
     - postgres
   tls:

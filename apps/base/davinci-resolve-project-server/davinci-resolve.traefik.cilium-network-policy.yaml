@@ -2,7 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: route-davinci-resolve
-  namespace: traefik-external-system
+  namespace: traefik-system
   labels:
     networking.tinyrack.net/owner: davinci-resolve
   annotations:

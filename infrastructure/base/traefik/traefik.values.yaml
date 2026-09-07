@@ -36,6 +36,13 @@ ingressClass:
   enabled: true
   isDefaultClass: true
   name: "traefik"
+ports:
+  postgres:
+    port: 5432
+    exposedPort: 5432
+    expose:
+      default: true
+    protocol: TCP
 service:
   labels:
     networking.tinyrack.net/load-balancer: cilium-l2
