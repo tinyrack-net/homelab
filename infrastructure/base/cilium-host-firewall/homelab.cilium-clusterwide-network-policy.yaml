@@ -45,6 +45,12 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
+            - port: "51820"
+              protocol: UDP
+    - fromCIDR:
+        - 10.132.244.0/22
+      toPorts:
+        - ports:
             - port: "21115"
               protocol: TCP
             - port: "21116"
@@ -57,8 +63,6 @@ spec:
               protocol: TCP
             - port: "21119"
               protocol: TCP
-            - port: "51820"
-              protocol: UDP
     - fromCIDR:
         - 10.132.244.0/22
       toPorts:

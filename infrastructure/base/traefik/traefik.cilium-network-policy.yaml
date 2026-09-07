@@ -18,6 +18,22 @@ specs:
                 protocol: TCP
               - port: "8443"
                 protocol: TCP
+      - fromCIDR:
+          - 10.132.244.0/22
+        toPorts:
+          - ports:
+              - port: "21115"
+                protocol: TCP
+              - port: "21116"
+                protocol: TCP
+              - port: "21116"
+                protocol: UDP
+              - port: "21117"
+                protocol: TCP
+              - port: "21118"
+                protocol: TCP
+              - port: "21119"
+                protocol: TCP
     egress:
       - toEntities:
           - kube-apiserver
@@ -40,6 +56,24 @@ specs:
         toPorts:
           - ports:
               - port: "4318"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: rustdesk-system
+              app.kubernetes.io/name: rustdesk
+        toPorts:
+          - ports:
+              - port: "21115"
+                protocol: TCP
+              - port: "21116"
+                protocol: TCP
+              - port: "21116"
+                protocol: UDP
+              - port: "21117"
+                protocol: TCP
+              - port: "21118"
+                protocol: TCP
+              - port: "21119"
                 protocol: TCP
   - endpointSelector:
       matchLabels:
@@ -65,6 +99,8 @@ specs:
           - 10.132.245.8/32
         toPorts:
           - ports:
+              - port: "3900"
+                protocol: TCP
               - port: "3902"
                 protocol: TCP
               - port: "3909"

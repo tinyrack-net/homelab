@@ -5,6 +5,43 @@ providers:
   kubernetesIngress:
     allowExternalNameServices: true
     ingressClass: "traefik"
+ports:
+  rd-nat:
+    port: 21115
+    expose:
+      default: true
+    exposedPort: 21115
+    protocol: TCP
+  rd-id-tcp:
+    port: 21116
+    expose:
+      default: true
+    exposedPort: 21116
+    protocol: TCP
+  rd-id-udp:
+    port: 21116
+    expose:
+      default: true
+    exposedPort: 21116
+    protocol: UDP
+  rd-relay:
+    port: 21117
+    expose:
+      default: true
+    exposedPort: 21117
+    protocol: TCP
+  rd-ws-id:
+    port: 21118
+    expose:
+      default: true
+    exposedPort: 21118
+    protocol: TCP
+  rd-ws-relay:
+    port: 21119
+    expose:
+      default: true
+    exposedPort: 21119
+    protocol: TCP
 deployment:
   replicas: 2
   podAnnotations:

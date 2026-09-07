@@ -10,8 +10,26 @@ spec:
       k8s:io.kubernetes.pod.namespace: rustdesk-system
       app.kubernetes.io/name: rustdesk
   ingress:
-    - fromEntities:
-        - world
+    - fromCIDR:
+        - 10.132.244.0/22
+      toPorts:
+        - ports:
+            - port: "21115"
+              protocol: TCP
+            - port: "21116"
+              protocol: TCP
+            - port: "21116"
+              protocol: UDP
+            - port: "21117"
+              protocol: TCP
+            - port: "21118"
+              protocol: TCP
+            - port: "21119"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
       toPorts:
         - ports:
             - port: "21115"

@@ -1,0 +1,94 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: rustdesk-nat-test
+  namespace: rustdesk-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - rd-nat
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: rustdesk
+          port: 21115
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: rustdesk-rendezvous
+  namespace: rustdesk-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - rd-id-tcp
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: rustdesk
+          port: 21116
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: rustdesk-rendezvous
+  namespace: rustdesk-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - rd-id-udp
+  routes:
+    - services:
+        - name: rustdesk
+          port: 21116
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: rustdesk-relay
+  namespace: rustdesk-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - rd-relay
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: rustdesk
+          port: 21117
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: rustdesk-websocket-rendezvous
+  namespace: rustdesk-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - rd-ws-id
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: rustdesk
+          port: 21118
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: rustdesk-websocket-relay
+  namespace: rustdesk-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - rd-ws-relay
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: rustdesk
+          port: 21119

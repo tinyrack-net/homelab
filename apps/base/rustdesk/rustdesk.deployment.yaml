@@ -27,7 +27,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: RELAY
-              value: rustdesk.winetree94.com:21117
+              value: rustdesk.intranet.winetree94.com:21117
             - name: ENCRYPTED_ONLY
               value: "1"
             - name: RUST_LOG

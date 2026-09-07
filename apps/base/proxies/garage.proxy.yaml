@@ -25,12 +25,12 @@ metadata:
   name: garage-ingress-route
   namespace: garage-proxy
   annotations:
-    kubernetes.io/ingress.class: traefik-external
+    kubernetes.io/ingress.class: traefik
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: HostRegexp(`^(.+\.)?storage\.winetree94\.com$`)
+    - match: HostRegexp(`^(.+\.)?storage\.intranet\.winetree94\.com$`)
       kind: Rule
       services:
         - name: garage-proxy-service

@@ -173,18 +173,6 @@ specs:
           - 10.132.245.8/32
         toPorts:
           - ports:
-              - port: "3900"
-                protocol: TCP
-  - endpointSelector:
-      matchLabels:
-        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-        k8s:io.kubernetes.pod.namespace: traefik-external-system
-        app.kubernetes.io/name: traefik
-    egress:
-      - toCIDR:
-          - 10.132.245.8/32
-        toPorts:
-          - ports:
               - port: "8087"
                 protocol: TCP
   - endpointSelector:

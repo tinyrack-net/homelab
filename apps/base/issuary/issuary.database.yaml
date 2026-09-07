@@ -7,7 +7,7 @@ spec:
   retentionPolicy: 30d
   configuration:
     destinationPath: s3://tinyrack-homelab/apps/issuary/database-17
-    endpointURL: https://storage.winetree94.com
+    endpointURL: https://storage.intranet.winetree94.com
     s3Credentials:
       region:
         name: tinyrack-homelab-s3-secret

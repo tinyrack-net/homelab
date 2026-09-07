@@ -6,4 +6,5 @@ resources:
   - rustdesk.storage.pvc.yaml
   - rustdesk.deployment.yaml
   - rustdesk.service.yaml
+  - rustdesk.ingress-route.yaml
   - rustdesk.cilium-network-policy.yaml
