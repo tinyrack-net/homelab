@@ -1,0 +1,24 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+spec:
+  interval: 5m
+  timeout: 15m
+  releaseName: immich
+  targetNamespace: immich-system
+  storageNamespace: immich-system
+  chartRef:
+    kind: OCIRepository
+    name: immich-repository
+    namespace: flux-system
+  install:
+    remediation:
+      retries: 0
+  upgrade:
+    remediation:
+      retries: 0
+  valuesFrom:
+    - kind: ConfigMap
+      name: immich-values
+      valuesKey: values.yaml

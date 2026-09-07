@@ -13,3 +13,4 @@ resources:
   - wg-easy.yaml
   - rustdesk.yaml
   - home-assistant.yaml
+  - immich.yaml

@@ -1,0 +1,36 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: immich-juicefs
+provisioner: csi.juicefs.com
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  csi.storage.k8s.io/provisioner-secret-name: immich-juicefs-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: immich-system
+  csi.storage.k8s.io/node-publish-secret-name: immich-juicefs-secret
+  csi.storage.k8s.io/node-publish-secret-namespace: immich-system
+mountOptions:
+  - cache-dir=/var/lib/jfs-cache
+  - cache-size=51200
+  - free-space-ratio=0.2
+  - buffer-size=200
+  - put-timeout=3600
+  - max-uploads=2
+  - upload-delay=10s
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-library
+  namespace: immich-system
+  labels:
+    storage.tinyrack.net/profile: immich
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Ti
+  storageClassName: immich-juicefs

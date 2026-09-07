@@ -24,3 +24,4 @@ resources:
   - cloudflared.yaml
   - cilium-host-firewall.yaml
   - monitoring.yaml
+  - juicefs.yaml

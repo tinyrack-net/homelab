@@ -1,0 +1,35 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: immich-database
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/immich/database
+  prune: true
+  timeout: 10m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: immich-deployment
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/immich/app
+  prune: true
+  timeout: 20m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: immich-database
+    - name: juicefs-csi-driver

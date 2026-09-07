@@ -1,0 +1,106 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: immich-database-backup-store
+  namespace: immich-system
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://tinyrack-homelab/apps/immich/database-18
+    endpointURL: https://storage.intranet.winetree94.com
+    s3Credentials:
+      region:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_REGION
+      accessKeyId:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: immich-database-cluster
+  namespace: immich-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18-standard-trixie@sha256:c2a773217853c6e0ffe7da9c37ea456466efb20cf844f27511a73fa6a81e3152
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: immich-database-backup-store
+  postgresql:
+    shared_preload_libraries:
+      - vchord.so
+    extensions:
+      - name: vchord
+        image:
+          reference: ghcr.io/tensorchord/vchord-scratch:pg18-v1.1.1@sha256:bdea43bed2a414e21bbf71767bf6f0739747ac480b267b51772dc214ac28dcb3
+        dynamic_library_path:
+          - /usr/lib/postgresql/18/lib
+        extension_control_path:
+          - /usr/share/postgresql/18/
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 32Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  bootstrap:
+    initdb:
+      database: immich
+      owner: immich
+      secret:
+        name: immich-database-user-secret
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: immich-database
+  namespace: immich-system
+spec:
+  name: immich
+  owner: immich
+  databaseReclaimPolicy: retain
+  cluster:
+    name: immich-database-cluster
+  schemas:
+    - name: juicefs
+      owner: immich
+      ensure: present
+  extensions:
+    - name: vector
+      ensure: present
+    - name: vchord
+      ensure: present
+    - name: earthdistance
+      ensure: present
+    - name: cube
+      ensure: present
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: immich-backup
+  namespace: immich-system
+spec:
+  schedule: "0 0 */4 * * *"
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+  cluster:
+    name: immich-database-cluster

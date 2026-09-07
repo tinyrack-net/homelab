@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: immich
+  namespace: immich-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`immich.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: immich-server
+          port: 2283
+  tls:
+    secretName: letsencrypt-cert

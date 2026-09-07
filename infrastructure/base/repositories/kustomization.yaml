@@ -13,3 +13,4 @@ resources:
   - grafana.yaml
   - prometheus-community.yaml
   - victoria-metrics.yaml
+  - juicefs.yaml

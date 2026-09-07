@@ -1,0 +1,51 @@
+mountMode: mountpod
+
+controller:
+  replicas: 1
+  provisioner: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+node:
+  hostNetwork: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+dashboard:
+  enabled: false
+
+globalConfig:
+  enabled: true
+  manageByHelm: true
+  mountPodPatch:
+    - pvcSelector:
+        matchLabels:
+          storage.tinyrack.net/profile: immich
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          cpu: "2"
+          memory: 2Gi
+      env:
+        - name: GOMEMLIMIT
+          value: 1600MiB
+      mountOptions:
+        - cache-dir=/var/lib/jfs-cache
+        - cache-size=51200
+        - free-space-ratio=0.2
+        - buffer-size=200
+        - put-timeout=3600
+        - max-uploads=2
+        - upload-delay=10s
