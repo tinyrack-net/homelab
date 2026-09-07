@@ -66,5 +66,3 @@ service:
   additionalServices:
     cloudflare:
       type: ClusterIP
-      annotations:
-        kustomize.toolkit.fluxcd.io/prune: disabled
