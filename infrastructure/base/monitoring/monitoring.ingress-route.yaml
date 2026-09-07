@@ -47,6 +47,7 @@ metadata:
 spec:
   entryPoints:
     - websecure
+    - cloudflare
   routes:
     - match: Host(`grafana.winetree94.com`)
       kind: Rule
@@ -66,6 +67,7 @@ metadata:
 spec:
   entryPoints:
     - websecure
+    - cloudflare
   routes:
     - match: Host(`telemetry.winetree94.com`) && Path(`/api/v1/write`)
       kind: Rule

@@ -8,6 +8,7 @@ metadata:
 spec:
   entryPoints:
     - websecure
+    - cloudflare
   routes:
     - match: Host(`home-assistant.winetree94.com`)
       kind: Rule

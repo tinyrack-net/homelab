@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - proxy-egress.cilium-network-policy.yaml
   - traefik.cilium-network-policy.yaml
+  - traefik.cloudflare.service.yaml
   - traefik.namespace.yaml
   - traefik.helm-release.yaml
 configMapGenerator:

@@ -25,6 +25,7 @@ metadata:
 spec:
   entryPoints:
     - websecure
+    - cloudflare
   routes:
     - match: Host(`photos.winetree94.com`)
       kind: Rule
