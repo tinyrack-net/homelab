@@ -35,3 +35,4 @@ spec:
     - name: load-repositories
     - name: immich-database
     - name: juicefs-csi-driver
+    - name: prometheus-operator-crds
