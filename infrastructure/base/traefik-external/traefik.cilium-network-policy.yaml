@@ -24,8 +24,6 @@ specs:
               pod: cloudflared
         toPorts:
           - ports:
-              - port: "8443"
-                protocol: TCP
               - port: "8444"
                 protocol: TCP
       - fromEndpoints:
