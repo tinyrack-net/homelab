@@ -15,6 +15,14 @@ specs:
           - ports:
               - port: "10250"
                 protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "9402"
+                protocol: TCP
     egress:
       - toEntities:
           - kube-apiserver

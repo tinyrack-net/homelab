@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: platform-monitoring-scrape
+  namespace: monitoring-system
+  labels:
+    networking.tinyrack.net/owner: monitoring
+spec:
+  description: Allow Alloy to scrape isolated platform metrics endpoints
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alloy
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: flux-system
+            app.kubernetes.io/part-of: flux
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: cert-manager-system
+            app.kubernetes.io/instance: cert-manager
+      toPorts:
+        - ports:
+            - port: "9402"
+              protocol: TCP
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "9963"
+              protocol: TCP
