@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-cloudnative-pg-clients
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: cloudnative-pg
+  annotations:
+    networking.tinyrack.net/hosts: "*.winetree94.com"
+spec:
+  description: Allow isolated CloudNativePG instances to reach external Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+            app.kubernetes.io/name: postgresql
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

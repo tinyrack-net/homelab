@@ -1,0 +1,33 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-karakeep
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: karakeep
+  annotations:
+    networking.tinyrack.net/hosts: bookmarks.winetree94.com
+spec:
+  description: Allow the bookmarks.winetree94.com route and OAuth callbacks
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: karakeep-system
+            app: karakeep-web
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: karakeep-system
+            serviceName: karakeep-web-service
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP

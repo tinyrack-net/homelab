@@ -1,0 +1,49 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-n8n
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: n8n
+  annotations:
+    networking.tinyrack.net/hosts: n8n.winetree94.com
+spec:
+  description: Allow the n8n.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: n8n-system
+            serviceName: n8n-service
+      toPorts:
+        - ports:
+            - port: "5678"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-n8n
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: n8n
+  annotations:
+    networking.tinyrack.net/hosts: n8n.winetree94.com
+spec:
+  description: Allow n8n database clients to reach internal Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: n8n-system
+            cnpg.io/cluster: n8n-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

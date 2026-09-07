@@ -1,0 +1,23 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-longhorn-clients
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: longhorn
+  annotations:
+    networking.tinyrack.net/hosts: "*.winetree94.com"
+spec:
+  description: Allow Longhorn components to reach external Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: longhorn-system
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

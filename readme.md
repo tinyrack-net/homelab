@@ -134,6 +134,20 @@ delegates the primary Pod network to Cilium while continuing to provide the
 The production cluster was migrated from Flannel and kube-proxy to Cilium. The
 one-time migration and rollback playbooks were removed after verification.
 
+## Traefik network policy ownership
+
+- Keep only shared entrypoint, Kubernetes API, and telemetry access in the
+  Traefik infrastructure policies.
+- Put route-specific access beside its owning application or proxy in a
+  `<owner>.traefik.cilium-network-policy.yaml` file.
+- Create the policy in `traefik-system` or `traefik-external-system`, name it
+  `route-<owner>`, and add the `networking.tinyrack.net/owner` label and
+  `networking.tinyrack.net/hosts` annotation.
+- Use `toServices` with the backend target port for Kubernetes Services and
+  `toCIDR` with explicit ports for LAN or ExternalName backends.
+- Group routes that share a backend into one owner policy. Host annotations are
+  documentation and do not enable Cilium L7 HTTP filtering.
+
 ## Sealed Secrets
 
 ```bash

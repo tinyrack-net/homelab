@@ -1,0 +1,49 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-wg-easy
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: wg-easy
+  annotations:
+    networking.tinyrack.net/hosts: vpn.intranet.winetree94.com
+spec:
+  description: Allow the vpn.intranet.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: wg-easy-system
+            serviceName: wg-easy-web
+      toPorts:
+        - ports:
+            - port: "51821"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-wg-easy-client
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: wg-easy
+  annotations:
+    networking.tinyrack.net/hosts: "*.winetree94.com"
+spec:
+  description: Allow VPN clients forwarded by wg-easy to external Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: wg-easy-system
+            app.kubernetes.io/name: wg-easy
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

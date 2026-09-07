@@ -1,0 +1,49 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-issuary
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: issuary
+  annotations:
+    networking.tinyrack.net/hosts: auth.winetree94.com
+spec:
+  description: Allow the auth.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: issuary-system
+            serviceName: issuary-service
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-issuary
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: issuary
+  annotations:
+    networking.tinyrack.net/hosts: auth.winetree94.com
+spec:
+  description: Allow Issuary database clients to reach internal Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: issuary-system
+            cnpg.io/cluster: issuary-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

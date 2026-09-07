@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-router
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: router
+  annotations:
+    networking.tinyrack.net/hosts: router.intranet.winetree94.com
+spec:
+  description: Allow the internal OPNsense route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.244.1/32
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

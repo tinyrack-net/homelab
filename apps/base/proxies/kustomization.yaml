@@ -9,3 +9,11 @@ resources:
   - xeon-nanokvm.proxy.yaml
   - openmediavault-nanokvm.proxy.yaml
   - photos.proxy.yaml
+  - garage.traefik.cilium-network-policy.yaml
+  - macmini-nanokvm.traefik.cilium-network-policy.yaml
+  - openmediavault.traefik.cilium-network-policy.yaml
+  - openmediavault-nanokvm.traefik.cilium-network-policy.yaml
+  - photos.traefik.cilium-network-policy.yaml
+  - proxmox.traefik.cilium-network-policy.yaml
+  - router.traefik.cilium-network-policy.yaml
+  - xeon-nanokvm.traefik.cilium-network-policy.yaml

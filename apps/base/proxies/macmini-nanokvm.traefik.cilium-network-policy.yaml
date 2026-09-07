@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-macmini-nanokvm
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: macmini-nanokvm
+  annotations:
+    networking.tinyrack.net/hosts: macmini.nanokvm.intranet.winetree94.com
+spec:
+  description: Allow the Mac mini NanoKVM route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.245.43/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

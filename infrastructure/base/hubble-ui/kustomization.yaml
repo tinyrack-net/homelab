@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - hubble.ingress-route.yaml
   - hubble.cilium-network-policy.yaml
+  - hubble.traefik.cilium-network-policy.yaml

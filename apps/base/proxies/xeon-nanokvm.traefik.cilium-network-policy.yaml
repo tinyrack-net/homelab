@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-xeon-nanokvm
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: xeon-nanokvm
+  annotations:
+    networking.tinyrack.net/hosts: xeon.nanokvm.intranet.winetree94.com
+spec:
+  description: Allow the Xeon NanoKVM route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.245.39/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

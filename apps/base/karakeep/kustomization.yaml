@@ -13,6 +13,7 @@ resources:
   - karakeep.web.service.yaml
   - karakeep.ingress-route.yaml
   - karakeep.cilium-network-policy.yaml
+  - karakeep.traefik.cilium-network-policy.yaml
 configMapGenerator:
   - name: karakeep-config-map
     namespace: karakeep-system

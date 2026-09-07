@@ -10,6 +10,7 @@ resources:
   - issuary.service.yaml
   - issuary.ingress-route.yaml
   - issuary.cilium-network-policy.yaml
+  - issuary.traefik.cilium-network-policy.yaml
 configMapGenerator:
   - name: issuary-config
     namespace: issuary-system

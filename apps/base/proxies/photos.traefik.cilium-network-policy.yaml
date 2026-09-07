@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-photos
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: photos
+  annotations:
+    networking.tinyrack.net/hosts: photos.winetree94.com
+spec:
+  description: Allow the photos.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.245.8/32
+      toPorts:
+        - ports:
+            - port: "2283"
+              protocol: TCP

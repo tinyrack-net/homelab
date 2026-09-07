@@ -8,3 +8,4 @@ resources:
   - home-assistant.service.yaml
   - home-assistant.ingress-route.yaml
   - home-assistant.cilium-network-policy.yaml
+  - home-assistant.traefik.cilium-network-policy.yaml

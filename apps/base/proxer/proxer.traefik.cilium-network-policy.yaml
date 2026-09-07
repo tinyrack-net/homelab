@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-proxer
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: proxer
+  annotations:
+    networking.tinyrack.net/hosts: proxy.intranet.winetree94.com
+spec:
+  description: Allow the internal Proxer routes
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: proxer-system
+            serviceName: proxer-service
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

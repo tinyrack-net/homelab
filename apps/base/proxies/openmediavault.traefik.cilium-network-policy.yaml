@@ -1,0 +1,45 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-openmediavault
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: openmediavault
+  annotations:
+    networking.tinyrack.net/hosts: openmediavault.intranet.winetree94.com
+spec:
+  description: Allow the internal OpenMediaVault route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.245.8/32
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-openmediavault
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: openmediavault
+  annotations:
+    networking.tinyrack.net/hosts: dav.winetree94.com
+spec:
+  description: Allow the external OpenMediaVault WebDAV route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.245.8/32
+      toPorts:
+        - ports:
+            - port: "8087"
+              protocol: TCP

@@ -7,3 +7,4 @@ resources:
   - proxer.service.yaml
   - proxer.ingress-route.yaml
   - proxer.cilium-network-policy.yaml
+  - proxer.traefik.cilium-network-policy.yaml

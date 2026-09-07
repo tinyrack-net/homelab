@@ -1,0 +1,61 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-openwebui
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: openwebui
+  annotations:
+    networking.tinyrack.net/hosts: ai.winetree94.com
+spec:
+  description: Allow the ai.winetree94.com route and OAuth callbacks
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: openwebui-system
+            app.kubernetes.io/component: open-webui
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: openwebui-system
+            serviceName: open-webui
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-openwebui
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: openwebui
+  annotations:
+    networking.tinyrack.net/hosts: ai.winetree94.com
+spec:
+  description: Allow OpenWebUI and its database clients to reach internal Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: openwebui-system
+            cnpg.io/cluster: openwebui-database-cluster
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: openwebui-system
+            app.kubernetes.io/component: open-webui
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

@@ -1,0 +1,48 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-monitoring
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: monitoring
+  annotations:
+    networking.tinyrack.net/hosts: grafana.winetree94.com,telemetry.winetree94.com
+spec:
+  description: Allow Grafana and telemetry ingestion routes
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: monitoring-system
+            serviceName: monitoring-grafana
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    - toServices:
+        - k8sService:
+            namespace: monitoring-system
+            serviceName: vmsingle-monitoring-victoria-metrics-k8s-stack
+      toPorts:
+        - ports:
+            - port: "8428"
+              protocol: TCP
+    - toServices:
+        - k8sService:
+            namespace: monitoring-system
+            serviceName: vlsingle-monitoring-victoria-metrics-k8s-stack
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
+    - toServices:
+        - k8sService:
+            namespace: monitoring-system
+            serviceName: vtsingle-monitoring-victoria-metrics-k8s-stack
+      toPorts:
+        - ports:
+            - port: "10428"
+              protocol: TCP

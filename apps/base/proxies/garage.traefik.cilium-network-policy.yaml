@@ -1,0 +1,26 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-garage
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: garage
+  annotations:
+    networking.tinyrack.net/hosts: garage.intranet.winetree94.com,storage.intranet.winetree94.com,*.web.garage.intranet.winetree94.com
+spec:
+  description: Allow the internal Garage API, console, and web routes
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.245.8/32
+      toPorts:
+        - ports:
+            - port: "3900"
+              protocol: TCP
+            - port: "3902"
+              protocol: TCP
+            - port: "3909"
+              protocol: TCP
