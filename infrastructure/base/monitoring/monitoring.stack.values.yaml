@@ -146,8 +146,8 @@ grafana:
       check_for_updates: false
       reporting_enabled: false
     server:
-      domain: grafana.winetree94.com
-      root_url: https://grafana.winetree94.com
+      domain: monitor.winetree94.com
+      root_url: https://monitor.winetree94.com
     auth:
       disable_login_form: true
       oauth_auto_login: true
