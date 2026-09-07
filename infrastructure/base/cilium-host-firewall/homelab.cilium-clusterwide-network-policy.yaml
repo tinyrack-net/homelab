@@ -19,6 +19,7 @@ spec:
               protocol: TCP
     - fromCIDR:
         - 10.132.244.0/22
+        - 10.8.0.0/24
       icmps:
         - fields:
             - family: IPv4
