@@ -49,6 +49,9 @@ spec:
               protocol: UDP
     - fromCIDR:
         - 10.132.244.0/22
+        - 10.8.0.0/24
+        - 10.199.0.0/16
+        - 100.64.0.0/10
       toPorts:
         - ports:
             - port: "21115"
