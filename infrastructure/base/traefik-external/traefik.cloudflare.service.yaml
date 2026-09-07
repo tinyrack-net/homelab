@@ -3,6 +3,12 @@ kind: Service
 metadata:
   name: traefik-external-cloudflare
   namespace: traefik-external-system
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    meta.helm.sh/release-name: traefik-external
+    meta.helm.sh/release-namespace: traefik-external-system
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   type: ClusterIP
   selector:
