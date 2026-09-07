@@ -14,7 +14,7 @@ spec:
     # passthrough: true  # DB가 직접 인증서 처리를 한다면 true (이 경우 Secret 필요 없음)
   routes:
     # 첫 번째 DB 라우팅
-    - match: HostSNI(`davinci-resolve.database.winetree94.com`)
+    - match: HostSNI(`davinci-resolve.database.intranet.winetree94.com`)
       services:
         - name: davinci-resolve-database-cluster-rw
           port: 5432

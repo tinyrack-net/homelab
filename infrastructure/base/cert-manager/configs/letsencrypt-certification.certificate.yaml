@@ -18,7 +18,6 @@ spec:
     - "*.tinyrack.net"
     - "*.winetree94.com"
     - "*.storage.intranet.winetree94.com"
-    - "*.database.winetree94.com"
     - "*.intranet.winetree94.com"
     - "*.proxy.intranet.winetree94.com"
     - "*.nanokvm.intranet.winetree94.com"
