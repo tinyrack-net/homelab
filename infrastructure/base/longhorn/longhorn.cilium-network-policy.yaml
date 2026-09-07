@@ -29,6 +29,9 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: traefik-external-system
             app.kubernetes.io/name: traefik
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
       toPorts:
         - ports:
             - port: "8443"

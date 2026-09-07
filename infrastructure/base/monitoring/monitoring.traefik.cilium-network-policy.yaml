@@ -46,3 +46,30 @@ spec:
         - ports:
             - port: "10428"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-traefik-metrics
+  namespace: monitoring-system
+  labels:
+    networking.tinyrack.net/owner: monitoring
+  annotations:
+    networking.tinyrack.net/hosts: traefik-metrics
+spec:
+  description: Allow Alloy to scrape internal and external Traefik metrics
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alloy
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-external-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "9100"
+              protocol: TCP
