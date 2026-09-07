@@ -20,6 +20,7 @@ specs:
                 protocol: TCP
       - fromCIDR:
           - 10.132.244.0/22
+          - 10.199.0.1/16
         toPorts:
           - ports:
               - port: "21115"
