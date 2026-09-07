@@ -3,9 +3,8 @@ kind: IngressRouteTCP
 metadata:
   name: davinci-resolve-ingress-route-tcp
   namespace: davinci-resolve-system
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - postgres
   tls:
