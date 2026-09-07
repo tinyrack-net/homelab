@@ -45,8 +45,10 @@ ingressClass:
 ports:
   cloudflare:
     port: 8444
+    exposedPort: 443
     expose:
       default: false
+      cloudflare: true
     protocol: TCP
     http:
       tls:
@@ -61,3 +63,8 @@ service:
     networking.tinyrack.net/load-balancer: cilium-l2
   annotations:
     lbipam.cilium.io/ips: "10.132.246.2"
+  additionalServices:
+    cloudflare:
+      type: ClusterIP
+      annotations:
+        kustomize.toolkit.fluxcd.io/prune: disabled
