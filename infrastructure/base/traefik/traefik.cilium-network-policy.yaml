@@ -3,117 +3,33 @@ kind: CiliumNetworkPolicy
 metadata:
   name: platform-traefik
   namespace: traefik-system
-specs:
-  - endpointSelector:
-      matchLabels:
-        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-        k8s:io.kubernetes.pod.namespace: traefik-system
-        app.kubernetes.io/name: traefik
-    ingress:
-      - fromEntities:
-          - world
-        toPorts:
-          - ports:
-              - port: "8000"
-                protocol: TCP
-              - port: "8443"
-                protocol: TCP
-      - fromEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: n8n-system
-              cnpg.io/cluster: n8n-database-cluster
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: issuary-system
-              cnpg.io/cluster: issuary-database-cluster
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: openwebui-system
-              cnpg.io/cluster: openwebui-database-cluster
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: openwebui-system
-              app.kubernetes.io/component: open-webui
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: davinci-resolve-system
-              cnpg.io/cluster: davinci-resolve-database-cluster
-        toPorts:
-          - ports:
-              - port: "8443"
-                protocol: TCP
-    egress:
-      - toEntities:
-          - kube-apiserver
-        toPorts:
-          - ports:
-              - port: "6443"
-                protocol: TCP
-      - toEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: kube-system
-              app.kubernetes.io/name: hubble-ui
-        toPorts:
-          - ports:
-              - port: "8081"
-                protocol: TCP
-      - toEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: monitoring-system
-              app.kubernetes.io/name: alloy
-        toPorts:
-          - ports:
-              - port: "4318"
-                protocol: TCP
-  - endpointSelector:
-      matchLabels:
-        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-        k8s:io.kubernetes.pod.namespace: traefik-system
-        app.kubernetes.io/name: traefik
-    egress:
-      - toEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: proxer-system
-              app: proxer
-        toPorts:
-          - ports:
-              - port: "8080"
-                protocol: TCP
-  - endpointSelector:
-      matchLabels:
-        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-        k8s:io.kubernetes.pod.namespace: traefik-system
-        app.kubernetes.io/name: traefik
-    egress:
-      - toCIDR:
-          - 10.132.245.8/32
-        toPorts:
-          - ports:
-              - port: "3900"
-                protocol: TCP
-              - port: "3902"
-                protocol: TCP
-              - port: "3909"
-                protocol: TCP
-  - endpointSelector:
-      matchLabels:
-        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-        k8s:io.kubernetes.pod.namespace: traefik-system
-        app.kubernetes.io/name: traefik
-    egress:
-      - toCIDR:
-          - 10.132.245.8/32
-        toPorts:
-          - ports:
-              - port: "8080"
-                protocol: TCP
-  - endpointSelector:
-      matchLabels:
-        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-        k8s:io.kubernetes.pod.namespace: traefik-system
-        app.kubernetes.io/name: traefik
-    egress:
-      - toEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: wg-easy-system
-              app.kubernetes.io/name: wg-easy
-        toPorts:
-          - ports:
-              - port: "51821"
-                protocol: TCP
+spec:
+  description: Allow shared internal Traefik platform traffic
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring-system
+            app.kubernetes.io/name: alloy
+      toPorts:
+        - ports:
+            - port: "4318"
+              protocol: TCP
