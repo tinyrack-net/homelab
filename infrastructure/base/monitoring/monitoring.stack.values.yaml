@@ -493,7 +493,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: (up{job=~"victoriametrics|victorialogs|victoriatraces"} == 0) or (increase(prometheus_remote_storage_samples_failed_total[10m]) > 0)
+                    expr: (up{job=~"vmsingle|vlsingle|vtsingle"} == 0) or (increase(otelcol_exporter_send_failed_spans_total[10m]) > 0) or (otelcol_exporter_queue_capacity > 0 and on(cluster,exporter) otelcol_exporter_queue_size / otelcol_exporter_queue_capacity > 0.9)
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -517,5 +517,5 @@ grafana:
               execErrState: Error
               for: 5m
               annotations:
-                summary: A telemetry backend or remote-write pipeline is failing
+                summary: A Victoria backend or OTLP export pipeline is failing
               labels: {severity: critical}
