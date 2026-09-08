@@ -130,6 +130,7 @@ grafana:
       BROWSER_READINESS_GIVE_UP_ON_ALL_QUERIES: 30s
       BROWSER_READINESS_NETWORK_IDLE_TIMEOUT: 10s
       BROWSER_READINESS_DOM_HASHCODE_TIMEOUT: 10s
+      BROWSER_MIN_WIDTH: "320"
     containerSecurityContext:
       readOnlyRootFilesystem: false
     resources:
