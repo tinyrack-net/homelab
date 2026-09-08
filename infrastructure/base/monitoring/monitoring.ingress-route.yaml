@@ -1,16 +1,6 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: telemetry-auth
-  namespace: monitoring-system
-spec:
-  basicAuth:
-    secret: telemetry-basic-auth
-    removeHeader: true
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
   name: redirect-to-https
   namespace: monitoring-system
 spec:
@@ -54,44 +44,5 @@ spec:
       services:
         - name: monitoring-grafana
           port: 80
-  tls:
-    secretName: letsencrypt-cert
----
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: telemetry-https
-  namespace: monitoring-system
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
-spec:
-  entryPoints:
-    - websecure
-    - cloudflare
-  routes:
-    - match: Host(`telemetry.winetree94.com`) && Path(`/api/v1/write`)
-      kind: Rule
-      priority: 100
-      middlewares:
-        - name: telemetry-auth
-      services:
-        - name: vmsingle-monitoring-victoria-metrics-k8s-stack
-          port: 8428
-    - match: Host(`telemetry.winetree94.com`) && Path(`/insert/loki/api/v1/push`)
-      kind: Rule
-      priority: 100
-      middlewares:
-        - name: telemetry-auth
-      services:
-        - name: vlsingle-monitoring-victoria-metrics-k8s-stack
-          port: 9428
-    - match: Host(`telemetry.winetree94.com`) && Path(`/insert/opentelemetry/v1/traces`)
-      kind: Rule
-      priority: 100
-      middlewares:
-        - name: telemetry-auth
-      services:
-        - name: vtsingle-monitoring-victoria-metrics-k8s-stack
-          port: 10428
   tls:
     secretName: letsencrypt-cert

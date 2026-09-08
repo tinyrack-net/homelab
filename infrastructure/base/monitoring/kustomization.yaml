@@ -3,9 +3,7 @@ kind: Kustomization
 resources:
   - monitoring.namespace.yaml
   - monitoring.stack.helm-release.yaml
-  - monitoring.node-exporter.helm-release.yaml
-  - monitoring.alloy.pvc.yaml
-  - monitoring.alloy.helm-release.yaml
+  - monitoring.k8s-monitoring.helm-release.yaml
   - monitoring.service-monitors.yaml
   - monitoring.ingress-route.yaml
   - monitoring.cilium-network-policy.yaml
@@ -15,15 +13,8 @@ resources:
   - monitoring.grafana.secret.yaml
   - monitoring.grafana-env.secret.yaml
   - monitoring.telemetry.secret.yaml
-  - monitoring.telemetry-auth.secret.yaml
   - monitoring.issuary.secret.yaml
 configMapGenerator:
-  - name: monitoring-alloy-config
-    namespace: monitoring-system
-    files:
-      - config.alloy=monitoring.alloy.config.alloy
-    options:
-      disableNameSuffixHash: true
   - name: grafana-fleet-overview
     namespace: monitoring-system
     files:
@@ -48,14 +39,6 @@ configMapGenerator:
         grafana_folder: Infrastructure
       annotations:
         grafana_folder: Infrastructure
-  - name: monitoring-alloy-values
-    files:
-      - values.yaml=monitoring.alloy.values.yaml
-    options:
-      disableNameSuffixHash: true
-      labels:
-        reconcile.fluxcd.io/watch: Enabled
-    namespace: monitoring-system
   - name: monitoring-stack-values
     files:
       - values.yaml=monitoring.stack.values.yaml
@@ -64,11 +47,3 @@ configMapGenerator:
       labels:
         reconcile.fluxcd.io/watch: Enabled
     namespace: monitoring-system
-  - name: monitoring-node-exporter-values
-    namespace: monitoring-system
-    files:
-      - values.yaml=monitoring.node-exporter.values.yaml
-    options:
-      disableNameSuffixHash: true
-      labels:
-        reconcile.fluxcd.io/watch: Enabled

@@ -43,6 +43,62 @@ internal:
   vmauth:
     spec:
       disableSelfServiceScrape: true
+      userNamespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring-system
+      userSelector:
+        matchLabels:
+          monitoring.tinyrack.net/access: telemetry-write
+      unauthorizedUserAccessSpec:
+        url_map:
+          - src_paths:
+              - /api/v1/query.*
+            url_prefix:
+              - http://vmsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:8428/
+          - src_paths:
+              - /select/logsql/.*
+            url_prefix:
+              - http://vlsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:9428/
+      ingress:
+        class_name: traefik-external
+        host: telemetry.winetree94.com
+        paths:
+          - /opentelemetry/v1/metrics
+          - /insert/opentelemetry/v1/logs
+          - /insert/opentelemetry/v1/traces
+        tlsHosts:
+          - telemetry.winetree94.com
+        tlsSecretName: letsencrypt-cert
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure,cloudflare
+extraObjects:
+  - apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMUser
+    metadata:
+      name: telemetry-write
+      namespace: monitoring-system
+      labels:
+        monitoring.tinyrack.net/access: telemetry-write
+    spec:
+      tokenRef:
+        name: telemetry-credentials
+        key: TELEMETRY_TOKEN
+      targetRefs:
+        - name: metrics
+          paths:
+            - /opentelemetry/v1/metrics
+          static:
+            url: http://vmsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:8428/
+        - name: logs
+          paths:
+            - /insert/opentelemetry/v1/logs
+          static:
+            url: http://vlsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:9428/
+        - name: traces
+          paths:
+            - /insert/opentelemetry/v1/traces
+          static:
+            url: http://vtsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:10428/
 prometheus-node-exporter:
   enabled: false
 kubelet:
@@ -58,31 +114,14 @@ kubeEtcd:
 coreDns:
   enabled: false
 kube-state-metrics:
-  enabled: true
-  vmScrape:
-    enabled: false
-  prometheus:
-    monitor:
-      enabled: true
-      jobLabel: app.kubernetes.io/name
-      http:
-        interval: 30s
-        relabelings:
-          - action: replace
-            replacement: kube-state-metrics
-            targetLabel: job
-  resources:
-    requests:
-      cpu: 25m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 192Mi
+  enabled: false
 vmsingle:
   enabled: true
   spec:
     disableSelfServiceScrape: true
     retentionPeriod: 30d
+    extraArgs:
+      opentelemetry.usePrometheusNaming: "true"
     resources:
       requests:
         cpu: 100m
