@@ -626,7 +626,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "node_hwmon_power_watt{fleet=\"dev-machines\",instance=~\"$instance\"} or node_power_supply_power_watt{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_all_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_cpu_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_gpu_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",instance=~\"$instance\",type=\"power\",unit=\"watts\"} or nvidia_smi_enforced_power_limit_watts{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "node_hwmon_power_watt{fleet=\"dev-machines\",instance=~\"$instance\"} or node_power_supply_power_watt{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_all_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_cpu_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_gpu_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",instance=~\"$instance\",type=\"power\",unit=\"watts\"}",
           "legendFormat": "{{instance}} {{chip}}{{sensor}}",
           "range": true,
           "refId": "A"
