@@ -173,12 +173,11 @@ grafana:
       auto_assign_org: true
       auto_assign_org_role: Viewer
     smtp:
-      # Enable after the monitoring mailbox is provisioned in Stalwart.
-      enabled: false
+      enabled: true
       host: mail.winetree94.com:587
       user: $__env{GF_SMTP_USER}
       password: $__env{GF_SMTP_PASSWORD}
-      from_address: monitoring@winetree94.com
+      from_address: notify@winetree94.com
       from_name: Homelab Monitoring
       startTLS_policy: MandatoryStartTLS
     unified_alerting:
@@ -193,7 +192,7 @@ grafana:
             - uid: homelab-email
               type: email
               settings:
-                addresses: admin@winetree94.com
+                addresses: admin@winetree94.com;winetree94@gmail.com
                 singleEmail: false
     policies.yaml:
       apiVersion: 1
