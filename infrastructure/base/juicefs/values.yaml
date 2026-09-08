@@ -33,10 +33,10 @@ globalConfig:
           storage.tinyrack.net/profile: immich
       resources:
         requests:
-          cpu: 100m
+          cpu: 500m
           memory: 512Mi
         limits:
-          cpu: "2"
+          cpu: "1"
           memory: 2Gi
       env:
         - name: GOMEMLIMIT

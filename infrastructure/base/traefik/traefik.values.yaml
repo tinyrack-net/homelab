@@ -5,6 +5,9 @@ providers:
   kubernetesIngress:
     allowExternalNameServices: true
     ingressClass: "traefik"
+additionalArguments:
+  - --entryPoints.websecure.transport.respondingTimeouts.readTimeout=0s
+  - --entryPoints.websecure.transport.respondingTimeouts.idleTimeout=600s
 deployment:
   replicas: 2
   podAnnotations:
