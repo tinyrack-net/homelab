@@ -120,15 +120,16 @@ grafana:
   imageRenderer:
     enabled: true
     image:
-      tag: v5.12.3
+      tag: v4.1.5
       pullPolicy: IfNotPresent
     env:
       HTTP_HOST: 0.0.0.0
       XDG_CONFIG_HOME: /tmp/.chromium
       XDG_CACHE_HOME: /tmp/.chromium
-      BROWSER_READINESS_GIVE_UP_ON_ALL_QUERIES: 30s
-      BROWSER_READINESS_NETWORK_IDLE_TIMEOUT: 10s
-      BROWSER_READINESS_DOM_HASHCODE_TIMEOUT: 10s
+      RENDERING_MODE: clustered
+      RENDERING_CLUSTERING_MODE: context
+      RENDERING_CLUSTERING_MAX_CONCURRENCY: "2"
+      RENDERING_CLUSTERING_TIMEOUT: "120"
     resources:
       requests:
         cpu: 50m
