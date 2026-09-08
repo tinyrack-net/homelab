@@ -84,18 +84,15 @@ extraObjects:
         name: telemetry-credentials
         key: TELEMETRY_TOKEN
       targetRefs:
-        - name: metrics
-          paths:
+        - paths:
             - /opentelemetry/v1/metrics
           static:
             url: http://vmsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:8428/
-        - name: logs
-          paths:
+        - paths:
             - /insert/opentelemetry/v1/logs
           static:
             url: http://vlsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:9428/
-        - name: traces
-          paths:
+        - paths:
             - /insert/opentelemetry/v1/traces
           static:
             url: http://vtsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:10428/
