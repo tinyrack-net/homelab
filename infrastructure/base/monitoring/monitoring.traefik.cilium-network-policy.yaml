@@ -25,26 +25,10 @@ spec:
     - toServices:
         - k8sService:
             namespace: monitoring-system
-            serviceName: vmsingle-monitoring-victoria-metrics-k8s-stack
+            serviceName: vmauth-monitoring-victoria-metrics-k8s-stack-internal
       toPorts:
         - ports:
-            - port: "8428"
-              protocol: TCP
-    - toServices:
-        - k8sService:
-            namespace: monitoring-system
-            serviceName: vlsingle-monitoring-victoria-metrics-k8s-stack
-      toPorts:
-        - ports:
-            - port: "9428"
-              protocol: TCP
-    - toServices:
-        - k8sService:
-            namespace: monitoring-system
-            serviceName: vtsingle-monitoring-victoria-metrics-k8s-stack
-      toPorts:
-        - ports:
-            - port: "10428"
+            - port: "8427"
               protocol: TCP
 ---
 apiVersion: cilium.io/v2

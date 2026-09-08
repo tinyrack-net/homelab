@@ -17,11 +17,7 @@ spec:
         - ports:
             - port: "3000"
               protocol: TCP
-            - port: "8428"
-              protocol: TCP
-            - port: "9428"
-              protocol: TCP
-            - port: "10428"
+            - port: "8427"
               protocol: TCP
             - port: "4318"
               protocol: TCP
