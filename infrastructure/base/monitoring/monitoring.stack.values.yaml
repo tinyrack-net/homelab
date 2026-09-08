@@ -120,7 +120,7 @@ grafana:
   imageRenderer:
     enabled: true
     image:
-      tag: 5.12.3
+      tag: 5.12.2
       pullPolicy: IfNotPresent
     resources:
       requests:
