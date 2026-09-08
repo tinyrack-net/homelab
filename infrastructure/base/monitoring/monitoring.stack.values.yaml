@@ -279,7 +279,7 @@ grafana:
       disable_login_form: true
       oauth_auto_login: true
     auth.basic:
-      enabled: true
+      enabled: false
     auth.generic_oauth:
       enabled: true
       name: Issuary
