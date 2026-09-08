@@ -37,6 +37,12 @@ spec:
         traces:
           enabled: true
           path: insert/opentelemetry/v1/traces
+        processors:
+          transform:
+            metrics:
+              datapoint:
+                - 'set(attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil'
+                - 'set(attributes["instance"], resource.attributes["service.instance.id"]) where resource.attributes["service.instance.id"] != nil'
         clusterLabels:
           - cluster
           - k8s.cluster.name
