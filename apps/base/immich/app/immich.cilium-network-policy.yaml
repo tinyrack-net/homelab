@@ -88,6 +88,9 @@ specs:
       - fromEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: kube-system
+              app: juicefs-csi-node
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: kube-system
               app.kubernetes.io/name: juicefs-mount
         toPorts:
           - ports:

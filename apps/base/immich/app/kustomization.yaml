@@ -1,6 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: immich-system
 resources:
   - immich.juicefs.secret.yaml
   - immich.storage.yaml
@@ -10,6 +9,7 @@ resources:
   - immich.traefik.cilium-network-policy.yaml
 configMapGenerator:
   - name: immich-values
+    namespace: immich-system
     files:
       - values.yaml
     options:
