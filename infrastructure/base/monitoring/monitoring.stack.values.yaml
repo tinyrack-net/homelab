@@ -123,6 +123,7 @@ grafana:
   sidecar:
     dashboards:
       multicluster: true
+      folderAnnotation: grafana_folder
   admin:
     existingSecret: grafana-admin
     userKey: admin-user

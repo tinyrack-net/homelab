@@ -36,6 +36,16 @@ configMapGenerator:
     options:
       labels:
         grafana_dashboard: "1"
+  - name: grafana-dev-machines-hardware
+    namespace: monitoring-system
+    files:
+      - dev-machines-hardware.json=monitoring.dev-machines-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+        grafana_folder: Infrastructure
+      annotations:
+        grafana_folder: Infrastructure
   - name: monitoring-alloy-values
     files:
       - values.yaml=monitoring.alloy.values.yaml
