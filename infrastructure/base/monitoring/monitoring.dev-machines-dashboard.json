@@ -73,7 +73,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "max by (instance, os) (max_over_time(up{fleet=\"dev-machines\",instance=~\"$instance\"}[2m]))",
+          "expr": "max by (instance, os) (max_over_time(up{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[2m]))",
           "instant": true,
           "legendFormat": "{{instance}} · {{os}}",
           "range": false,
@@ -108,7 +108,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "max by (instance, os, vendor, model, cpu) (dev_machine_info{fleet=\"dev-machines\",instance=~\"$instance\"})",
+          "expr": "max by (instance, os, vendor, model, cpu) (dev_machine_info{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"})",
           "format": "table",
           "instant": true,
           "range": false,
@@ -196,7 +196,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(1 - avg by (instance) (rate(node_cpu_seconds_total{fleet=\"dev-machines\",instance=~\"$instance\",mode=\"idle\"}[5m]))) or (1 - avg by (instance) (rate(windows_cpu_time_total{fleet=\"dev-machines\",instance=~\"$instance\",mode=\"idle\"}[5m])))",
+          "expr": "(1 - avg by (instance) (rate(node_cpu_seconds_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",mode=\"idle\"}[5m]))) or (1 - avg by (instance) (rate(windows_cpu_time_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",mode=\"idle\"}[5m])))",
           "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
@@ -242,21 +242,21 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "node_load1{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "node_load1{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} load1",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "node_load15{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "node_load15{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} load15",
           "range": true,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "windows_system_processor_queue_length{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "windows_system_processor_queue_length{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} queue",
           "range": true,
           "refId": "C"
@@ -305,7 +305,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(1 - node_memory_MemAvailable_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} / node_memory_MemTotal_bytes{fleet=\"dev-machines\",instance=~\"$instance\"}) or (1 - node_memory_free_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} / node_memory_total_bytes{fleet=\"dev-machines\",instance=~\"$instance\"}) or (1 - windows_memory_available_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} / windows_memory_physical_total_bytes{fleet=\"dev-machines\",instance=~\"$instance\"})",
+          "expr": "(1 - node_memory_MemAvailable_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} / node_memory_MemTotal_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}) or (1 - node_memory_free_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} / node_memory_total_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}) or (1 - windows_memory_available_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} / windows_memory_physical_total_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"})",
           "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
@@ -366,7 +366,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(1 - node_filesystem_avail_bytes{fleet=\"dev-machines\",instance=~\"$instance\",fstype!~\"tmpfs|devtmpfs|overlay|squashfs\"} / node_filesystem_size_bytes{fleet=\"dev-machines\",instance=~\"$instance\",fstype!~\"tmpfs|devtmpfs|overlay|squashfs\"}) or (1 - windows_logical_disk_free_bytes{fleet=\"dev-machines\",instance=~\"$instance\",volume!~\"HarddiskVolume.*\"} / windows_logical_disk_size_bytes{fleet=\"dev-machines\",instance=~\"$instance\",volume!~\"HarddiskVolume.*\"})",
+          "expr": "(1 - node_filesystem_avail_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",fstype!~\"tmpfs|devtmpfs|overlay|squashfs\"} / node_filesystem_size_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",fstype!~\"tmpfs|devtmpfs|overlay|squashfs\"}) or (1 - windows_logical_disk_free_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",volume!~\"HarddiskVolume.*\"} / windows_logical_disk_size_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",volume!~\"HarddiskVolume.*\"})",
           "legendFormat": "{{instance}} {{mountpoint}}{{volume}}",
           "range": true,
           "refId": "A"
@@ -412,14 +412,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(node_disk_read_bytes_total{fleet=\"dev-machines\",instance=~\"$instance\"}[5m]) or rate(windows_physical_disk_read_bytes_total{fleet=\"dev-machines\",instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_disk_read_bytes_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[5m]) or rate(windows_physical_disk_read_bytes_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[5m])",
           "legendFormat": "{{instance}} {{device}}{{disk}} read",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "rate(node_disk_written_bytes_total{fleet=\"dev-machines\",instance=~\"$instance\"}[5m]) or rate(windows_physical_disk_write_bytes_total{fleet=\"dev-machines\",instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_disk_written_bytes_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[5m]) or rate(windows_physical_disk_write_bytes_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[5m])",
           "legendFormat": "{{instance}} {{device}}{{disk}} write",
           "range": true,
           "refId": "B"
@@ -465,14 +465,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{fleet=\"dev-machines\",instance=~\"$instance\",device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) or rate(windows_net_bytes_received_total{fleet=\"dev-machines\",instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_network_receive_bytes_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) or rate(windows_net_bytes_received_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[5m])",
           "legendFormat": "{{instance}} {{device}}{{nic}} receive",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{fleet=\"dev-machines\",instance=~\"$instance\",device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) or rate(windows_net_bytes_sent_total{fleet=\"dev-machines\",instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_network_transmit_bytes_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",device!~\"lo|docker.*|veth.*|br-.*\"}[5m]) or rate(windows_net_bytes_sent_total{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[5m])",
           "legendFormat": "{{instance}} {{device}}{{nic}} transmit",
           "range": true,
           "refId": "B"
@@ -532,7 +532,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "node_hwmon_temp_celsius{fleet=\"dev-machines\",instance=~\"$instance\"} or node_thermal_zone_temp{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_cpu_temp_celsius{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_gpu_temp_celsius{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",instance=~\"$instance\",type=\"temperature\",unit=\"celsius\"} or nvidia_smi_temperature_gpu{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "node_hwmon_temp_celsius{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or node_thermal_zone_temp{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or macmon_cpu_temp_celsius{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or macmon_gpu_temp_celsius{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",type=\"temperature\",unit=\"celsius\"} or nvidia_smi_temperature_gpu{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} {{chip}}{{sensor}}{{hardware}}",
           "range": true,
           "refId": "A"
@@ -579,7 +579,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "node_hwmon_fan_rpm{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_fan_speed_rpm{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",instance=~\"$instance\",type=\"fan\",unit=\"rpm\"}",
+          "expr": "node_hwmon_fan_rpm{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or macmon_fan_speed_rpm{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",type=\"fan\",unit=\"rpm\"}",
           "legendFormat": "{{instance}} {{chip}}{{fan}}{{sensor}}",
           "range": true,
           "refId": "A"
@@ -626,7 +626,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "node_hwmon_power_watt{fleet=\"dev-machines\",instance=~\"$instance\"} or node_power_supply_power_watt{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_all_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_cpu_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or macmon_gpu_power_watts{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",instance=~\"$instance\",type=\"power\",unit=\"watts\"}",
+          "expr": "node_hwmon_power_watt{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or node_power_supply_power_watt{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or macmon_all_power_watts{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or macmon_cpu_power_watts{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or macmon_gpu_power_watts{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",type=\"power\",unit=\"watts\"}",
           "legendFormat": "{{instance}} {{chip}}{{sensor}}",
           "range": true,
           "refId": "A"
@@ -672,7 +672,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "node_hwmon_in_volts{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",instance=~\"$instance\",type=\"voltage\",unit=\"volts\"}",
+          "expr": "node_hwmon_in_volts{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or dev_hardware_sensor_value{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\",type=\"voltage\",unit=\"volts\"}",
           "legendFormat": "{{instance}} {{chip}}{{sensor}}",
           "range": true,
           "refId": "A"
@@ -741,7 +741,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * (dev_battery_charge_ratio{fleet=\"dev-machines\",instance=~\"$instance\"} or node_power_supply_capacity{fleet=\"dev-machines\",instance=~\"$instance\"} / 100)",
+          "expr": "100 * (dev_battery_charge_ratio{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or node_power_supply_capacity{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} / 100)",
           "legendFormat": "{{instance}} battery",
           "range": true,
           "refId": "A"
@@ -803,7 +803,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "nvidia_smi_utilization_gpu_ratio{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_gpu_utilization_ratio{fleet=\"dev-machines\",instance=~\"$instance\"} or ((node_drm_gpu_busy_percent{fleet=\"dev-machines\",instance=~\"$instance\"} / 100) unless on(instance) dev_gpu_utilization_ratio{fleet=\"dev-machines\",instance=~\"$instance\"}) or macmon_gpu_usage_ratio{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "nvidia_smi_utilization_gpu_ratio{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or dev_gpu_utilization_ratio{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} or ((node_drm_gpu_busy_percent{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} / 100) unless on(instance) dev_gpu_utilization_ratio{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}) or macmon_gpu_usage_ratio{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} {{name}}{{card}}",
           "range": true,
           "refId": "A"
@@ -850,7 +850,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(nvidia_smi_memory_used_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} / nvidia_smi_memory_total_bytes{fleet=\"dev-machines\",instance=~\"$instance\"}) or (node_drm_memory_vram_used_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} / node_drm_memory_vram_size_bytes{fleet=\"dev-machines\",instance=~\"$instance\"})",
+          "expr": "(nvidia_smi_memory_used_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} / nvidia_smi_memory_total_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}) or (node_drm_memory_vram_used_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"} / node_drm_memory_vram_size_bytes{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"})",
           "legendFormat": "{{instance}} {{name}}{{card}}",
           "range": true,
           "refId": "A"
@@ -923,7 +923,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "smartctl_device_smart_status{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "smartctl_device_smart_status{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} {{device}}",
           "range": true,
           "refId": "A"
@@ -970,7 +970,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "smartctl_device_temperature{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "smartctl_device_temperature{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} {{device}}",
           "range": true,
           "refId": "A"
@@ -1019,7 +1019,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "smartctl_device_percentage_used{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "smartctl_device_percentage_used{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} {{device}} used",
           "range": true,
           "refId": "A"
@@ -1079,7 +1079,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "up{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "up{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} · {{job}}",
           "range": true,
           "refId": "A"
@@ -1126,7 +1126,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "time() - timestamp(up{fleet=\"dev-machines\",instance=~\"$instance\"})",
+          "expr": "time() - timestamp(up{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"})",
           "legendFormat": "{{instance}} · {{job}}",
           "range": true,
           "refId": "A"
@@ -1156,13 +1156,13 @@
           "type": "prometheus",
           "uid": "VictoriaMetrics"
         },
-        "definition": "label_values(dev_machine_info{fleet=\"dev-machines\"}, instance)",
+        "definition": "label_values(dev_machine_info{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\"}, instance)",
         "includeAll": true,
         "label": "Machine",
         "multi": true,
         "name": "instance",
         "query": {
-          "query": "label_values(dev_machine_info{fleet=\"dev-machines\"}, instance)",
+          "query": "label_values(dev_machine_info{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\"}, instance)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
