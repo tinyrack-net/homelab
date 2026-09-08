@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: immich-migration-initial
+  name: immich-migration-initial-v2
   namespace: immich-system
   labels:
     app.kubernetes.io/name: immich-migration
@@ -26,6 +26,7 @@ spec:
             - --sftp-user=root
             - --sftp-key-file=/secrets/id_ed25519
             - --sftp-known-hosts-file=/secrets/known_hosts
+            - --sftp-host-key-algorithms=ssh-ed25519
             - --sftp-disable-hashcheck
             - --sftp-shell-type=none
             - --transfers=4
