@@ -1,6 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - immich.admin.secret.yaml
   - immich.juicefs.secret.yaml
   - immich.storage.yaml
   - immich.helm-release.yaml
