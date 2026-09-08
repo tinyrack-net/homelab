@@ -193,10 +193,10 @@ defaultDashboards:
     victoriametrics-vmalert:
       enabled: false
     node-exporter-full:
-      enabled: true
+      enabled: false
   sources:
     node-exporter-full:
-      enabled: true
+      enabled: false
 defaultDatasources:
   victorialogs:
     datasources:

@@ -39,6 +39,16 @@ configMapGenerator:
         grafana_folder: Infrastructure
       annotations:
         grafana_folder: Infrastructure
+  - name: grafana-node-exporter-full
+    namespace: monitoring-system
+    files:
+      - node-exporter-full.json=monitoring.node-exporter-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+        grafana_folder: Infrastructure
+      annotations:
+        grafana_folder: Infrastructure
   - name: monitoring-stack-values
     files:
       - values.yaml=monitoring.stack.values.yaml
