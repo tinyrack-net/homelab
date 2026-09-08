@@ -39,6 +39,10 @@ vmalert:
         memory: 256Mi
 alertmanager:
   enabled: false
+internal:
+  vmauth:
+    spec:
+      disableSelfServiceScrape: true
 prometheus-node-exporter:
   enabled: false
 kubelet:
