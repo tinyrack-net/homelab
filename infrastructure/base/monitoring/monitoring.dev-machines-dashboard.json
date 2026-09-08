@@ -822,7 +822,7 @@
         "defaults": {
           "decimals": 1,
           "noValue": "unsupported",
-          "unit": "bytes"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -850,20 +850,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "nvidia_smi_memory_used_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} or node_drm_memory_vram_used_bytes{fleet=\"dev-machines\",instance=~\"$instance\"}",
-          "legendFormat": "{{instance}} {{name}}{{card}} used",
+          "expr": "(nvidia_smi_memory_used_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} / nvidia_smi_memory_total_bytes{fleet=\"dev-machines\",instance=~\"$instance\"}) or (node_drm_memory_vram_used_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} / node_drm_memory_vram_size_bytes{fleet=\"dev-machines\",instance=~\"$instance\"})",
+          "legendFormat": "{{instance}} {{name}}{{card}}",
           "range": true,
           "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "nvidia_smi_memory_total_bytes{fleet=\"dev-machines\",instance=~\"$instance\"} or node_drm_memory_vram_size_bytes{fleet=\"dev-machines\",instance=~\"$instance\"}",
-          "legendFormat": "{{instance}} {{name}}{{card}} total",
-          "range": true,
-          "refId": "B"
         }
       ],
-      "title": "GPU memory",
+      "title": "GPU memory utilization",
       "type": "timeseries",
       "id": 19
     },
