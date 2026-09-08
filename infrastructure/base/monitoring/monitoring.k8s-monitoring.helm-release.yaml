@@ -157,8 +157,6 @@ spec:
           - clustered
           - otel-receiver
         includeDestinations: [telemetry]
-        extraService:
-          enabled: true
         alloy:
           resources:
             requests:
