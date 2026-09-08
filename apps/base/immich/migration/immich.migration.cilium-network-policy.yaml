@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: immich-migration
+  namespace: immich-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: immich-migration
+  egress:
+    - toCIDR:
+        - 10.132.245.8/32
+      toPorts:
+        - ports:
+            - port: "22"
+              protocol: TCP

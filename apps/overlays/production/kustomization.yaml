@@ -14,3 +14,4 @@ resources:
   - rustdesk.yaml
   - home-assistant.yaml
   - immich.yaml
+  - immich-migration.yaml
