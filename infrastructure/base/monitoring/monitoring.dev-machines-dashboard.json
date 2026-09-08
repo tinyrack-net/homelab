@@ -803,7 +803,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "nvidia_smi_utilization_gpu_ratio{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_gpu_utilization_ratio{fleet=\"dev-machines\",instance=~\"$instance\"} or node_drm_gpu_busy_percent{fleet=\"dev-machines\",instance=~\"$instance\"} / 100 or macmon_gpu_usage_ratio{fleet=\"dev-machines\",instance=~\"$instance\"}",
+          "expr": "nvidia_smi_utilization_gpu_ratio{fleet=\"dev-machines\",instance=~\"$instance\"} or dev_gpu_utilization_ratio{fleet=\"dev-machines\",instance=~\"$instance\"} or ((node_drm_gpu_busy_percent{fleet=\"dev-machines\",instance=~\"$instance\"} / 100) unless on(instance) dev_gpu_utilization_ratio{fleet=\"dev-machines\",instance=~\"$instance\"}) or macmon_gpu_usage_ratio{fleet=\"dev-machines\",instance=~\"$instance\"}",
           "legendFormat": "{{instance}} {{name}}{{card}}",
           "range": true,
           "refId": "A"
