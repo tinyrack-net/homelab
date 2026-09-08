@@ -6,7 +6,7 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-  releaseName: monitoring
+  releaseName: monitoring-k8s
   dependsOn:
     - name: monitoring-stack
   chart:
@@ -152,6 +152,7 @@ spec:
       destinations: [telemetry]
     collectors:
       alloy:
+        fullnameOverride: monitoring-alloy
         presets:
           - singleton
           - clustered
