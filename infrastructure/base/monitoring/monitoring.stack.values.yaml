@@ -128,6 +128,9 @@ grafana:
     userKey: admin-user
     passwordKey: admin-password
   envFromSecret: grafana-env
+  podAnnotations:
+    # Bump whenever grafana-env is resealed so environment variables are reloaded.
+    monitoring.tinyrack.net/credentials-revision: "2026-09-08-1"
   persistence:
     enabled: true
     storageClassName: longhorn-strict-local
