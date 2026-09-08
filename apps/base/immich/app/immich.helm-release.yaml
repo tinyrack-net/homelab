@@ -4,7 +4,6 @@ metadata:
   name: immich
   namespace: immich-system
 spec:
-  suspend: true
   interval: 5m
   timeout: 15m
   releaseName: immich

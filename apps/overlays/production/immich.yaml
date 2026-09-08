@@ -4,7 +4,6 @@ metadata:
   name: immich-database
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
   path: ./apps/base/immich/database
   prune: true
@@ -22,7 +21,6 @@ metadata:
   name: immich-deployment
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
   path: ./apps/base/immich/app
   prune: true
