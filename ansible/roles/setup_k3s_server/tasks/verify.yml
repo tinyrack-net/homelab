@@ -113,5 +113,12 @@
       - setup_k3s_server_verified_config["flannel-backend"] == setup_k3s_server_flannel_backend
       - setup_k3s_server_verified_config["disable-network-policy"] | bool
       - setup_k3s_server_verified_config["disable-kube-proxy"] | bool
+      - setup_k3s_server_verified_config["etcd-expose-metrics"] | bool
+      - >-
+        'bind-address=' ~ setup_k3s_server_metrics_bind_address in
+        setup_k3s_server_verified_config['kube-controller-manager-arg']
+      - >-
+        'bind-address=' ~ setup_k3s_server_metrics_bind_address in
+        setup_k3s_server_verified_config['kube-scheduler-arg']
       - "' Ready ' in (' ' ~ setup_k3s_server_node.stdout ~ ' ')"
     fail_msg: The K3s server does not match the managed configuration.

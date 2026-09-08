@@ -3,8 +3,10 @@ kind: Kustomization
 resources:
   - monitoring.namespace.yaml
   - monitoring.stack.helm-release.yaml
+  - monitoring.node-exporter.helm-release.yaml
   - monitoring.alloy.pvc.yaml
   - monitoring.alloy.helm-release.yaml
+  - monitoring.service-monitors.yaml
   - monitoring.ingress-route.yaml
   - monitoring.cilium-network-policy.yaml
   - monitoring.scrape.cilium-network-policy.yaml
@@ -62,3 +64,11 @@ configMapGenerator:
       labels:
         reconcile.fluxcd.io/watch: Enabled
     namespace: monitoring-system
+  - name: monitoring-node-exporter-values
+    namespace: monitoring-system
+    files:
+      - values.yaml=monitoring.node-exporter.values.yaml
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled

@@ -14,6 +14,7 @@ spec:
     name: flux-system
   dependsOn:
     - name: infrastructure-repositories
+    - name: prometheus-operator-crds
     - name: sealed-secrets
     - name: longhorn
     - name: traefik-external

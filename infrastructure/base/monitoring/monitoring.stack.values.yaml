@@ -1,6 +1,8 @@
 victoria-metrics-operator:
   serviceMonitor:
     enabled: false
+  operator:
+    disable_prometheus_converter: true
   resources:
     requests:
       cpu: 25m
@@ -21,13 +23,50 @@ vmagent:
 vlagent:
   enabled: false
 vmalert:
-  enabled: false
+  enabled: true
+  spec:
+    evaluationInterval: 30s
+    selectAllByDefault: true
+    disableSelfServiceScrape: true
+    extraArgs:
+      notifier.blackhole: "true"
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
 alertmanager:
   enabled: false
 prometheus-node-exporter:
   enabled: false
+kubelet:
+  enabled: false
+kubeApiServer:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
+coreDns:
+  enabled: false
 kube-state-metrics:
   enabled: true
+  vmScrape:
+    enabled: false
+  prometheus:
+    monitor:
+      enabled: true
+      jobLabel: app.kubernetes.io/name
+      http:
+        interval: 30s
+        relabelings:
+          - action: replace
+            replacement: kube-state-metrics
+            targetLabel: job
   resources:
     requests:
       cpu: 25m
@@ -38,6 +77,7 @@ kube-state-metrics:
 vmsingle:
   enabled: true
   spec:
+    disableSelfServiceScrape: true
     retentionPeriod: 30d
     resources:
       requests:
@@ -56,6 +96,7 @@ vmsingle:
 vlsingle:
   enabled: true
   spec:
+    disableSelfServiceScrape: true
     retentionPeriod: 7d
     resources:
       requests:
@@ -74,6 +115,7 @@ vlsingle:
 vtsingle:
   enabled: true
   spec:
+    disableSelfServiceScrape: true
     retentionPeriod: 3d
     resources:
       requests:
@@ -117,6 +159,8 @@ defaultDatasources:
               datasourceUid: VictoriaTraces
 grafana:
   enabled: true
+  vmScrape:
+    enabled: false
   imageRenderer:
     enabled: true
     image:
