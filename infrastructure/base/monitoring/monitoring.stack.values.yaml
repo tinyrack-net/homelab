@@ -77,11 +77,11 @@ vtsingle:
     retentionPeriod: 3d
     resources:
       requests:
-        cpu: 100m
-        memory: 256Mi
+        cpu: 50m
+        memory: 128Mi
       limits:
-        cpu: "2"
-        memory: 1Gi
+        cpu: 500m
+        memory: 512Mi
     storage:
       storageClassName: longhorn-strict-local
       accessModes:
@@ -134,11 +134,11 @@ grafana:
       readOnlyRootFilesystem: false
     resources:
       requests:
-        cpu: 50m
-        memory: 128Mi
+        cpu: 100m
+        memory: 256Mi
       limits:
-        cpu: 500m
-        memory: 512Mi
+        cpu: "2"
+        memory: 1Gi
   plugins:
     - victoriametrics-metrics-datasource
     - victoriametrics-logs-datasource
