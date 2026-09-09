@@ -21,6 +21,8 @@ websocket:
 terminals:
   enabled: false
 replicaCount: 2
+podLabels:
+  observability.tinyrack.net/otlp-client: "true"
 persistence:
   enabled: false
   provider: s3
@@ -44,6 +46,27 @@ sso:
     providerName: "Issuary"
     providerUrl: "https://auth.winetree94.com/oauth/.well-known/openid-configuration"
 extraEnvVars:
+  # OpenTelemetry
+  - name: ENABLE_OTEL
+    value: "true"
+  - name: ENABLE_OTEL_TRACES
+    value: "true"
+  - name: ENABLE_OTEL_METRICS
+    value: "false"
+  - name: ENABLE_OTEL_LOGS
+    value: "false"
+  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4317
+  - name: OTEL_EXPORTER_OTLP_INSECURE
+    value: "true"
+  - name: OTEL_SERVICE_NAME
+    value: open-webui
+  - name: OTEL_RESOURCE_ATTRIBUTES
+    value: deployment.environment.name=production,service.version=0.11.3
+  - name: OTEL_TRACES_SAMPLER
+    value: parentbased_always_on
+  - name: OTEL_SDK_DISABLED
+    value: "false"
   # DB
   - name: DATABASE_USER
     valueFrom:

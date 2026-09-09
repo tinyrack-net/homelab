@@ -21,6 +21,14 @@ specs:
     egress:
       - toEndpoints:
           - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "4317"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
               k8s:io.kubernetes.pod.namespace: openwebui-system
               cnpg.io/cluster: openwebui-database-cluster
         toPorts:
