@@ -14,6 +14,7 @@ spec:
         karakeep.winetree94.com/auth-migration: issuary-auth-domain-20260825
       labels:
         app: karakeep-web
+        observability.tinyrack.net/otlp-client: "true"
     spec:
       containers:
         - env:
