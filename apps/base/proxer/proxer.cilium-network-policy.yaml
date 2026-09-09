@@ -19,5 +19,13 @@ specs:
               - port: "8080"
                 protocol: TCP
     egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "4318"
+                protocol: TCP
       - toCIDR:
           - 10.132.244.0/22

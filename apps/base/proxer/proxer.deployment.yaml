@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: proxer
+        observability.tinyrack.net/otlp-client: "true"
     spec:
       containers:
         - name: proxer
@@ -26,6 +27,16 @@ spec:
               containerPort: 8080
               protocol: TCP
           env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4318
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http/protobuf
+            - name: OTEL_SERVICE_NAME
+              value: proxer
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: deployment.environment.name=production,service.version=0.14.2
+            - name: OTEL_SDK_DISABLED
+              value: "false"
             - name: PROXER_LISTEN
               value: 0.0.0.0:8080
             - name: PROXER_DOMAIN
