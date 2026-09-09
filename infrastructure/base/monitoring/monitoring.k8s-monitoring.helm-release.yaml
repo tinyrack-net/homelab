@@ -56,39 +56,6 @@ spec:
           create: false
           name: telemetry-credentials
           namespace: monitoring-system
-      traceSampler:
-        type: otlp
-        protocol: http
-        url: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4318
-        tls:
-          insecure: true
-        metrics:
-          enabled: false
-        logs:
-          enabled: false
-        traces:
-          enabled: true
-          path: v1/traces
-        processors:
-          serviceGraphMetrics:
-            enabled: true
-            destinations: [telemetry]
-            dimensions:
-              - deployment.environment.name
-              - k8s.cluster.name
-              - k8s.namespace.name
-              - service.version
-            collector:
-              alloy:
-                extraPorts:
-                  - name: otlp-grpc
-                    port: 4317
-                    targetPort: 4317
-                    protocol: TCP
-                    appProtocol: grpc
-              controller:
-                type: statefulset
-                replicas: 1
     clusterMetrics:
       enabled: true
       collector: alloy
@@ -144,7 +111,7 @@ spec:
       destinations: [telemetry]
       jobLabel: kubernetes-events
     applicationObservability:
-      enabled: true
+      enabled: false
       collector: alloy
       destinations: [telemetry, traceSampler]
       receivers:

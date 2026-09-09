@@ -45,7 +45,7 @@ spec:
             - name: N8N_OTEL_ENABLED
               value: "true"
             - name: N8N_OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4318
+              value: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4318
             - name: N8N_OTEL_EXPORTER_SERVICE_NAME
               value: n8n
             - name: N8N_OTEL_TRACES_SAMPLE_RATE

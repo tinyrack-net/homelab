@@ -19,6 +19,7 @@ spec:
         }
 
         otelcol.exporter.otlphttp "telemetry" {
+          metrics_endpoint = "http://vmauth-monitoring-victoria-metrics-k8s-stack-internal.monitoring-system.svc.cluster.local:8427/opentelemetry/v1/metrics"
           traces_endpoint = "http://vmauth-monitoring-victoria-metrics-k8s-stack-internal.monitoring-system.svc.cluster.local:8427/insert/opentelemetry/v1/traces"
           client {
             endpoint = "http://vmauth-monitoring-victoria-metrics-k8s-stack-internal.monitoring-system.svc.cluster.local:8427"
@@ -43,7 +44,125 @@ spec:
           send_batch_size = 8192
           send_batch_max_size = 0
           output {
+            metrics = [otelcol.exporter.otlphttp.telemetry.input]
             traces = [otelcol.exporter.otlphttp.telemetry.input]
+          }
+        }
+
+        otelcol.processor.k8sattributes "default" {
+          passthrough = false
+          extract {
+            metadata = ["k8s.namespace.name","k8s.pod.name","k8s.deployment.name","k8s.statefulset.name","k8s.daemonset.name","k8s.cronjob.name","k8s.job.name","k8s.node.name","k8s.pod.uid","k8s.pod.start_time"]
+          }
+          pod_association {
+            source {
+              from = "resource_attribute"
+              name = "k8s.pod.ip"
+            }
+          }
+          pod_association {
+            source {
+              from = "resource_attribute"
+              name = "k8s.pod.uid"
+            }
+          }
+          pod_association {
+            source {
+              from = "connection"
+            }
+          }
+          output {
+            traces = [otelcol.processor.transform.sanitize.input]
+          }
+        }
+
+        otelcol.processor.transform "sanitize" {
+          error_mode = "ignore"
+          trace_statements {
+            context = "resource"
+            statements = [
+              `set(attributes["deployment.environment.name"], "production") where attributes["deployment.environment.name"] == nil`,
+              `set(attributes["k8s.cluster.name"], "homelab") where attributes["k8s.cluster.name"] == nil`,
+            ]
+          }
+          trace_statements {
+            context = "span"
+            statements = [
+              `set(status.code, STATUS_CODE_ERROR) where attributes["http.response.status_code"] >= 500`,
+              `delete_matching_keys(attributes, "^(url\\.(full|query)|http\\.(request|response)\\.header\\.(authorization|proxy-authorization|cookie|set-cookie)|db\\.(statement|query\\.text)|redis\\.(command|args)|gen_ai\\.(prompt|completion|input|output)|llm\\.(prompts|completions)|enduser\\.|user\\.)")`,
+            ]
+          }
+          output {
+            traces = [otelcol.processor.filter.health.input]
+          }
+        }
+
+        otelcol.processor.filter "health" {
+          error_mode = "ignore"
+          traces {
+            span = [
+              `IsMatch(attributes["http.route"], "(?i)(^|/)(health|healthz|ready|readyz|live|livez)(/|$)")`,
+              `IsMatch(attributes["url.path"], "(?i)(^|/)(health|healthz|ready|readyz|live|livez)(/|$)")`,
+            ]
+          }
+          output {
+            traces = [
+              otelcol.processor.filter.span_metrics.input,
+              otelcol.connector.servicegraph.default.input,
+              otelcol.processor.tail_sampling.default.input,
+            ]
+          }
+        }
+
+        otelcol.processor.filter "span_metrics" {
+          error_mode = "silent"
+          traces {
+            span = [`kind == 1`]
+          }
+          output {
+            traces = [otelcol.connector.spanmetrics.default.input]
+          }
+        }
+
+        otelcol.connector.spanmetrics "default" {
+          dimension {
+            name = "http.request.method"
+          }
+          dimension {
+            name = "http.response.status_code"
+          }
+          dimension {
+            name = "deployment.environment.name"
+          }
+          aggregation_cardinality_limit = 5000
+          namespace = "traces.span.metrics"
+          metrics_expiration = "15m"
+          series_expiration = "15m"
+          histogram {
+            unit = "s"
+            explicit {
+              buckets = ["2ms","4ms","6ms","8ms","10ms","50ms","100ms","200ms","400ms","800ms","1s","1400ms","2s","5s","10s","15s"]
+            }
+          }
+          output {
+            metrics = [otelcol.processor.batch.telemetry.input]
+          }
+        }
+
+        otelcol.connector.servicegraph "default" {
+          cache_loop = "1m"
+          database_name_attributes = ["db.name"]
+          dimensions = [
+            "deployment.environment.name",
+            "k8s.cluster.name",
+            "k8s.namespace.name",
+            "service.version",
+          ]
+          latency_histogram_buckets = ["2ms","4ms","6ms","8ms","10ms","50ms","100ms","200ms","400ms","800ms","1s","1400ms","2s","5s","10s","15s"]
+          metrics_flush_interval = "60s"
+          store_expiration_loop = "2s"
+          output {
+            metrics = [otelcol.processor.batch.telemetry.input]
           }
         }
 
@@ -92,7 +211,7 @@ spec:
             max_request_body_size = "20MiB"
           }
           output {
-            traces = [otelcol.processor.tail_sampling.default.input]
+            traces = [otelcol.processor.k8sattributes.default.input]
           }
         }
     extraPorts:
