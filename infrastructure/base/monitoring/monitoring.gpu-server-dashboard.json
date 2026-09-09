@@ -324,7 +324,9 @@
             "fillOpacity": 10,
             "showPoints": "never",
             "spanNulls": false
-          }
+          },
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       }
@@ -375,7 +377,9 @@
             "fillOpacity": 10,
             "showPoints": "never",
             "spanNulls": false
-          }
+          },
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       }
@@ -640,7 +644,9 @@
             "fillOpacity": 10,
             "showPoints": "never",
             "spanNulls": false
-          }
+          },
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       }
@@ -932,7 +938,9 @@
                 "value": 0.75
               }
             ]
-          }
+          },
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       }
@@ -1177,7 +1185,9 @@
             "fillOpacity": 10,
             "showPoints": "never",
             "spanNulls": false
-          }
+          },
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       }
@@ -1228,7 +1238,9 @@
             "fillOpacity": 10,
             "showPoints": "never",
             "spanNulls": false
-          }
+          },
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       }
@@ -1335,7 +1347,9 @@
             "fillOpacity": 10,
             "showPoints": "never",
             "spanNulls": false
-          }
+          },
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       }
