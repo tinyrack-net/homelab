@@ -41,7 +41,7 @@ spec:
                 name: issuary-grafana-oauth
           env:
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4318
+              value: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4318
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: http/protobuf
             - name: OTEL_SERVICE_NAME

@@ -34,7 +34,7 @@ tracing:
     enabled: true
     http:
       enabled: true
-      endpoint: http://monitoring-alloy.monitoring-system.svc:4318/v1/traces
+      endpoint: http://monitoring-trace-sampler.monitoring-system.svc:4318/v1/traces
 ingressClass:
   enabled: true
   isDefaultClass: true
