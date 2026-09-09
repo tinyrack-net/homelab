@@ -221,7 +221,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(vllm:num_requests_running{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
+          "expr": "sum(vllm_num_requests_running{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
           "instant": true
         }
       ],
@@ -676,12 +676,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(vllm:prompt_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(vllm_prompt_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
           "legendFormat": "input tokens/s"
         },
         {
           "refId": "B",
-          "expr": "sum(rate(vllm:generation_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(vllm_generation_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
           "legendFormat": "output tokens/s"
         }
       ],
@@ -732,17 +732,17 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(vllm:num_requests_running{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
+          "expr": "sum(vllm_num_requests_running{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
           "legendFormat": "running"
         },
         {
           "refId": "B",
-          "expr": "sum(vllm:num_requests_waiting{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
+          "expr": "sum(vllm_num_requests_waiting{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
           "legendFormat": "waiting"
         },
         {
           "refId": "C",
-          "expr": "max(vllm:kv_cache_usage_perc{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
+          "expr": "max(vllm_kv_cache_usage_perc{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"})",
           "legendFormat": "KV cache ratio"
         }
       ],
@@ -793,7 +793,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (finished_reason) (rate(vllm:request_success_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum by (finished_reason) (rate(vllm_request_success_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
           "legendFormat": "{{finished_reason}}"
         }
       ],
@@ -844,7 +844,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase(vllm:num_preemptions_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(increase(vllm_num_preemptions_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval]))",
           "legendFormat": "preemptions"
         }
       ],
@@ -895,7 +895,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(vllm:spec_decode_num_accepted_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[5m])) / clamp_min(sum(rate(vllm:spec_decode_num_draft_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[5m])), 1e-9)",
+          "expr": "sum(rate(vllm_spec_decode_num_accepted_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[5m])) / clamp_min(sum(rate(vllm_spec_decode_num_draft_tokens_total{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[5m])), 1e-9)",
           "instant": true
         }
       ],
@@ -968,12 +968,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.5, sum by (le) (rate(vllm:time_to_first_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(vllm_time_to_first_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
           "legendFormat": "p50"
         },
         {
           "refId": "B",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(vllm:time_to_first_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(vllm_time_to_first_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
           "legendFormat": "p95"
         }
       ],
@@ -1024,12 +1024,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.5, sum by (le) (rate(vllm:request_time_per_output_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(vllm_request_time_per_output_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
           "legendFormat": "p50"
         },
         {
           "refId": "B",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(vllm:request_time_per_output_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(vllm_request_time_per_output_token_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
           "legendFormat": "p95"
         }
       ],
@@ -1080,12 +1080,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.5, sum by (le) (rate(vllm:e2e_request_latency_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(vllm_e2e_request_latency_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
           "legendFormat": "p50"
         },
         {
           "refId": "B",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(vllm:e2e_request_latency_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(vllm_e2e_request_latency_seconds_bucket{fleet=\"gpu-servers\",scope_name=\"otelcol/prometheusreceiver\",instance=~\"$instance\"}[$__rate_interval])))",
           "legendFormat": "p95"
         }
       ],
