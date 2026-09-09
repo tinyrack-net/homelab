@@ -10,6 +10,8 @@ additionalArguments:
   - --entryPoints.websecure.transport.respondingTimeouts.idleTimeout=600s
 deployment:
   replicas: 2
+  podLabels:
+    observability.tinyrack.net/otlp-client: "true"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9100"
