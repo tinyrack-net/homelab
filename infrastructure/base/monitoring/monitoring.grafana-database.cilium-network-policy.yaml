@@ -18,8 +18,35 @@ spec:
             - port: "9187"
               protocol: TCP
   egress:
-    - toEntities:
-        - all
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-grafana-database-backup
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: monitoring
+  annotations:
+    networking.tinyrack.net/hosts: storage.intranet.winetree94.com
+spec:
+  description: Allow the Grafana database to reach object storage through internal Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring-system
+            cnpg.io/cluster: grafana-database-cluster
       toPorts:
         - ports:
             - port: "8443"
