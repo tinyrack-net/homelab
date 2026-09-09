@@ -11,6 +11,7 @@ resources:
   - monitoring.scrape.cilium-network-policy.yaml
   - monitoring.traefik.cilium-network-policy.yaml
   - monitoring.grafana-oidc.cilium-network-policy.yaml
+  - monitoring.grafana-database.cilium-network-policy.yaml
   - monitoring.grafana.secret.yaml
   - monitoring.grafana-env.secret.yaml
   - monitoring.grafana-database.yaml
