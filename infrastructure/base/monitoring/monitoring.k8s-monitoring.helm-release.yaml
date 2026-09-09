@@ -58,8 +58,8 @@ spec:
           namespace: monitoring-system
       traceSampler:
         type: otlp
-        protocol: grpc
-        url: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4317
+        protocol: http
+        url: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4318
         tls:
           insecure: true
         metrics:
@@ -68,6 +68,7 @@ spec:
           enabled: false
         traces:
           enabled: true
+          path: v1/traces
         processors:
           serviceGraphMetrics:
             enabled: true
