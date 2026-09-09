@@ -38,6 +38,40 @@ spec:
           enabled: true
           path: insert/opentelemetry/v1/traces
         processors:
+          serviceGraphMetrics:
+            enabled: true
+            destinations: [telemetry]
+            dimensions:
+              - deployment.environment.name
+              - k8s.cluster.name
+              - k8s.namespace.name
+              - service.version
+            collector:
+              controller:
+                type: statefulset
+                replicas: 1
+          tailSampling:
+            enabled: true
+            decisionWait: 15s
+            decisionCache:
+              sampledCacheSize: 100000
+              nonSampledCacheSize: 100000
+            numTraces: 10000
+            expectedNewTracesPerSec: 50
+            policies:
+              - name: errors
+                type: status_code
+                status_codes: [ERROR]
+              - name: slow-requests
+                type: latency
+                threshold_ms: 2000
+              - name: baseline
+                type: probabilistic
+                sampling_percentage: 10
+            collector:
+              controller:
+                type: statefulset
+                replicas: 1
           transform:
             metrics:
               datapoint:
@@ -119,16 +153,42 @@ spec:
           http:
             enabled: true
           grpc:
-            enabled: false
+            enabled: true
       metrics:
-        enabled: false
+        enabled: true
+        filters:
+          datapoint:
+            - 'IsMatch(attributes["span.name"], "(?i)(^|/)(health|healthz|ready|readyz|live|livez)(/|$)")'
       logs:
         enabled: false
       traces:
         enabled: true
+        filters:
+          span:
+            - 'IsMatch(attributes["http.route"], "(?i)(^|/)(health|healthz|ready|readyz|live|livez)(/|$)")'
+            - 'IsMatch(attributes["url.path"], "(?i)(^|/)(health|healthz|ready|readyz|live|livez)(/|$)")'
+        transforms:
+          resource:
+            - 'set(attributes["deployment.environment.name"], "production") where attributes["deployment.environment.name"] == nil'
+          span:
+            - 'set(attributes["span.metrics.skip"], true) where IsMatch(attributes["http.route"], "(?i)(^|/)(health|healthz|ready|readyz|live|livez)(/|$)")'
+            - 'set(attributes["span.metrics.skip"], true) where IsMatch(attributes["url.path"], "(?i)(^|/)(health|healthz|ready|readyz|live|livez)(/|$)")'
+            - 'set(status.code, STATUS_CODE_ERROR) where attributes["http.response.status_code"] >= 500'
+            - 'delete_matching_keys(attributes, "^(url\\.(full|query)|http\\.(request|response)\\.header\\.(authorization|proxy-authorization|cookie|set-cookie)|db\\.(statement|query\\.text)|redis\\.(command|args)|gen_ai\\.(prompt|completion|input|output)|llm\\.(prompts|completions)|enduser\\.|user\\.)")'
       connectors:
         grafanaCloudMetrics:
           enabled: false
+        spanMetrics:
+          enabled: true
+          aggregationCardinalityLimit: 5000
+          metricsExpiration: 15m
+          seriesExpiration: 15m
+          dimensions:
+            - name: http.request.method
+            - name: http.response.status_code
+            - name: deployment.environment.name
+          exemplars:
+            enabled: false
       processors:
         memoryLimiter:
           enabled: true
@@ -181,6 +241,8 @@ spec:
     collectors:
       alloy:
         fullnameOverride: monitoring-alloy
+        controller:
+          replicas: 1
         presets:
           - singleton
           - clustered

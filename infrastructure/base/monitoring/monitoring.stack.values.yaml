@@ -172,7 +172,7 @@ vtsingle:
   enabled: true
   spec:
     disableSelfServiceScrape: true
-    retentionPeriod: 3d
+    retentionPeriod: 7d
     resources:
       requests:
         cpu: 50m
@@ -209,10 +209,41 @@ defaultDatasources:
           derivedFields:
             - name: trace_id
               matcherType: regex
-              matcherRegex: '00-([0-9a-f]{32})-[0-9a-f]{16}-[0-9a-f]{2}'
+              matcherRegex: '(?:00-|"?trace_id"?\s*[=:]\s*"?)([0-9a-fA-F]{32})(?:-[0-9a-fA-F]{16}-[0-9a-fA-F]{2})?'
               url: '${__value.raw}'
               urlDisplayLabel: View trace
               datasourceUid: VictoriaTraces
+  victoriatraces:
+    datasources:
+      - name: VictoriaTraces
+        access: proxy
+        uid: VictoriaTraces
+        type: jaeger
+        jsonData:
+          nodeGraph:
+            enabled: true
+          traceIdTimeParams:
+            enabled: true
+          tracesToLogsV2:
+            datasourceUid: VictoriaLogs
+            spanStartTimeShift: -1m
+            spanEndTimeShift: 1m
+            filterByTraceID: true
+            filterBySpanID: false
+          tracesToMetrics:
+            datasourceUid: VictoriaMetrics
+            spanStartTimeShift: -1m
+            spanEndTimeShift: 1m
+            tags:
+              - key: service.name
+                value: service_name
+              - key: span.name
+                value: span_name
+            queries:
+              - name: Request rate
+                query: 'sum(rate(traces_span_metrics_calls_total{$$__tags}[5m]))'
+              - name: Error rate
+                query: 'sum(rate(traces_span_metrics_calls_total{$$__tags,status_code="STATUS_CODE_ERROR"}[5m]))'
 grafana:
   enabled: true
   vmScrape:
@@ -493,7 +524,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: (up{job=~"vmsingle|vlsingle|vtsingle"} == 0) or (increase(otelcol_exporter_send_failed_spans_total[10m]) > 0) or (otelcol_exporter_queue_capacity > 0 and on(cluster,exporter) otelcol_exporter_queue_size / otelcol_exporter_queue_capacity > 0.9)
+                    expr: (up{job=~"vmsingle|vlsingle|vtsingle"} == 0) or (increase(otelcol_exporter_send_failed_spans_total[10m]) > 0) or (increase(otelcol_exporter_enqueue_failed_spans_total[10m]) > 0) or (increase(otelcol_receiver_refused_spans_total[10m]) > 0) or (increase(otelcol_processor_refused_spans_total[10m]) > 0) or (otelcol_exporter_queue_capacity > 0 and on(cluster,exporter) otelcol_exporter_queue_size / otelcol_exporter_queue_capacity > 0.9)
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -517,5 +548,77 @@ grafana:
               execErrState: Error
               for: 5m
               annotations:
-                summary: A Victoria backend or OTLP export pipeline is failing
+                summary: A Victoria backend is down, or the OTLP pipeline is rejecting, losing, or queueing spans
+              labels: {severity: critical}
+            - uid: trace-storage-warning
+              title: VictoriaTraces storage above 70%
+              condition: B
+              data:
+                - refId: A
+                  relativeTimeRange: {from: 600, to: 0}
+                  datasourceUid: VictoriaMetrics
+                  model:
+                    datasource: {type: prometheus, uid: VictoriaMetrics}
+                    editorMode: code
+                    expr: kubelet_volume_stats_used_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} / kubelet_volume_stats_capacity_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} > 0.70
+                    instant: true
+                    intervalMs: 1000
+                    maxDataPoints: 43200
+                    refId: A
+                - refId: B
+                  relativeTimeRange: {from: 0, to: 0}
+                  datasourceUid: __expr__
+                  model:
+                    conditions:
+                      - evaluator: {params: [0], type: gt}
+                        operator: {type: and}
+                        query: {params: [A]}
+                        reducer: {params: [], type: last}
+                        type: query
+                    datasource: {type: __expr__, uid: __expr__}
+                    intervalMs: 1000
+                    maxDataPoints: 43200
+                    refId: B
+                    type: classic_conditions
+              noDataState: OK
+              execErrState: Error
+              for: 15m
+              annotations:
+                summary: VictoriaTraces is above 70%; review the 48-hour growth projection before expanding the PVC
+              labels: {severity: warning}
+            - uid: trace-storage-critical
+              title: VictoriaTraces storage above 85%
+              condition: B
+              data:
+                - refId: A
+                  relativeTimeRange: {from: 600, to: 0}
+                  datasourceUid: VictoriaMetrics
+                  model:
+                    datasource: {type: prometheus, uid: VictoriaMetrics}
+                    editorMode: code
+                    expr: kubelet_volume_stats_used_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} / kubelet_volume_stats_capacity_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} > 0.85
+                    instant: true
+                    intervalMs: 1000
+                    maxDataPoints: 43200
+                    refId: A
+                - refId: B
+                  relativeTimeRange: {from: 0, to: 0}
+                  datasourceUid: __expr__
+                  model:
+                    conditions:
+                      - evaluator: {params: [0], type: gt}
+                        operator: {type: and}
+                        query: {params: [A]}
+                        reducer: {params: [], type: last}
+                        type: query
+                    datasource: {type: __expr__, uid: __expr__}
+                    intervalMs: 1000
+                    maxDataPoints: 43200
+                    refId: B
+                    type: classic_conditions
+              noDataState: OK
+              execErrState: Error
+              for: 5m
+              annotations:
+                summary: VictoriaTraces is above 85% capacity
               labels: {severity: critical}

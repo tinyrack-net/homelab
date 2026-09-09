@@ -29,6 +29,16 @@ configMapGenerator:
     options:
       labels:
         grafana_dashboard: "1"
+  - name: grafana-trace-overview
+    namespace: monitoring-system
+    files:
+      - trace-overview.json=monitoring.trace-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+        grafana_folder: Observability
+      annotations:
+        grafana_folder: Observability
   - name: grafana-dev-machines-hardware
     namespace: monitoring-system
     files:

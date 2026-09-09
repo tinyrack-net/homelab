@@ -29,6 +29,15 @@ spec:
         - ports:
             - port: "4318"
               protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            observability.tinyrack.net/otlp-client: "true"
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+            - port: "4318"
+              protocol: TCP
     - fromEntities:
         - kube-apiserver
   egress:
