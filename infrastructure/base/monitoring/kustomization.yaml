@@ -13,6 +13,8 @@ resources:
   - monitoring.grafana-oidc.cilium-network-policy.yaml
   - monitoring.grafana.secret.yaml
   - monitoring.grafana-env.secret.yaml
+  - monitoring.grafana-database.yaml
+  - monitoring.grafana-database-user.secret.yaml
   - monitoring.telemetry.secret.yaml
   - monitoring.issuary.secret.yaml
 configMapGenerator:

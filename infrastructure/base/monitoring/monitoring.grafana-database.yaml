@@ -1,0 +1,69 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: grafana-database-backup-store
+  namespace: monitoring-system
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://tinyrack-homelab/infrastructure/monitoring/grafana-database-18
+    endpointURL: https://storage.intranet.winetree94.com
+    s3Credentials:
+      region:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_REGION
+      accessKeyId:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: grafana-database-cluster
+  namespace: monitoring-system
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm@sha256:cdb5c283a473507f7c597ea7e045d1a5e8efcbc4c5101aada013af9bd37ccc43
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: grafana-database-backup-store
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  bootstrap:
+    initdb:
+      database: grafana
+      owner: grafana
+      secret:
+        name: grafana-database-user-secret
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: grafana-backup
+  namespace: monitoring-system
+spec:
+  schedule: "0 0 */4 * * *"
+  immediate: true
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+  cluster:
+    name: grafana-database-cluster
