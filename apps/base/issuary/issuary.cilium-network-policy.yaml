@@ -29,6 +29,14 @@ specs:
     egress:
       - toEndpoints:
           - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "4318"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
               k8s:io.kubernetes.pod.namespace: issuary-system
               cnpg.io/cluster: issuary-database-cluster
         toPorts:
