@@ -4,6 +4,7 @@ metadata:
   name: monitoring-trace-sampler
   namespace: monitoring-system
 spec:
+  fullnameOverride: monitoring-trace-sampler
   alloy:
     configMap:
       create: true
