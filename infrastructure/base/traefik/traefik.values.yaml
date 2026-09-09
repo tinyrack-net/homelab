@@ -27,7 +27,7 @@ accessLog:
       defaultMode: drop
 tracing:
   serviceName: traefik-internal
-  sampleRate: 0.1
+  sampleRate: 1.0
   resourceAttributes:
     cluster: homelab
   otlp:
