@@ -56,7 +56,9 @@ extraEnvVars:
   - name: ENABLE_OTEL_LOGS
     value: "false"
   - name: OTEL_EXPORTER_OTLP_ENDPOINT
-    value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4317
+    value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4318
+  - name: OTEL_EXPORTER_OTLP_PROTOCOL
+    value: http/protobuf
   - name: OTEL_EXPORTER_OTLP_INSECURE
     value: "true"
   - name: OTEL_SERVICE_NAME
