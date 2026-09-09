@@ -25,7 +25,7 @@ specs:
               app.kubernetes.io/name: alloy
         toPorts:
           - ports:
-              - port: "4317"
+              - port: "4318"
                 protocol: TCP
       - toEndpoints:
           - matchLabels:
