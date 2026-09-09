@@ -73,7 +73,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "max by (instance, os) (max_over_time(up{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[2m]))",
+          "expr": "max by (instance, os) (max_over_time(up{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[2m])) or (max by (instance, os) (last_over_time(up{fleet=\"dev-machines\",scope_name=\"otelcol\/prometheusreceiver\",instance=~\"$instance\"}[30d])) * 0)",
           "instant": true,
           "legendFormat": "{{instance}} · {{os}}",
           "range": false,
