@@ -222,11 +222,10 @@ defaultDashboards:
       enabled: false
     victoriametrics-vmalert:
       enabled: false
-    node-exporter-full:
-      enabled: false
   sources:
     node-exporter-full:
-      enabled: false
+      # node-exporter is installed by k8s-monitoring, not this stack's subchart.
+      enabled: true
 defaultDatasources:
   victorialogs:
     datasources:
