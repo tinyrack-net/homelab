@@ -76,24 +76,23 @@ spec:
                 type: probabilistic
                 sampling_percentage: 10
             collector:
-              alloy:
-                service:
-                  enabled: false
-                extraObjects:
-                  - apiVersion: v1
-                    kind: Service
-                    metadata:
-                      name: monitoring-k8s-telemetry-sampler
-                    spec:
-                      selector:
-                        app.kubernetes.io/instance: monitoring-k8s-telemetry-sampler
-                        app.kubernetes.io/name: alloy
-                      ports:
-                        - name: otlp-grpc
-                          port: 4317
-                          targetPort: 4317
-                          protocol: TCP
-                          appProtocol: grpc
+              service:
+                enabled: false
+              extraObjects:
+                - apiVersion: v1
+                  kind: Service
+                  metadata:
+                    name: monitoring-k8s-telemetry-sampler
+                  spec:
+                    selector:
+                      app.kubernetes.io/instance: monitoring-k8s-telemetry-sampler
+                      app.kubernetes.io/name: alloy
+                    ports:
+                      - name: otlp-grpc
+                        port: 4317
+                        targetPort: 4317
+                        protocol: TCP
+                        appProtocol: grpc
               controller:
                 type: statefulset
                 replicas: 1
