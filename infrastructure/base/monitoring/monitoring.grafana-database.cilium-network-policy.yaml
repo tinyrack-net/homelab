@@ -17,3 +17,12 @@ spec:
               protocol: TCP
             - port: "9187"
               protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
