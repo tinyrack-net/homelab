@@ -63,6 +63,9 @@ immich:
 server:
   controllers:
     main:
+      pod:
+        labels:
+          observability.tinyrack.net/otlp-client: "true"
       containers:
         main:
           image:
@@ -75,6 +78,13 @@ server:
             limits:
               cpu: 1500m
               memory: 4Gi
+          env:
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://monitoring-alloy.monitoring-system.svc.cluster.local:4318
+            OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+            OTEL_SERVICE_NAME: immich
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production,service.version=3.1.0
+            OTEL_TRACES_SAMPLER: parentbased_always_on
+            OTEL_SDK_DISABLED: "false"
           probes:
             liveness:
               custom: true
