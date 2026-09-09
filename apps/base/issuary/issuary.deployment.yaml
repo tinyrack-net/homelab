@@ -17,6 +17,7 @@ spec:
     metadata:
       labels:
         app: issuary
+        observability.tinyrack.net/otlp-client: "true"
     spec:
       containers:
         - name: issuary
@@ -24,6 +25,8 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - node
+            - --import
+            - ./dist/telemetry.js
             - dist/cli.js
             - serve
             - --config-path=/config/config.yaml
@@ -37,6 +40,18 @@ spec:
             - secretRef:
                 name: issuary-grafana-oauth
           env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4318
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http/protobuf
+            - name: OTEL_SERVICE_NAME
+              value: issuary
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: deployment.environment.name=production,service.version=0.29.1
+            - name: OTEL_TRACES_SAMPLER
+              value: parentbased_always_on
+            - name: OTEL_SDK_DISABLED
+              value: "false"
             - name: NODE_EXTRA_CA_CERTS
               value: /etc/issuary/database-ca/ca.crt
             - name: ISSUARY_DATABASE_USER
