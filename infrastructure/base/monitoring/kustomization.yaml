@@ -57,6 +57,16 @@ configMapGenerator:
         grafana_folder: Infrastructure
       annotations:
         grafana_folder: Infrastructure
+  - name: grafana-gpu-server
+    namespace: monitoring-system
+    files:
+      - gpu-server.json=monitoring.gpu-server-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+        grafana_folder: Infrastructure
+      annotations:
+        grafana_folder: Infrastructure
   - name: grafana-node-exporter-full
     namespace: monitoring-system
     files:
