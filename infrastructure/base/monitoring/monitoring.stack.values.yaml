@@ -1,3 +1,13 @@
+# K3s component metrics share the kubelet /metrics scrape. Component job
+# relabeling does not create synthetic up metrics for removed endpoints.
+defaultRules:
+  rules:
+    KubeAPIDown: {enabled: false}
+    KubeAPIInstanceUnreachable: {enabled: false}
+    KubeControllerManagerDown: {enabled: false}
+    KubeControllerManagerInstanceUnreachable: {enabled: false}
+    KubeSchedulerDown: {enabled: false}
+    KubeSchedulerInstanceUnreachable: {enabled: false}
 victoria-metrics-operator:
   serviceMonitor:
     enabled: false
@@ -135,13 +145,14 @@ vmsingle:
     retentionPeriod: 30d
     extraArgs:
       opentelemetry.usePrometheusNaming: "true"
+      maxConcurrentInserts: "4"
     resources:
       requests:
-        cpu: 100m
-        memory: 512Mi
-      limits:
         cpu: "1"
         memory: 2Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
     storage:
       storageClassName: longhorn-strict-local
       accessModes:
@@ -524,7 +535,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: (up{job=~"vmsingle|vlsingle|vtsingle"} == 0) or (increase(otelcol_exporter_send_failed_spans_total[10m]) > 0) or (increase(otelcol_exporter_enqueue_failed_spans_total[10m]) > 0) or (increase(otelcol_receiver_refused_spans_total[10m]) > 0) or (increase(otelcol_processor_refused_spans_total[10m]) > 0) or (otelcol_exporter_queue_capacity > 0 and on(cluster,exporter) otelcol_exporter_queue_size / otelcol_exporter_queue_capacity > 0.9)
+                    expr: ((up{job=~"vmsingle|vlsingle|vtsingle|vmauth"} == 0) + 1) or (increase(otelcol_exporter_send_failed_spans_total[10m]) > 0) or (increase(otelcol_exporter_enqueue_failed_spans_total[10m]) > 0) or (increase(otelcol_receiver_refused_spans_total[10m]) > 0) or (increase(otelcol_processor_refused_spans_total[10m]) > 0) or (increase(otelcol_exporter_send_failed_metric_points_total[10m]) > 0) or (increase(otelcol_exporter_enqueue_failed_metric_points_total[10m]) > 0) or (increase(otelcol_receiver_refused_metric_points_total[10m]) > 0) or (increase(otelcol_processor_refused_metric_points_total[10m]) > 0) or (max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_size) / max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_capacity) > 0.9)
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -548,8 +559,332 @@ grafana:
               execErrState: Error
               for: 5m
               annotations:
-                summary: A Victoria backend is down, or the OTLP pipeline is rejecting, losing, or queueing spans
+                summary: A Victoria backend is down, or the OTLP pipeline is rejecting, losing, or queueing telemetry
               labels: {severity: critical}
+            - uid: node-telemetry-stale
+              title: Node telemetry stale
+              condition: B
+              data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: VictoriaMetrics
+                model:
+                  datasource:
+                    type: prometheus
+                    uid: VictoriaMetrics
+                  editorMode: code
+                  expr: (time() - max by(cluster) (timestamp(node_time_seconds{job="node-exporter"})) > 90) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (node_time_seconds{job="node-exporter"}))
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                relativeTimeRange:
+                  from: 0
+                  to: 0
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                  - evaluator:
+                      params:
+                      - 0
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                      - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: B
+                  type: threshold
+                  expression: A
+              noDataState: OK
+              execErrState: Error
+              for: 2m
+              annotations:
+                summary: Node exporter samples are over 90 seconds old or missing
+              labels:
+                severity: warning
+            - uid: node-telemetry-sparse
+              title: Node telemetry has gaps
+              condition: B
+              data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: VictoriaMetrics
+                model:
+                  datasource:
+                    type: prometheus
+                    uid: VictoriaMetrics
+                  editorMode: code
+                  expr: (max by(cluster) (count_over_time(node_time_seconds{job="node-exporter"}[5m])) < 8) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (count_over_time(node_time_seconds{job="node-exporter"}[5m])))
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                relativeTimeRange:
+                  from: 0
+                  to: 0
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                  - evaluator:
+                      params:
+                      - 0
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                      - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: B
+                  type: threshold
+                  expression: A
+              noDataState: OK
+              execErrState: Error
+              for: 2m
+              annotations:
+                summary: Node exporter received fewer than eight samples in five minutes
+              labels:
+                severity: warning
+            - uid: alloy-restarting
+              title: Alloy restarted or was OOM killed
+              condition: B
+              data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: VictoriaMetrics
+                model:
+                  datasource:
+                    type: prometheus
+                    uid: VictoriaMetrics
+                  editorMode: code
+                  expr: (increase(kube_pod_container_status_restarts_total{namespace="monitoring-system",container="alloy",pod=~"monitoring-alloy-.*"}[10m]) > 0) or ((time() - kube_pod_container_status_last_terminated_timestamp{namespace="monitoring-system",container="alloy",pod=~"monitoring-alloy-.*"} < 600) and on(cluster,namespace,pod,container) (kube_pod_container_status_last_terminated_reason{namespace="monitoring-system",container="alloy",reason="OOMKilled"} == 1))
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                relativeTimeRange:
+                  from: 0
+                  to: 0
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                  - evaluator:
+                      params:
+                      - 0
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                      - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: B
+                  type: threshold
+                  expression: A
+              noDataState: OK
+              execErrState: Error
+              for: 0s
+              annotations:
+                summary: Alloy restarted or was OOM killed in the last ten minutes
+              labels:
+                severity: warning
+            - uid: metrics-delivery-failure
+              title: Metrics delivery failure
+              condition: B
+              data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: VictoriaMetrics
+                model:
+                  datasource:
+                    type: prometheus
+                    uid: VictoriaMetrics
+                  editorMode: code
+                  expr: (increase(otelcol_exporter_send_failed_metric_points_total[5m]) > 0) or (increase(otelcol_exporter_enqueue_failed_metric_points_total[5m]) > 0) or (increase(otelcol_receiver_refused_metric_points_total[5m]) > 0) or (increase(otelcol_processor_refused_metric_points_total[5m]) > 0) or (increase(vm_concurrent_insert_limit_timeout_total[5m]) > 0)
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                relativeTimeRange:
+                  from: 0
+                  to: 0
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                  - evaluator:
+                      params:
+                      - 0
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                      - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: B
+                  type: threshold
+                  expression: A
+              noDataState: OK
+              execErrState: Error
+              for: 0s
+              annotations:
+                summary: Metric delivery failed, metrics were refused, or VictoriaMetrics insertion timed out
+              labels:
+                severity: warning
+            - uid: metrics-ingestion-pressure
+              title: Metrics ingestion pressure
+              condition: B
+              data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: VictoriaMetrics
+                model:
+                  datasource:
+                    type: prometheus
+                    uid: VictoriaMetrics
+                  editorMode: code
+                  expr: (max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_size) / max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_capacity) > 0.8) or (vm_concurrent_insert_current / vm_concurrent_insert_capacity >= 1)
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                relativeTimeRange:
+                  from: 0
+                  to: 0
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                  - evaluator:
+                      params:
+                      - 0
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                      - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: B
+                  type: threshold
+                  expression: A
+              noDataState: OK
+              execErrState: Error
+              for: 5m
+              annotations:
+                summary: OTLP queue exceeds 80% or VictoriaMetrics insertion concurrency stays saturated
+              labels:
+                severity: warning
+            - uid: k3s-metrics-unreachable
+              title: K3s metrics scrape failed
+              condition: B
+              data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: VictoriaMetrics
+                model:
+                  datasource:
+                    type: prometheus
+                    uid: VictoriaMetrics
+                  editorMode: code
+                  expr: (up{job="kubelet",metrics_path="/metrics"} == 0) + 1 or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) up{job="kubelet",metrics_path="/metrics"})
+                  instant: true
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+              - refId: B
+                relativeTimeRange:
+                  from: 0
+                  to: 0
+                datasourceUid: __expr__
+                model:
+                  conditions:
+                  - evaluator:
+                      params:
+                      - 0
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                      - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
+                  datasource:
+                    type: __expr__
+                    uid: __expr__
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: B
+                  type: threshold
+                  expression: A
+              noDataState: OK
+              execErrState: Error
+              for: 2m
+              annotations:
+                summary: The shared K3s kubelet /metrics scrape is failing or missing
+              labels:
+                severity: warning
             - uid: trace-storage-warning
               title: VictoriaTraces storage above 70%
               condition: B
