@@ -35,8 +35,39 @@ spec:
           enabled: true
           path: insert/opentelemetry/v1/logs
         traces:
-          enabled: true
+          enabled: false
           path: insert/opentelemetry/v1/traces
+        processors:
+          transform:
+            metrics:
+              datapoint:
+                - 'set(attributes["job"], resource.attributes["service.name"]) where attributes["job"] == nil and resource.attributes["service.name"] != nil'
+                - 'set(attributes["instance"], resource.attributes["service.instance.id"]) where attributes["instance"] == nil and resource.attributes["service.instance.id"] != nil'
+                - 'set(attributes["metrics_path"], "/metrics/cadvisor") where resource.attributes["service.name"] == "kubelet" and IsMatch(metric.name, "^container_")'
+                - 'set(attributes["metrics_path"], "/metrics") where resource.attributes["service.name"] == "kubelet" and not IsMatch(metric.name, "^container_")'
+        clusterLabels:
+          - cluster
+          - k8s.cluster.name
+        overwriteClusterLabel: true
+        auth:
+          type: bearerToken
+          bearerTokenKey: TELEMETRY_TOKEN
+        secret:
+          create: false
+          name: telemetry-credentials
+          namespace: monitoring-system
+      traceSampler:
+        type: otlp
+        protocol: grpc
+        url: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4317
+        tls:
+          insecure: true
+        metrics:
+          enabled: false
+        logs:
+          enabled: false
+        traces:
+          enabled: true
         processors:
           serviceGraphMetrics:
             enabled: true
@@ -57,63 +88,6 @@ spec:
               controller:
                 type: statefulset
                 replicas: 1
-          tailSampling:
-            enabled: true
-            decisionWait: 15s
-            decisionCache:
-              sampledCacheSize: 100000
-              nonSampledCacheSize: 100000
-            numTraces: 10000
-            expectedNewTracesPerSec: 50
-            policies:
-              - name: errors
-                type: status_code
-                status_codes: [ERROR]
-              - name: slow-requests
-                type: latency
-                threshold_ms: 2000
-              - name: baseline
-                type: probabilistic
-                sampling_percentage: 10
-            collector:
-              service:
-                enabled: false
-              extraObjects:
-                - apiVersion: v1
-                  kind: Service
-                  metadata:
-                    name: monitoring-k8s-telemetry-sampler
-                  spec:
-                    selector:
-                      app.kubernetes.io/instance: monitoring-k8s-telemetry-sampler
-                      app.kubernetes.io/name: alloy
-                    ports:
-                      - name: otlp-grpc
-                        port: 4317
-                        targetPort: 4317
-                        protocol: TCP
-                        appProtocol: grpc
-              controller:
-                type: statefulset
-                replicas: 1
-          transform:
-            metrics:
-              datapoint:
-                - 'set(attributes["job"], resource.attributes["service.name"]) where attributes["job"] == nil and resource.attributes["service.name"] != nil'
-                - 'set(attributes["instance"], resource.attributes["service.instance.id"]) where attributes["instance"] == nil and resource.attributes["service.instance.id"] != nil'
-                - 'set(attributes["metrics_path"], "/metrics/cadvisor") where resource.attributes["service.name"] == "kubelet" and IsMatch(metric.name, "^container_")'
-                - 'set(attributes["metrics_path"], "/metrics") where resource.attributes["service.name"] == "kubelet" and not IsMatch(metric.name, "^container_")'
-        clusterLabels:
-          - cluster
-          - k8s.cluster.name
-        overwriteClusterLabel: true
-        auth:
-          type: bearerToken
-          bearerTokenKey: TELEMETRY_TOKEN
-        secret:
-          create: false
-          name: telemetry-credentials
-          namespace: monitoring-system
     clusterMetrics:
       enabled: true
       collector: alloy
@@ -171,7 +145,7 @@ spec:
     applicationObservability:
       enabled: true
       collector: alloy
-      destinations: [telemetry]
+      destinations: [telemetry, traceSampler]
       receivers:
         otlp:
           http:
