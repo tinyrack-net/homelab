@@ -191,7 +191,7 @@ spec:
       processors:
         memoryLimiter:
           enabled: true
-          limit: 1536MiB
+          limit: 3GiB
     prometheusOperatorObjects:
       enabled: true
       collector: alloy
@@ -256,7 +256,7 @@ spec:
               memory: 512Mi
             limits:
               cpu: "1"
-              memory: 2Gi
+              memory: 4Gi
         extraConfig: |-
           discovery.kubernetes "nodes" {
             role = "node"
