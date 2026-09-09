@@ -19,7 +19,7 @@ configMapGenerator:
   - name: grafana-k3s-apiserver
     namespace: monitoring-system
     files:
-      - apiserver.json=monitoring.apiserver-dashboard.json
+      - k3s-apiserver.json=monitoring.apiserver-dashboard.json
     options:
       labels:
         grafana_dashboard: "1"
