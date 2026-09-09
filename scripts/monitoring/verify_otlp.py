@@ -80,6 +80,12 @@ def main():
                 expected[(origin[1:], *key(name, sample.labels))] = sample.value
                 label_names.setdefault(name, set()).update(sample.labels)
 
+    # Exercise path identity when general metrics and cAdvisor share job/node.
+    # These probes are checked separately from the captured input series.
+    for endpoint, source in [('/k3s', 'general'), ('/cadvisor', 'cadvisor'), ('/resource', 'resource')]:
+        fixtures[endpoint] = fixtures.get(endpoint, b'').rstrip() + (
+            '\n# TYPE otlp_path_probe gauge\notlp_path_probe{source="' + source + '"} 1\n').encode()
+
     state = {'mode': 'ok', 'requests': 0, 'rejected': 0, 'max_points': 0,
              'max_rss': 0, 'max_queue_bytes': 0, 'last_success': 0, 'errors': [],
              'input_nan_samples': nan_samples, 'failure_counters': {}, 'phases': []}
@@ -169,6 +175,16 @@ prometheus.relabel "k3s" {
   forward_to = [otelcol.receiver.prometheus.telemetry.receiver]
 }
 '''
+        for endpoint, section, job in [('cadvisor', 'cadvisor', 'kubelet'),
+                                       ('resource', 'kubeletResource', 'integrations/kubernetes/resources')]:
+            path_rules = values['clusterMetrics'][section]['extraMetricProcessingRules']
+            prefix += '\n'.join([
+                f'prometheus.scrape "{endpoint}" {{',
+                '  targets = [{"__address__" = "127.0.0.1:19428", "__metrics_path__" = "/' + endpoint + '", "instance" = "k3s-fixture", "node" = "fixture"}]',
+                f'  job_name = "{job}"', '  scrape_interval = "30s"',
+                f'  forward_to = [prometheus.relabel.{endpoint}.receiver]', '}',
+                f'prometheus.relabel "{endpoint}" {{', path_rules,
+                '  forward_to = [otelcol.receiver.prometheus.telemetry.receiver]', '}', ''])
         with tempfile.TemporaryDirectory(prefix='alloy-otlp-replay-') as directory:
             config = Path(directory) / 'config.alloy'
             assert fixture_node, 'K3s fixture must contain kubelet_node_name'
@@ -215,11 +231,13 @@ prometheus.relabel "k3s" {
             query = urllib.parse.urlencode({'match[]': '{instance=~"(k3s|node)-fixture"}'})
             exported = urllib.request.urlopen('http://127.0.0.1:19429/api/v1/export?' + query, timeout=30).read().decode()
             args.output.with_suffix('.export.jsonl').write_text(exported)
-            actual, jobs = {}, {}
+            actual, jobs, probe_paths = {}, {}, {}
             for line in exported.splitlines():
                 record = json.loads(line)
                 metric = record['metric']
                 name = metric['__name__']
+                if name == 'otlp_path_probe':
+                    probe_paths[metric['source']] = (metric.get('job'), metric.get('metrics_path'))
                 if name not in label_names:
                     continue
                 labels = {k: metric[k] for k in label_names[name] if k in metric}
@@ -237,6 +255,9 @@ prometheus.relabel "k3s" {
             args.output.write_text(json.dumps(state, indent=2))
             assert not missing, list(sorted(missing))[:15]
             assert not different, different[:15]
+            assert probe_paths == {'general': ('kubelet', '/metrics'),
+                                   'cadvisor': ('kubelet', '/metrics/cadvisor'),
+                                   'resource': ('integrations/kubernetes/resources', '/metrics/resource')}, probe_paths
             assert state['max_rss'] > 0 and state['max_points'] > 0
             for (origin, name), js in jobs.items():
                 assert len(js) == 1, (name, js)

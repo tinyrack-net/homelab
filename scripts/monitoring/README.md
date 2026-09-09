@@ -62,6 +62,9 @@ Empty labels are equivalent to absent labels in Prometheus. The parser's legacy
 counter `_total` rewrite is reversed before comparison. NaN samples contain no
 measurement and VictoriaMetrics omits them; their count is reported separately.
 
+Synthetic probes also verify that `/metrics`, `/metrics/cadvisor`, and
+`/metrics/resource` remain distinct when scrapes share a job and instance.
+
 The scenarios cover healthy delivery, a slow receiver, five minutes of 503s,
 and recovery. Assertions check a maximum of 8,192 OTLP points per request,
 128 MiB per signal queue, RSS below 2 GiB, and a running container without OOM.
@@ -113,3 +116,11 @@ Use repeated `--cluster` flags for the final all-cluster check. Exit status is
 nonzero for any detected regression. A missing queue metric is a failure, not a
 zero queue. A newly captured baseline may initially lack a flushed sample; retain
 the report and run the full elapsed window before advancing.
+
+For the initial pipeline graph replacement, `collectors.alloy.controller` has
+an `observability.tinyrack.net/otlp-pipeline: bounded-k3s-v1` Pod annotation.
+This forces a fresh Pod through GitOps: the initial homelab hot reload left old
+API/scheduler scrape shutdown tasks hanging while the Pod still reported Ready.
+That failed window is excluded from success claims and retained in rollout
+evidence. Start the new observation window only after the replacement Pod is
+ready and fresh metrics are reaching storage.
