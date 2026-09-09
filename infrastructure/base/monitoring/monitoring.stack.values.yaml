@@ -122,6 +122,22 @@ extraObjects:
             - /opentelemetry/v1/metrics
           static:
             url: http://vmsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:8428/
+  - apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMUser
+    metadata:
+      name: gpu-server-telemetry-write
+      namespace: monitoring-system
+      labels:
+        monitoring.tinyrack.net/access: telemetry-write
+    spec:
+      tokenRef:
+        name: telemetry-credentials
+        key: GPU_SERVER_TELEMETRY_TOKEN
+      targetRefs:
+        - paths:
+            - /opentelemetry/v1/metrics
+          static:
+            url: http://vmsingle-monitoring-victoria-metrics-k8s-stack.monitoring-system.svc.cluster.local.:8428/
 prometheus-node-exporter:
   enabled: false
 kubelet:
