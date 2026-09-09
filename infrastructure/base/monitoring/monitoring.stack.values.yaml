@@ -308,6 +308,8 @@ grafana:
     dashboards:
       multicluster: true
       folderAnnotation: grafana_folder
+      provider:
+        foldersFromFilesStructure: true
   admin:
     existingSecret: grafana-admin
     userKey: admin-user
