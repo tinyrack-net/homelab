@@ -274,6 +274,8 @@ spec:
         controller:
           replicas: 1
           podAnnotations:
+            # Recreate the collector when replacing the OTLP/scrape graph.
+            observability.tinyrack.net/otlp-pipeline: "bounded-k3s-v1"
             observability.tinyrack.net/trace-pipeline: "v1"
         presets:
           - singleton
