@@ -69,6 +69,7 @@ specs:
                 protocol: TCP
       - toCIDR:
           - 10.132.245.37/32
+          - 10.132.245.41/32
         toPorts:
           - ports:
               - port: "8080"
