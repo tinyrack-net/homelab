@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: n8n
+        observability.tinyrack.net/otlp-client: "true"
     spec:
       initContainers:
         - name: volume-permissions
@@ -41,6 +42,30 @@ spec:
             - mountPath: /home/node/.n8n
               name: n8n-storage
           env:
+            - name: N8N_OTEL_ENABLED
+              value: "true"
+            - name: N8N_OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://monitoring-alloy.monitoring-system.svc.cluster.local:4318
+            - name: N8N_OTEL_EXPORTER_SERVICE_NAME
+              value: n8n
+            - name: N8N_OTEL_TRACES_SAMPLE_RATE
+              value: "1.0"
+            - name: N8N_OTEL_TRACES_INCLUDE_NODE_SPANS
+              value: "true"
+            - name: N8N_OTEL_TRACES_PRODUCTION_ONLY
+              value: "true"
+            - name: N8N_OTEL_TRACES_INJECT_OUTBOUND
+              value: "true"
+            - name: N8N_AGENTS_TRACING_ENABLED
+              value: "true"
+            - name: N8N_AGENTS_TRACING_RECORD_INPUTS
+              value: "false"
+            - name: N8N_AGENTS_TRACING_RECORD_OUTPUTS
+              value: "false"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: deployment.environment.name=production,service.version=2.36.8
+            - name: OTEL_SDK_DISABLED
+              value: "false"
             - name: DB_TYPE
               value: postgresdb
             - name: DB_POSTGRESDB_HOST
