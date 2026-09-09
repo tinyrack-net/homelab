@@ -47,6 +47,13 @@ spec:
               - k8s.namespace.name
               - service.version
             collector:
+              alloy:
+                extraPorts:
+                  - name: otlp-grpc
+                    port: 4317
+                    targetPort: 4317
+                    protocol: TCP
+                    appProtocol: grpc
               controller:
                 type: statefulset
                 replicas: 1
@@ -69,6 +76,13 @@ spec:
                 type: probabilistic
                 sampling_percentage: 10
             collector:
+              alloy:
+                extraPorts:
+                  - name: otlp-grpc
+                    port: 4317
+                    targetPort: 4317
+                    protocol: TCP
+                    appProtocol: grpc
               controller:
                 type: statefulset
                 replicas: 1
