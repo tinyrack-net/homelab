@@ -4,6 +4,7 @@ resources:
   - monitoring.namespace.yaml
   - monitoring.stack.helm-release.yaml
   - monitoring.k8s-monitoring.helm-release.yaml
+  - monitoring.trace-sampler.alloy.yaml
   - monitoring.service-monitors.yaml
   - monitoring.ingress-route.yaml
   - monitoring.cilium-network-policy.yaml

@@ -1,0 +1,123 @@
+apiVersion: collectors.grafana.com/v1alpha1
+kind: Alloy
+metadata:
+  name: monitoring-trace-sampler
+  namespace: monitoring-system
+spec:
+  alloy:
+    configMap:
+      create: true
+      content: |-
+        remote.kubernetes.secret "telemetry" {
+          name      = "telemetry-credentials"
+          namespace = "monitoring-system"
+        }
+
+        otelcol.auth.bearer "telemetry" {
+          token = remote.kubernetes.secret.telemetry.data["TELEMETRY_TOKEN"]
+        }
+
+        otelcol.exporter.otlphttp "telemetry" {
+          traces_endpoint = "https://telemetry.winetree94.com/insert/opentelemetry/v1/traces"
+          client {
+            endpoint = "https://telemetry.winetree94.com"
+            auth = otelcol.auth.bearer.telemetry.handler
+            headers = {
+              "X-Scope-OrgID" = convert.nonsensitive(remote.kubernetes.secret.telemetry.data["tenantId"]),
+            }
+            tls {
+              insecure = false
+              insecure_skip_verify = false
+              ca_pem = convert.nonsensitive(remote.kubernetes.secret.telemetry.data["ca"])
+              cert_pem = convert.nonsensitive(remote.kubernetes.secret.telemetry.data["cert"])
+              key_pem = remote.kubernetes.secret.telemetry.data["key"]
+            }
+          }
+          retry_on_failure {
+            enabled = true
+            initial_interval = "5s"
+            max_interval = "30s"
+            max_elapsed_time = "5m"
+          }
+          sending_queue {
+            enabled = true
+          }
+        }
+
+        otelcol.processor.batch "telemetry" {
+          timeout = "2s"
+          send_batch_size = 8192
+          output {
+            traces = [otelcol.exporter.otlphttp.telemetry.input]
+          }
+        }
+
+        otelcol.processor.tail_sampling "default" {
+          decision_wait = "15s"
+          decision_cache = {
+            sampled_cache_size = 100000,
+            non_sampled_cache_size = 100000,
+          }
+          num_traces = 10000
+          expected_new_traces_per_sec = 50
+
+          policy {
+            name = "errors"
+            type = "status_code"
+            status_code {
+              status_codes = ["ERROR"]
+            }
+          }
+          policy {
+            name = "slow-requests"
+            type = "latency"
+            latency {
+              threshold_ms = 2000
+            }
+          }
+          policy {
+            name = "baseline"
+            type = "probabilistic"
+            probabilistic {
+              sampling_percentage = 10
+            }
+          }
+          output {
+            traces = [otelcol.processor.batch.telemetry.input]
+          }
+        }
+
+        otelcol.receiver.otlp "default" {
+          grpc {
+            endpoint = "0.0.0.0:4317"
+            max_recv_msg_size = "4MiB"
+          }
+          http {
+            endpoint = "0.0.0.0:4318"
+            max_request_body_size = "20MiB"
+          }
+          output {
+            traces = [otelcol.processor.tail_sampling.default.input]
+          }
+        }
+    extraPorts:
+      - name: otlp-grpc
+        port: 4317
+        targetPort: 4317
+        protocol: TCP
+        appProtocol: grpc
+      - name: otlp-http
+        port: 4318
+        targetPort: 4318
+        protocol: TCP
+        appProtocol: http
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+  controller:
+    type: statefulset
+    replicas: 1
