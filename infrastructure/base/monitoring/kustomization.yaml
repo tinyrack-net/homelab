@@ -16,6 +16,13 @@ resources:
   - monitoring.telemetry.secret.yaml
   - monitoring.issuary.secret.yaml
 configMapGenerator:
+  - name: grafana-k3s-apiserver
+    namespace: monitoring-system
+    files:
+      - apiserver.json=monitoring.apiserver-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
   - name: grafana-fleet-overview
     namespace: monitoring-system
     files:

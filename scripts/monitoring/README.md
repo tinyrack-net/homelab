@@ -18,13 +18,15 @@ There is no metric-name allowlist on the consolidated K3s scrape.
 The shared process/queue families use `apiserver` because the provisioned API
 Server dashboard references them under that job. They describe the shared K3s
 process, not independent component processes. Audit on 2026-09-09 covered 41
-dashboards (16 component queries) and 204 active recording/alert rules (38
+dashboards (16 component panel queries and two API Server selectors) and 204 active recording/alert rules (38
 component references). `rest_client_*` preserves `KubeClientErrors`; scheduler
 histogram rules retain `job="kube-scheduler"`.
 
 The six alerts for removed API/controller/scheduler scrape endpoints are disabled
 by name in the stack values. `k3s-metrics-unreachable` checks the real consolidated
-scrape instead. No synthetic component `up` series are generated. Explicit
+scrape instead. No synthetic component `up` series are generated. The vendored API Server dashboard
+keeps its UID and panels; its cluster/instance selectors use
+`apiserver_request_total` instead of the removed endpoint `up`. Explicit
 `metrics_path` labels distinguish `/metrics`, `/metrics/resource`, and
 `/metrics/cadvisor` through OTLP conversion. Node Exporter labels are unchanged.
 

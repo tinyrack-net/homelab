@@ -201,6 +201,9 @@ vtsingle:
 defaultDashboards:
   enabled: true
   dashboards:
+    # Vendored below so selectors follow real K3s component metrics, not removed up.
+    apiserver:
+      enabled: false
     victoriametrics-vmalert:
       enabled: false
     node-exporter-full:
