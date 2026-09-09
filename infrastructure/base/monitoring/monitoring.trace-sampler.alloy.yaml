@@ -19,19 +19,12 @@ spec:
         }
 
         otelcol.exporter.otlphttp "telemetry" {
-          traces_endpoint = "https://telemetry.winetree94.com/insert/opentelemetry/v1/traces"
+          traces_endpoint = "http://vmauth-monitoring-victoria-metrics-k8s-stack-internal.monitoring-system.svc.cluster.local:8427/insert/opentelemetry/v1/traces"
           client {
-            endpoint = "https://telemetry.winetree94.com"
+            endpoint = "http://vmauth-monitoring-victoria-metrics-k8s-stack-internal.monitoring-system.svc.cluster.local:8427"
             auth = otelcol.auth.bearer.telemetry.handler
             headers = {
               "X-Scope-OrgID" = convert.nonsensitive(remote.kubernetes.secret.telemetry.data["tenantId"]),
-            }
-            tls {
-              insecure = false
-              insecure_skip_verify = false
-              ca_pem = convert.nonsensitive(remote.kubernetes.secret.telemetry.data["ca"])
-              cert_pem = convert.nonsensitive(remote.kubernetes.secret.telemetry.data["cert"])
-              key_pem = remote.kubernetes.secret.telemetry.data["key"]
             }
           }
           retry_on_failure {

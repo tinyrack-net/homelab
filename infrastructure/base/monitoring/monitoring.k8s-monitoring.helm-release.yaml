@@ -27,7 +27,7 @@ spec:
       telemetry:
         type: otlp
         protocol: http
-        url: https://telemetry.winetree94.com
+        url: http://vmauth-monitoring-victoria-metrics-k8s-stack-internal.monitoring-system.svc.cluster.local:8427
         metrics:
           enabled: true
           path: opentelemetry/v1/metrics
