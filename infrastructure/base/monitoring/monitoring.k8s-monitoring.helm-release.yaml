@@ -242,6 +242,8 @@ spec:
         fullnameOverride: monitoring-alloy
         controller:
           replicas: 1
+          podAnnotations:
+            observability.tinyrack.net/trace-pipeline: "v1"
         presets:
           - singleton
           - clustered
