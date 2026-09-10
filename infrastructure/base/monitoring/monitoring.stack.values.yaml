@@ -309,6 +309,7 @@ grafana:
       multicluster: true
       folderAnnotation: grafana_folder
       provider:
+        disableDelete: true
         foldersFromFilesStructure: true
   admin:
     existingSecret: grafana-admin
