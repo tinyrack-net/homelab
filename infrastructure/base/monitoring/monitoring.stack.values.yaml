@@ -396,6 +396,7 @@ grafana:
               settings:
                 addresses: admin@winetree94.com;winetree94@gmail.com
                 singleEmail: false
+                subject: '{{`[{{ .Status | toUpper }}][{{ .GroupLabels.cluster }}] {{ .GroupLabels.alertname }} ({{ .CommonLabels.severity }})`}}'
     policies.yaml:
       apiVersion: 1
       policies:
@@ -404,6 +405,7 @@ grafana:
           group_by:
             - grafana_folder
             - alertname
+            - cluster
           group_wait: 30s
           group_interval: 5m
           repeat_interval: 6h
@@ -425,7 +427,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: (label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) count by(cluster) (up)
+                    expr: (((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) count by(cluster) (up{cluster=~"homelab|mail-server|tinyrack"})) or (0 * (label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", ""))))
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -444,12 +446,14 @@ grafana:
                     intervalMs: 1000
                     maxDataPoints: 43200
                     refId: B
-                    type: classic_conditions
+                    type: threshold
+                    expression: A
               noDataState: OK
               execErrState: Error
               for: 5m
               annotations:
-                summary: One or more clusters stopped reporting telemetry
+                summary: '{{`Cluster {{ $labels.cluster }} stopped reporting telemetry`}}'
+                description: '{{`Expected cluster {{ $labels.cluster }} is absent from the up metric.`}}'
               labels: {severity: critical}
             - uid: node-not-ready
               title: Kubernetes node not ready
@@ -461,7 +465,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+                    expr: min by(cluster,node) (kube_node_status_condition{cluster=~"homelab|mail-server|tinyrack",condition="Ready",status="true"}) == bool 0
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -480,11 +484,14 @@ grafana:
                     intervalMs: 1000
                     maxDataPoints: 43200
                     refId: B
-                    type: classic_conditions
+                    type: threshold
+                    expression: A
               noDataState: OK
               execErrState: Error
               for: 5m
-              annotations: {summary: A Kubernetes node is not Ready}
+              annotations:
+                summary: '{{`Node {{ $labels.node }} in {{ $labels.cluster }} is not Ready`}}'
+                description: '{{`Ready condition value is {{ $values.A.Value }}.`}}'
               labels: {severity: critical}
             - uid: workload-failure
               title: Kubernetes workload failure
@@ -496,7 +503,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: (kube_pod_container_status_waiting_reason{reason=~"CrashLoopBackOff|ImagePullBackOff|ErrImagePull"} > 0) or ((kube_pod_status_ready{condition="true"} == 0) and on(cluster,namespace,pod) (kube_pod_status_phase{phase="Running"} == 1))
+                    expr: label_replace(kube_pod_container_status_waiting_reason{cluster=~"homelab|mail-server|tinyrack",reason=~"CrashLoopBackOff|ImagePullBackOff|ErrImagePull"} > bool 0, "failure_type", "container_waiting", "", "") or label_replace((min by(cluster,namespace,pod) (kube_pod_status_ready{cluster=~"homelab|mail-server|tinyrack",condition="true"}) == bool 0) and on(cluster,namespace,pod) (max by(cluster,namespace,pod) (kube_pod_status_phase{cluster=~"homelab|mail-server|tinyrack",phase="Running"}) == 1), "failure_type", "pod_not_ready", "", "")
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -515,12 +522,14 @@ grafana:
                     intervalMs: 1000
                     maxDataPoints: 43200
                     refId: B
-                    type: classic_conditions
+                    type: threshold
+                    expression: A
               noDataState: OK
               execErrState: Error
               for: 10m
               annotations:
-                summary: A pod is not Ready or a container is stuck waiting
+                summary: '{{`{{ $labels.cluster }}/{{ $labels.namespace }}/{{ $labels.pod }} has a workload failure`}}'
+                description: '{{`Failure type={{ $labels.failure_type }}, container={{ $labels.container }}, reason={{ $labels.reason }}.`}}'
               labels: {severity: warning}
             - uid: node-resource-high
               title: Node or volume capacity high
@@ -532,7 +541,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: (1 - avg by(cluster,instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.90) or (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes > 0.90) or ((1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"}) > 0.85) or (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes > 0.85)
+                    expr: label_replace(1 - avg by(cluster,instance) (rate(node_cpu_seconds_total{cluster=~"homelab|mail-server|tinyrack",job="node-exporter",mode="idle"}[5m])) > bool 0.90, "resource_type", "cpu", "", "") or label_replace(max by(cluster,instance) (1 - node_memory_MemAvailable_bytes{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"} / node_memory_MemTotal_bytes{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}) > bool 0.90, "resource_type", "memory", "", "") or label_replace(max by(cluster,instance,device,mountpoint,fstype) (1 - node_filesystem_avail_bytes{cluster=~"homelab|mail-server|tinyrack",job="node-exporter",fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{cluster=~"homelab|mail-server|tinyrack",job="node-exporter",fstype!~"tmpfs|overlay|squashfs"}) > bool 0.85, "resource_type", "filesystem", "", "") or label_replace(max by(cluster,namespace,persistentvolumeclaim) (kubelet_volume_stats_used_bytes{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"} / kubelet_volume_stats_capacity_bytes{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"}) > bool 0.85, "resource_type", "pvc", "", "")
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -551,12 +560,14 @@ grafana:
                     intervalMs: 1000
                     maxDataPoints: 43200
                     refId: B
-                    type: classic_conditions
+                    type: threshold
+                    expression: A
               noDataState: OK
               execErrState: Error
               for: 10m
               annotations:
-                summary: "CPU or memory is above 90%, or storage is above 85%"
+                summary: '{{`{{ $labels.cluster }} {{ $labels.resource_type }} capacity is above threshold`}}'
+                description: '{{`Instance={{ $labels.instance }}, mountpoint={{ $labels.mountpoint }}, namespace={{ $labels.namespace }}, PVC={{ $labels.persistentvolumeclaim }}.`}}'
               labels: {severity: warning}
             - uid: telemetry-pipeline-failure
               title: Telemetry pipeline failure
@@ -568,7 +579,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: ((up{job=~"vmsingle|vlsingle|vtsingle|vmauth"} == 0) + 1) or (increase(otelcol_exporter_send_failed_spans_total[10m]) > 0) or (increase(otelcol_exporter_enqueue_failed_spans_total[10m]) > 0) or (increase(otelcol_receiver_refused_spans_total[10m]) > 0) or (increase(otelcol_processor_refused_spans_total[10m]) > 0) or (increase(otelcol_exporter_send_failed_metric_points_total[10m]) > 0) or (increase(otelcol_exporter_enqueue_failed_metric_points_total[10m]) > 0) or (increase(otelcol_receiver_refused_metric_points_total[10m]) > 0) or (increase(otelcol_processor_refused_metric_points_total[10m]) > 0) or (max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_size) / max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_capacity) > 0.9)
+                    expr: label_replace(up{cluster=~"homelab|mail-server|tinyrack",job=~"vmsingle|vlsingle|vtsingle|vmauth"} == bool 0, "failure_type", "backend_down", "", "") or label_replace(increase(otelcol_exporter_send_failed_spans_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "span_send_failed", "", "") or label_replace(increase(otelcol_exporter_enqueue_failed_spans_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "span_enqueue_failed", "", "") or label_replace(increase(otelcol_receiver_refused_spans_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "span_receiver_refused", "", "") or label_replace(increase(otelcol_processor_refused_spans_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "span_processor_refused", "", "") or label_replace(increase(otelcol_exporter_send_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "metric_send_failed", "", "") or label_replace(increase(otelcol_exporter_enqueue_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "metric_enqueue_failed", "", "") or label_replace(increase(otelcol_receiver_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "metric_receiver_refused", "", "") or label_replace(increase(otelcol_processor_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[10m]) > bool 0, "failure_type", "metric_processor_refused", "", "") or label_replace(max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_size{cluster=~"homelab|mail-server|tinyrack"}) / max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_capacity{cluster=~"homelab|mail-server|tinyrack"}) > bool 0.9, "failure_type", "queue_critical", "", "")
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -587,12 +598,14 @@ grafana:
                     intervalMs: 1000
                     maxDataPoints: 43200
                     refId: B
-                    type: classic_conditions
+                    type: threshold
+                    expression: A
               noDataState: OK
               execErrState: Error
               for: 5m
               annotations:
-                summary: A Victoria backend is down, or the OTLP pipeline is rejecting, losing, or queueing telemetry
+                summary: '{{`{{ $labels.cluster }} telemetry pipeline failure`}}'
+                description: '{{`Failure type={{ $labels.failure_type }}, job={{ $labels.job }}, instance={{ $labels.instance }}, data type={{ $labels.data_type }}.`}}'
               labels: {severity: critical}
             - uid: node-telemetry-stale
               title: Node telemetry stale
@@ -608,7 +621,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (time() - max by(cluster) (timestamp(node_time_seconds{job="node-exporter"})) > 90) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (node_time_seconds{job="node-exporter"}))
+                  expr: (time() - max by(cluster) (timestamp(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"})) > bool 90) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}))
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -645,7 +658,8 @@ grafana:
               execErrState: Error
               for: 2m
               annotations:
-                summary: Node exporter samples are over 90 seconds old or missing
+                summary: '{{`{{ $labels.cluster }} node exporter telemetry is stale or missing`}}'
+                description: 'The latest node exporter sample is over 90 seconds old.'
               labels:
                 severity: warning
             - uid: node-telemetry-sparse
@@ -662,7 +676,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (max by(cluster) (count_over_time(node_time_seconds{job="node-exporter"}[5m])) < 8) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (count_over_time(node_time_seconds{job="node-exporter"}[5m])))
+                  expr: (max by(cluster) (count_over_time(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}[5m])) < bool 8) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (count_over_time(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}[5m])))
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -699,7 +713,8 @@ grafana:
               execErrState: Error
               for: 2m
               annotations:
-                summary: Node exporter received fewer than eight samples in five minutes
+                summary: '{{`{{ $labels.cluster }} node exporter telemetry has gaps`}}'
+                description: 'Fewer than eight samples were received in five minutes.'
               labels:
                 severity: warning
             - uid: alloy-restarting
@@ -716,7 +731,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (increase(kube_pod_container_status_restarts_total{namespace="monitoring-system",container="alloy",pod=~"monitoring-alloy-.*"}[10m]) > 0) or ((time() - kube_pod_container_status_last_terminated_timestamp{namespace="monitoring-system",container="alloy",pod=~"monitoring-alloy-.*"} < 600) and on(cluster,namespace,pod,container) (kube_pod_container_status_last_terminated_reason{namespace="monitoring-system",container="alloy",reason="OOMKilled"} == 1))
+                  expr: label_replace(increase(kube_pod_container_status_restarts_total{cluster=~"homelab|mail-server|tinyrack",namespace="monitoring-system",container="alloy",pod=~"monitoring-alloy-.*"}[10m]) > bool 0, "failure_type", "restart", "", "") or label_replace(((time() - kube_pod_container_status_last_terminated_timestamp{cluster=~"homelab|mail-server|tinyrack",namespace="monitoring-system",container="alloy",pod=~"monitoring-alloy-.*"}) < bool 600) and on(cluster,namespace,pod,container) (kube_pod_container_status_last_terminated_reason{cluster=~"homelab|mail-server|tinyrack",namespace="monitoring-system",container="alloy",reason="OOMKilled"} == 1), "failure_type", "oom_killed", "", "")
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -753,7 +768,8 @@ grafana:
               execErrState: Error
               for: 0s
               annotations:
-                summary: Alloy restarted or was OOM killed in the last ten minutes
+                summary: '{{`Alloy in {{ $labels.cluster }} restarted or was OOM killed`}}'
+                description: '{{`Failure type={{ $labels.failure_type }}, pod={{ $labels.pod }}, container={{ $labels.container }}.`}}'
               labels:
                 severity: warning
             - uid: metrics-delivery-failure
@@ -770,7 +786,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (increase(otelcol_exporter_send_failed_metric_points_total[5m]) > 0) or (increase(otelcol_exporter_enqueue_failed_metric_points_total[5m]) > 0) or (increase(otelcol_receiver_refused_metric_points_total[5m]) > 0) or (increase(otelcol_processor_refused_metric_points_total[5m]) > 0) or (increase(vm_concurrent_insert_limit_timeout_total[5m]) > 0)
+                  expr: label_replace(increase(otelcol_exporter_send_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "export_send", "", "") or label_replace(increase(otelcol_exporter_enqueue_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "export_enqueue", "", "") or label_replace(increase(otelcol_receiver_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "receiver_refused", "", "") or label_replace(increase(otelcol_processor_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "processor_refused", "", "") or label_replace(increase(vm_concurrent_insert_limit_timeout_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "insert_timeout", "", "")
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -807,7 +823,8 @@ grafana:
               execErrState: Error
               for: 0s
               annotations:
-                summary: Metric delivery failed, metrics were refused, or VictoriaMetrics insertion timed out
+                summary: '{{`{{ $labels.cluster }} metric delivery failure`}}'
+                description: '{{`Failure type={{ $labels.failure_type }}, instance={{ $labels.instance }}, component={{ $labels.component_id }}.`}}'
               labels:
                 severity: warning
             - uid: metrics-ingestion-pressure
@@ -824,7 +841,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_size) / max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_capacity) > 0.8) or (vm_concurrent_insert_current / vm_concurrent_insert_capacity >= 1)
+                  expr: label_replace(max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_size{cluster=~"homelab|mail-server|tinyrack"}) / max by(cluster,instance,exporter,data_type,component_id,component_path) (otelcol_exporter_queue_capacity{cluster=~"homelab|mail-server|tinyrack"}) > bool 0.8, "pressure_type", "export_queue", "", "") or label_replace(max by(cluster,instance,job) (vm_concurrent_insert_current{cluster=~"homelab|mail-server|tinyrack"}) / max by(cluster,instance,job) (vm_concurrent_insert_capacity{cluster=~"homelab|mail-server|tinyrack"}) >= bool 1, "pressure_type", "insert_concurrency", "", "")
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -861,7 +878,8 @@ grafana:
               execErrState: Error
               for: 5m
               annotations:
-                summary: OTLP queue exceeds 80% or VictoriaMetrics insertion concurrency stays saturated
+                summary: '{{`{{ $labels.cluster }} metric ingestion pressure`}}'
+                description: '{{`Pressure type={{ $labels.pressure_type }}, instance={{ $labels.instance }}, data type={{ $labels.data_type }}.`}}'
               labels:
                 severity: warning
             - uid: k3s-metrics-unreachable
@@ -878,7 +896,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (up{job="kubelet",metrics_path="/metrics"} == 0) + 1 or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) up{job="kubelet",metrics_path="/metrics"})
+                  expr: (max by(cluster) (up{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"}) == bool 0) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (up{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"}))
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -915,7 +933,8 @@ grafana:
               execErrState: Error
               for: 2m
               annotations:
-                summary: The shared K3s kubelet /metrics scrape is failing or missing
+                summary: '{{`{{ $labels.cluster }} K3s kubelet metrics scrape is failing or missing`}}'
+                description: 'The expected kubelet /metrics target is down or absent.'
               labels:
                 severity: warning
             - uid: trace-storage-warning
@@ -928,7 +947,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: kubelet_volume_stats_used_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} / kubelet_volume_stats_capacity_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} > 0.70
+                    expr: max by(cluster,namespace,persistentvolumeclaim) (kubelet_volume_stats_used_bytes{cluster="homelab",job="kubelet",metrics_path="/metrics",namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} / kubelet_volume_stats_capacity_bytes{cluster="homelab",job="kubelet",metrics_path="/metrics",namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"})
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -938,7 +957,7 @@ grafana:
                   datasourceUid: __expr__
                   model:
                     conditions:
-                      - evaluator: {params: [0], type: gt}
+                      - evaluator: {params: [0.70], type: gt}
                         operator: {type: and}
                         query: {params: [A]}
                         reducer: {params: [], type: last}
@@ -947,12 +966,14 @@ grafana:
                     intervalMs: 1000
                     maxDataPoints: 43200
                     refId: B
-                    type: classic_conditions
+                    type: threshold
+                    expression: A
               noDataState: OK
               execErrState: Error
               for: 15m
               annotations:
-                summary: VictoriaTraces is above 70%; review the 48-hour growth projection before expanding the PVC
+                summary: '{{`{{ $labels.cluster }} VictoriaTraces storage is above 70%`}}'
+                description: '{{`PVC={{ $labels.persistentvolumeclaim }}, usage={{ humanizePercentage $values.A.Value }}.`}}'
               labels: {severity: warning}
             - uid: trace-storage-critical
               title: VictoriaTraces storage above 85%
@@ -964,7 +985,7 @@ grafana:
                   model:
                     datasource: {type: prometheus, uid: VictoriaMetrics}
                     editorMode: code
-                    expr: kubelet_volume_stats_used_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} / kubelet_volume_stats_capacity_bytes{namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} > 0.85
+                    expr: max by(cluster,namespace,persistentvolumeclaim) (kubelet_volume_stats_used_bytes{cluster="homelab",job="kubelet",metrics_path="/metrics",namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"} / kubelet_volume_stats_capacity_bytes{cluster="homelab",job="kubelet",metrics_path="/metrics",namespace="monitoring-system",persistentvolumeclaim=~".*vtsingle.*"})
                     instant: true
                     intervalMs: 1000
                     maxDataPoints: 43200
@@ -974,7 +995,7 @@ grafana:
                   datasourceUid: __expr__
                   model:
                     conditions:
-                      - evaluator: {params: [0], type: gt}
+                      - evaluator: {params: [0.85], type: gt}
                         operator: {type: and}
                         query: {params: [A]}
                         reducer: {params: [], type: last}
@@ -983,10 +1004,12 @@ grafana:
                     intervalMs: 1000
                     maxDataPoints: 43200
                     refId: B
-                    type: classic_conditions
+                    type: threshold
+                    expression: A
               noDataState: OK
               execErrState: Error
               for: 5m
               annotations:
-                summary: VictoriaTraces is above 85% capacity
+                summary: '{{`{{ $labels.cluster }} VictoriaTraces storage is above 85%`}}'
+                description: '{{`PVC={{ $labels.persistentvolumeclaim }}, usage={{ humanizePercentage $values.A.Value }}.`}}'
               labels: {severity: critical}
