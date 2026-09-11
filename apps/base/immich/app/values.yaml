@@ -29,6 +29,7 @@ immich:
 server:
   controllers:
     main:
+      strategy: Recreate
       pod:
         labels:
           observability.tinyrack.net/otlp-client: "true"
@@ -66,6 +67,7 @@ machine-learning:
   enabled: true
   controllers:
     main:
+      strategy: Recreate
       containers:
         main:
           image:
