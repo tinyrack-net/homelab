@@ -29,7 +29,10 @@ immich:
 server:
   controllers:
     main:
-      strategy: Recreate
+      strategy: RollingUpdate
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
       pod:
         labels:
           observability.tinyrack.net/otlp-client: "true"
@@ -67,7 +70,10 @@ machine-learning:
   enabled: true
   controllers:
     main:
-      strategy: Recreate
+      strategy: RollingUpdate
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
       containers:
         main:
           image:
