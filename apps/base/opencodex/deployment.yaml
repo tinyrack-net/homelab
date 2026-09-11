@@ -25,6 +25,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - >-
+              set -x;
               mkdir -p /state/opencodex /state/codex;
               chown -R 1000:1000 /state;
               chmod 700 /state/opencodex /state/codex;
@@ -36,7 +37,9 @@ spec:
                 cp /bootstrap/OPENCODEX_API_AUTH_TOKEN /state/opencodex/service-api-token;
                 chmod 600 /state/opencodex/service-api-token;
               fi;
-              chown -R 1000:1000 /state
+              chown -R 1000:1000 /state;
+              echo initialize-state-complete;
+              sleep 20
           securityContext:
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}
