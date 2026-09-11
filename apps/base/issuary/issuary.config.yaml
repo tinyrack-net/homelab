@@ -4,7 +4,7 @@ server:
   trust_proxy: true
 
 logging:
-  level: info
+  level: debug
   format: json
 
 database:
