@@ -10,6 +10,7 @@ resources:
   - network-policy.yaml
 configMapGenerator:
   - name: opencodex-config
+    namespace: opencodex-system
     files:
       - config.json=config.json
     options:
