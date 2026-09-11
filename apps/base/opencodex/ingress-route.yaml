@@ -1,0 +1,27 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: opencodex-external
+  namespace: opencodex-system
+  annotations: {kubernetes.io/ingress.class: traefik-external}
+spec:
+  entryPoints: [websecure, cloudflare]
+  routes:
+    - match: Host(`llm.winetree94.com`)
+      kind: Rule
+      services: [{name: opencodex, port: 10100}]
+  tls: {secretName: letsencrypt-cert}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: opencodex-internal
+  namespace: opencodex-system
+  annotations: {kubernetes.io/ingress.class: traefik}
+spec:
+  entryPoints: [websecure]
+  routes:
+    - match: Host(`opencodex.intranet.winetree94.com`)
+      kind: Rule
+      services: [{name: opencodex, port: 10101}]
+  tls: {secretName: letsencrypt-cert}

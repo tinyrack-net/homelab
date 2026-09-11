@@ -1,0 +1,25 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: opencodex
+  namespace: opencodex-system
+spec:
+  endpointSelector: {matchLabels: {app.kubernetes.io/name: opencodex}}
+  ingress:
+    - fromEndpoints: [{matchLabels: {k8s:io.kubernetes.pod.namespace: traefik-external-system, app.kubernetes.io/name: traefik}}]
+      toPorts: [{ports: [{port: "10100", protocol: TCP}]}]
+    - fromEndpoints: [{matchLabels: {k8s:io.kubernetes.pod.namespace: traefik-system, app.kubernetes.io/name: traefik}}]
+      toPorts: [{ports: [{port: "10101", protocol: TCP}]}]
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - {port: "53", protocol: UDP}
+            - {port: "53", protocol: TCP}
+    - toEntities: [kube-apiserver]
+      toPorts: [{ports: [{port: "6443", protocol: TCP}]}]
+    - toEntities: [world]
+      toPorts: [{ports: [{port: "443", protocol: TCP}, {port: "80", protocol: TCP}]}]
