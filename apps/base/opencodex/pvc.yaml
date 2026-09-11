@@ -8,7 +8,7 @@ metadata:
     recurring-job-group.longhorn.io/longhorn-backup: enabled
 spec:
   accessModes: [ReadWriteOnce]
-  storageClassName: longhorn
+  storageClassName: longhorn-strict-local
   resources:
     requests:
       storage: 10Gi
