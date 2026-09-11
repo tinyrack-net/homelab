@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: initialize-state
-          image: ghcr.io/tinyrack-net/opencodex:latest
+          image: ghcr.io/tinyrack-net/opencodex:3.0.0@sha256:b8f837f30598b67013f92e1e9d03749b9cc201092d203860b854b2d42d73d5eb
           command: ["/bin/sh", "-c"]
           args:
             - >-
@@ -43,7 +43,7 @@ spec:
             - {name: config, mountPath: /config, readOnly: true}
       containers:
         - name: opencodex
-          image: ghcr.io/tinyrack-net/opencodex:latest # {"$imagepolicy": "flux-system:opencodex"}
+          image: ghcr.io/tinyrack-net/opencodex:3.0.0@sha256:b8f837f30598b67013f92e1e9d03749b9cc201092d203860b854b2d42d73d5eb # {"$imagepolicy": "flux-system:opencodex"}
           imagePullPolicy: Always
           env:
             - {name: OPENCODEX_HOME, value: /state/opencodex}
