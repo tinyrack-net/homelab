@@ -37,6 +37,8 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}
+            runAsUser: 0
+            runAsNonRoot: false
           volumeMounts:
             - {name: state, mountPath: /state}
             - {name: bootstrap, mountPath: /bootstrap, readOnly: true}
