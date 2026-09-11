@@ -1,0 +1,125 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-cliproxyapi
+  namespace: cliproxyapi-system
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: cliproxyapi-system
+        app: cliproxyapi
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8317"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cliproxyapi-system
+              cnpg.io/cluster: cliproxyapi-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "4318"
+                protocol: TCP
+      - toCIDR:
+          - 10.132.244.0/22
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: cliproxyapi-system
+        cnpg.io/cluster: cliproxyapi-database-cluster
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cliproxyapi-system
+              app: cliproxyapi
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+              - port: "9187"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+              - port: "9187"
+                protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-cliproxyapi
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: cliproxyapi
+  annotations:
+    networking.tinyrack.net/hosts: llm.winetree94.com
+spec:
+  description: Allow the llm.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: cliproxyapi-system
+            serviceName: cliproxyapi-service
+      toPorts:
+        - ports:
+            - port: "8317"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-cliproxyapi
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: cliproxyapi
+  annotations:
+    networking.tinyrack.net/hosts: llm.intranet.winetree94.com
+spec:
+  description: Allow the llm.intranet.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: cliproxyapi-system
+            serviceName: cliproxyapi-service
+      toPorts:
+        - ports:
+            - port: "8317"
+              protocol: TCP

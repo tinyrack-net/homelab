@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cliproxyapi
+  namespace: cliproxyapi-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: cliproxyapi
+  template:
+    metadata:
+      labels:
+        app: cliproxyapi
+        observability.tinyrack.net/otlp-client: "true"
+    spec:
+      initContainers:
+        - name: copy-bootstrap-config
+          image: busybox:1.37.0
+          command: ["sh", "-c", "cp /bootstrap/config.yaml /config/config.yaml"]
+          volumeMounts:
+            - name: bootstrap-config
+              mountPath: /bootstrap
+              readOnly: true
+            - name: writable-config
+              mountPath: /config
+      containers:
+        - name: cliproxyapi
+          image: eceasy/cli-proxy-api:v7.2.157@sha256:7ad14e95aa5347325a0f727cb9be30673f619369624b9fc89673da60736f7cb5
+          imagePullPolicy: IfNotPresent
+          command:
+            - /CLIProxyAPI/CLIProxyAPI
+          args:
+            - --config
+            - /config/config.yaml
+          ports:
+            - name: http
+              containerPort: 8317
+              protocol: TCP
+          env:
+            - name: PGSTORE_LOCAL_PATH
+              value: /var/lib/cliproxyapi
+            - name: MANAGEMENT_STATIC_PATH
+              value: /var/lib/cliproxyapi/static
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4318
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http/protobuf
+            - name: OTEL_SERVICE_NAME
+              value: cliproxyapi
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: deployment.environment.name=production,service.version=v7.2.157
+            - name: OTEL_SDK_DISABLED
+              value: "false"
+          envFrom:
+            - secretRef:
+                name: cliproxyapi-secrets
+          volumeMounts:
+            - name: writable-config
+              mountPath: /config
+            - name: runtime-data
+              mountPath: /var/lib/cliproxyapi
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 2
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: bootstrap-config
+          configMap:
+            name: cliproxyapi-bootstrap-config
+        - name: writable-config
+          emptyDir: {}
+        - name: runtime-data
+          emptyDir: {}

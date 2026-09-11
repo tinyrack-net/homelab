@@ -1,0 +1,38 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: cliproxyapi-external
+  namespace: cliproxyapi-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+    - cloudflare
+  routes:
+    - match: Host(`llm.winetree94.com`) && !Path(`/management.html`) && !PathPrefix(`/v0/management`) && !PathPrefix(`/v0/resource/plugins`)
+      kind: Rule
+      services:
+        - name: cliproxyapi-service
+          port: 8317
+  tls:
+    secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: cliproxyapi-internal
+  namespace: cliproxyapi-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`llm.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: cliproxyapi-service
+          port: 8317
+  tls:
+    secretName: letsencrypt-cert

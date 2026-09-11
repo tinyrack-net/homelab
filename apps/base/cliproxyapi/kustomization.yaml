@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - cliproxyapi.namespace.yaml
+  - cliproxyapi.database.user.secret.yaml
+  - cliproxyapi.database.superuser.secret.yaml
+  - cliproxyapi.secrets.yaml
+  - cliproxyapi.database.yaml
+  - cliproxyapi.deployment.yaml
+  - cliproxyapi.service.yaml
+  - cliproxyapi.ingress-route.yaml
+  - cliproxyapi.cilium-network-policy.yaml
+configMapGenerator:
+  - name: cliproxyapi-bootstrap-config
+    namespace: cliproxyapi-system
+    files:
+      - config.yaml=cliproxyapi.bootstrap-config.yaml

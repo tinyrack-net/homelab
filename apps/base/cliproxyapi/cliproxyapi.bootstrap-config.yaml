@@ -1,0 +1,9 @@
+host: ""
+port: 8317
+remote-management:
+  allow-remote: true
+  disable-control-panel: false
+auth-dir: "/var/lib/cliproxyapi/pgstore/auths"
+logging-to-file: false
+usage-statistics-enabled: false
+request-retry: 3
