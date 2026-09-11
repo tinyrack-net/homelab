@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: initialize-state
-          image: ghcr.io/tinyrack-net/opencodex:3.0.0@sha256:b8f837f30598b67013f92e1e9d03749b9cc201092d203860b854b2d42d73d5eb
+          image: busybox:1.38.0@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
           command: ["/bin/sh", "-c"]
           args:
             - >-
@@ -29,10 +29,12 @@ spec:
               chown -R 1000:1000 /state;
               chmod 700 /state/opencodex /state/codex;
               if [ ! -s /state/opencodex/config.json ]; then
-                install -o 1000 -g 1000 -m 600 /config/config.json /state/opencodex/config.json;
+                cp /config/config.json /state/opencodex/config.json;
+                chmod 600 /state/opencodex/config.json;
               fi;
               if [ ! -s /state/opencodex/service-api-token ]; then
-                install -o 1000 -g 1000 -m 600 /bootstrap/OPENCODEX_API_AUTH_TOKEN /state/opencodex/service-api-token;
+                cp /bootstrap/OPENCODEX_API_AUTH_TOKEN /state/opencodex/service-api-token;
+                chmod 600 /state/opencodex/service-api-token;
               fi;
               chown -R 1000:1000 /state
           securityContext:
