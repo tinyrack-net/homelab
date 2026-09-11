@@ -31,8 +31,8 @@ server:
     main:
       strategy: RollingUpdate
       rollingUpdate:
-        maxSurge: 0
-        maxUnavailable: 1
+        surge: "0"
+        unavailable: 1
       pod:
         labels:
           observability.tinyrack.net/otlp-client: "true"
@@ -72,8 +72,8 @@ machine-learning:
     main:
       strategy: RollingUpdate
       rollingUpdate:
-        maxSurge: 0
-        maxUnavailable: 1
+        surge: "0"
+        unavailable: 1
       containers:
         main:
           image:
