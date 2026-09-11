@@ -21,6 +21,8 @@ spec:
   policy:
     semver:
       range: '>=0.0.0 <1.0.0'
+  digestReflectionPolicy: Always
+  interval: 5m
 ---
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageUpdateAutomation
