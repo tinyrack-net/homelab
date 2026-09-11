@@ -14,4 +14,3 @@ resources:
   - rustdesk.yaml
   - home-assistant.yaml
   - immich.yaml
-  - opencodex.yaml
