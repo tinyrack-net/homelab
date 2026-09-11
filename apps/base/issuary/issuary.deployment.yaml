@@ -49,7 +49,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: issuary
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: deployment.environment.name=production,service.version=0.32.5
+              value: deployment.environment.name=production,service.version=0.32.6
             - name: OTEL_TRACES_SAMPLER
               value: parentbased_always_on
             - name: OTEL_SDK_DISABLED
