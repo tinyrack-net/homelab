@@ -82,7 +82,7 @@ spec:
           image: alpine/socat:1.8.0.3
           args: ["TCP-LISTEN:10102,fork,reuseaddr,bind=0.0.0.0", "TCP:127.0.0.1:10101"]
           ports:
-            - {name: management-proxy, containerPort: 10102, protocol: TCP}
+            - {name: mgmtproxy, containerPort: 10102, protocol: TCP}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}
