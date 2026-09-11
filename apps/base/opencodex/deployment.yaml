@@ -33,7 +33,8 @@ spec:
               fi;
               if [ ! -s /state/opencodex/service-api-token ]; then
                 install -o 1000 -g 1000 -m 600 /bootstrap/OPENCODEX_API_AUTH_TOKEN /state/opencodex/service-api-token;
-              fi
+              fi;
+              chown -R 1000:1000 /state
           securityContext:
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}
