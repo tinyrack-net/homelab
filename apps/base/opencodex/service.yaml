@@ -8,4 +8,4 @@ spec:
     app.kubernetes.io/name: opencodex
   ports:
     - {name: data, port: 10100, targetPort: data}
-    - {name: management, port: 10101, targetPort: management}
+    - {name: management, port: 10101, targetPort: management-proxy}

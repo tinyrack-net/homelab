@@ -9,7 +9,7 @@ spec:
     - fromEndpoints: [{matchLabels: {k8s:io.kubernetes.pod.namespace: traefik-external-system, app.kubernetes.io/name: traefik}}]
       toPorts: [{ports: [{port: "10100", protocol: TCP}]}]
     - fromEndpoints: [{matchLabels: {k8s:io.kubernetes.pod.namespace: traefik-system, app.kubernetes.io/name: traefik}}]
-      toPorts: [{ports: [{port: "10101", protocol: TCP}]}]
+      toPorts: [{ports: [{port: "10102", protocol: TCP}]}]
   egress:
     - toEndpoints:
         - matchLabels:
