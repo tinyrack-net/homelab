@@ -79,7 +79,7 @@ spec:
             - {name: state, mountPath: /state}
             - {name: tmp, mountPath: /tmp}
         - name: management-proxy
-          image: alpine/socat:1.8.0.3
+          image: alpine/socat:1.8.0.3@sha256:beb4a68d9e4fe6b0f21ea774a0fde6c31f580dde6368939ed70100c5385b015e
           args: ["TCP-LISTEN:10102,fork,reuseaddr,bind=0.0.0.0", "TCP:127.0.0.1:10101"]
           ports:
             - {name: mgmtproxy, containerPort: 10102, protocol: TCP}
