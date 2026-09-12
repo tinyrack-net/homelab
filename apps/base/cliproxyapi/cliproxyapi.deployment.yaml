@@ -62,8 +62,6 @@ spec:
               mountPath: /config
             - name: runtime-data
               mountPath: /var/lib/cliproxyapi
-            - name: plugins
-              mountPath: /CLIProxyAPI/plugins
           livenessProbe:
             tcpSocket:
               port: http
@@ -93,6 +91,3 @@ spec:
           emptyDir: {}
         - name: runtime-data
           emptyDir: {}
-        - name: plugins
-          persistentVolumeClaim:
-            claimName: cliproxyapi-plugins

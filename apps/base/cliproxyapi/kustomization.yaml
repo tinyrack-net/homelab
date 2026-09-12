@@ -6,7 +6,6 @@ resources:
   - cliproxyapi.database.superuser.secret.yaml
   - cliproxyapi.secrets.yaml
   - cliproxyapi.database.yaml
-  - cliproxyapi.plugins.pvc.yaml
   - cliproxyapi.deployment.yaml
   - cliproxyapi.service.yaml
   - cliproxyapi.ingress-route.yaml
