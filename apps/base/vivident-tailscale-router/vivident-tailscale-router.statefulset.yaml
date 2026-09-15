@@ -62,7 +62,7 @@ spec:
             - name: TS_KUBE_SECRET
               value: ""
             - name: TS_HOSTNAME
-              value: homelab-tailscale-router
+              value: winetree94-home
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_ROUTES
