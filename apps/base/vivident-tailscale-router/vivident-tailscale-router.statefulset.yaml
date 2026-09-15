@@ -37,6 +37,13 @@ spec:
             - |
               sysctl -w net.ipv4.ip_forward=1
               ip route replace default via 10.132.244.1 dev net1
+              if ! iptables-legacy -t mangle -C FORWARD \
+                -o tailscale0 -p tcp --tcp-flags SYN,RST SYN \
+                -j TCPMSS --clamp-mss-to-pmtu 2>/dev/null; then
+                iptables-legacy -t mangle -A FORWARD \
+                  -o tailscale0 -p tcp --tcp-flags SYN,RST SYN \
+                  -j TCPMSS --clamp-mss-to-pmtu
+              fi
               if ! iptables-legacy -t nat -C POSTROUTING \
                 -s 10.132.244.0/22 -o tailscale0 \
                 -m comment --comment vivident-tailscale-router \
