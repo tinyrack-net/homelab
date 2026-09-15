@@ -107,6 +107,8 @@
         'getmeili/meilisearch',
         'n8nio/n8n',
         'n8nio/runners',
+        'ghcr.io/koenkk/zigbee2mqtt',
+        'eclipse-mosquitto',
       ],
       dependencyDashboardApproval: true,
     },

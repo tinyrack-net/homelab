@@ -4,8 +4,26 @@ resources:
   - home-assistant.namespace.yaml
   - home-assistant.storage.pvc.yaml
   - home-assistant.network-attachment.yaml
+  - mosquitto-auth.secret.yaml
+  - mosquitto.storage.pvc.yaml
   - home-assistant.deployment.yaml
+  - mosquitto.deployment.yaml
+  - zigbee2mqtt-secrets.secret.yaml
+  - zigbee2mqtt.storage.pvc.yaml
+  - zigbee2mqtt.deployment.yaml
   - home-assistant.service.yaml
+  - mosquitto.service.yaml
+  - zigbee2mqtt.service.yaml
   - home-assistant.ingress-route.yaml
+  - zigbee2mqtt.ingress-route.yaml
   - home-assistant.cilium-network-policy.yaml
+  - mosquitto.cilium-network-policy.yaml
+  - zigbee2mqtt.cilium-network-policy.yaml
   - home-assistant.traefik.cilium-network-policy.yaml
+  - zigbee2mqtt.traefik.cilium-network-policy.yaml
+configMapGenerator:
+  - name: mosquitto-config
+    namespace: home-assistant-system
+    files:
+      - mosquitto.conf
+      - mosquitto.acl

@@ -1,0 +1,23 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-mosquitto
+  namespace: home-assistant-system
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: home-assistant-system
+      app: mosquitto
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: home-assistant-system
+            app: zigbee2mqtt
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: home-assistant-system
+            app: home-assistant
+      toPorts:
+        - ports:
+            - port: "1883"
+              protocol: TCP

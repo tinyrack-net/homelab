@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-zigbee2mqtt
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: zigbee2mqtt
+  annotations:
+    networking.tinyrack.net/hosts: zigbee.intranet.winetree94.com
+spec:
+  description: Allow the zigbee.intranet.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: home-assistant-system
+            serviceName: zigbee2mqtt
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

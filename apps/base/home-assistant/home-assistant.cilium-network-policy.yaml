@@ -45,3 +45,11 @@ specs:
                 protocol: TCP
       - toCIDR:
           - 10.132.244.0/22
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: home-assistant-system
+              app: mosquitto
+        toPorts:
+          - ports:
+              - port: "1883"
+                protocol: TCP
