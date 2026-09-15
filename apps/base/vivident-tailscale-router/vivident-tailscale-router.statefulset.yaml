@@ -68,6 +68,8 @@ spec:
               value: ""
             - name: TS_EXTRA_ARGS
               value: --accept-routes
+            - name: TS_TAILSCALED_EXTRA_ARGS
+              value: --port=33360
             - name: TS_BOOT_TIMEOUT
               value: 10m
             - name: TS_ENABLE_HEALTH_CHECK
