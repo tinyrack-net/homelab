@@ -122,6 +122,15 @@ spec:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: cliproxyapi-system
+            cnpg.io/cluster: cliproxyapi-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
   egress:
     - toServices:
         - k8sService:
