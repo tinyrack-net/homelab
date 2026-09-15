@@ -5,7 +5,7 @@ metadata:
 spec:
   blocks:
     - start: 10.132.246.1
-      stop: 10.132.246.253
+      stop: 10.132.246.251
   serviceSelector:
     matchLabels:
       networking.tinyrack.net/load-balancer: cilium-l2

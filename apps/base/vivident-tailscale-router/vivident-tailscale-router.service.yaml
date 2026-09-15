@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vivident-tailscale-router
+  namespace: vivident
+  labels:
+    app.kubernetes.io/name: vivident-tailscale-router
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: vivident-tailscale-router

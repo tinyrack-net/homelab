@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vivident-tailscale-router
+  namespace: vivident
+spec:
+  serviceName: vivident-tailscale-router
+  replicas: 1
+  revisionHistoryLimit: 2
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vivident-tailscale-router
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[{"name":"vivident-tailscale-lan","interface":"net1"}]'
+      labels:
+        app.kubernetes.io/name: vivident-tailscale-router
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      nodeSelector:
+        kubernetes.io/hostname: homelab
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: configure-forwarding
+          image: tailscale/tailscale:v1.102.3@sha256:51fec4863144d6ba0a22504cfb455d020ee0307d0c04eb48f5afee63390bdba0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              sysctl -w net.ipv4.ip_forward=1
+              if ! iptables-legacy -t nat -C POSTROUTING \
+                -s 10.132.244.0/22 -o tailscale0 \
+                -m comment --comment vivident-tailscale-router \
+                -j MASQUERADE 2>/dev/null; then
+                iptables-legacy -t nat -A POSTROUTING \
+                  -s 10.132.244.0/22 -o tailscale0 \
+                  -m comment --comment vivident-tailscale-router \
+                  -j MASQUERADE
+              fi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_ADMIN
+      containers:
+        - name: tailscale
+          image: tailscale/tailscale:v1.102.3@sha256:51fec4863144d6ba0a22504cfb455d020ee0307d0c04eb48f5afee63390bdba0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TS_USERSPACE
+              value: "false"
+            - name: TS_AUTH_ONCE
+              value: "true"
+            - name: TS_STATE_DIR
+              value: /var/lib/tailscale
+            - name: TS_KUBE_SECRET
+              value: ""
+            - name: TS_HOSTNAME
+              value: homelab-tailscale-router
+            - name: TS_ACCEPT_DNS
+              value: "false"
+            - name: TS_ROUTES
+              value: ""
+            - name: TS_EXTRA_ARGS
+              value: --accept-routes
+            - name: TS_BOOT_TIMEOUT
+              value: 10m
+            - name: TS_ENABLE_HEALTH_CHECK
+              value: "true"
+            - name: TS_LOCAL_ADDR_PORT
+              value: 127.0.0.1:9002
+            - name: TS_SOCKET
+              value: /tmp/tailscaled.sock
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_ADMIN
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -ec
+                - wget -q -T 2 -O /dev/null http://127.0.0.1:9002/healthz
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -ec
+                - wget -q -T 2 -O /dev/null http://127.0.0.1:9002/healthz
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -ec
+                - wget -q -T 2 -O /dev/null http://127.0.0.1:9002/healthz
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          volumeMounts:
+            - name: tailscale-state
+              mountPath: /var/lib/tailscale
+            - name: dev-net-tun
+              mountPath: /dev/net/tun
+      volumes:
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+  volumeClaimTemplates:
+    - metadata:
+        name: tailscale-state
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: longhorn-strict-local
+        volumeMode: Filesystem

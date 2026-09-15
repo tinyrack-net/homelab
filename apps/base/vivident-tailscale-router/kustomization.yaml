@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - vivident-tailscale-router.namespace.yaml
+  - vivident-tailscale-router.network-attachment.yaml
+  - vivident-tailscale-router.service.yaml
+  - vivident-tailscale-router.statefulset.yaml
