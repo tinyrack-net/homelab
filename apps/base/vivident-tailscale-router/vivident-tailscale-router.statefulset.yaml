@@ -39,18 +39,18 @@ spec:
               ip route replace default via 10.132.244.1 dev net1
               if ! iptables-legacy -t mangle -C FORWARD \
                 -o tailscale0 -p tcp --tcp-flags SYN,RST SYN \
-                -j TCPMSS --clamp-mss-to-pmtu 2>/dev/null; then
+                -j TCPMSS --set-mss 1200 2>/dev/null; then
                 iptables-legacy -t mangle -A FORWARD \
                   -o tailscale0 -p tcp --tcp-flags SYN,RST SYN \
-                  -j TCPMSS --clamp-mss-to-pmtu
+                  -j TCPMSS --set-mss 1200
               fi
               # Clamp SYN-ACKs too so LAN clients respect the tunnel MTU when uploading.
               if ! iptables-legacy -t mangle -C FORWARD \
                 -i tailscale0 -o net1 -p tcp --tcp-flags SYN,RST SYN \
-                -j TCPMSS --clamp-mss-to-pmtu 2>/dev/null; then
+                -j TCPMSS --set-mss 1200 2>/dev/null; then
                 iptables-legacy -t mangle -A FORWARD \
                   -i tailscale0 -o net1 -p tcp --tcp-flags SYN,RST SYN \
-                  -j TCPMSS --clamp-mss-to-pmtu
+                  -j TCPMSS --set-mss 1200
               fi
               if ! iptables-legacy -t nat -C POSTROUTING \
                 -s 10.132.244.0/22 -o tailscale0 \
