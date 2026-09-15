@@ -33,6 +33,8 @@ spec:
           env:
             - name: TZ
               value: Asia/Seoul
+            - name: Z2M_ONBOARD_NO_SERVER
+              value: "true"
             - name: ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_ENABLED
               value: "true"
             - name: ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_DISCOVERY_TOPIC
