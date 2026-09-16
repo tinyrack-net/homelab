@@ -97,7 +97,7 @@ spec:
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: sum(rate(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model",alias=~"$alias",failed="true"}[$__rate_interval])) / clamp_min(sum(rate(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval])), 1e-9) or vector(0)
+          expr: sum(increase(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model",alias=~"$alias",failed="true"}[$__range])) / clamp_min(sum(increase(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])), 1) or vector(0)
           legendFormat: Errors
       fieldConfig:
         defaults:
