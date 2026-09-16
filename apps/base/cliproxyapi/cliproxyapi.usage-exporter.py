@@ -198,6 +198,7 @@ class ExporterState:
         self.management_port = parsed.port or 8317
         self.connection = None
         self.connection_lock = threading.Lock()
+        self.connected = False
         self.failure_count = 0
 
     def set_connection(self, connection):
@@ -338,6 +339,7 @@ class ExporterState:
                 raise ValueError("usage subscription was not acknowledged")
 
             self.failure_count = 0
+            self.connected = True
             self.metrics.inc_counter(
                 "cliproxyapi_usage_collector_polls_total", {"result": "success"}
             )
@@ -384,6 +386,7 @@ class ExporterState:
                 ERROR_INITIAL_BACKOFF_SECONDS * (2 ** exponent),
             )
         finally:
+            self.connected = False
             self.close_connection()
 
     def subscription_loop(self):
@@ -398,6 +401,11 @@ def make_handler(state):
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             if self.path == "/metrics":
+                if state.connected:
+                    state.metrics.set_gauge(
+                        "cliproxyapi_usage_collector_last_success_timestamp_seconds",
+                        time.time(),
+                    )
                 payload = state.metrics.render().encode("utf-8")
                 self.send_response(200)
                 self.send_header(
