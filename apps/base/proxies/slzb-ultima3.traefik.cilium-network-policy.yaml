@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-slzb-ultima3
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: slzb-ultima3
+  annotations:
+    networking.tinyrack.net/hosts: slzb-ultima3.intranet.winetree94.com
+spec:
+  description: Allow the internal SLZB-Ultima3 route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDR:
+        - 10.132.245.48/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
