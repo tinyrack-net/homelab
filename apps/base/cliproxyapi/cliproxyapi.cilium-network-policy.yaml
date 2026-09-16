@@ -21,6 +21,14 @@ specs:
           - ports:
               - port: "8317"
                 protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "9101"
+                protocol: TCP
     egress:
       - toEndpoints:
           - matchLabels:

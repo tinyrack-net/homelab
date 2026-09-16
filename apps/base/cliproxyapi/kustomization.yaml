@@ -8,6 +8,8 @@ resources:
   - cliproxyapi.database.yaml
   - cliproxyapi.deployment.yaml
   - cliproxyapi.service.yaml
+  - cliproxyapi.usage-metrics.service.yaml
+  - cliproxyapi.usage-metrics.servicemonitor.yaml
   - cliproxyapi.ingress-route.yaml
   - cliproxyapi.cilium-network-policy.yaml
 configMapGenerator:
@@ -15,3 +17,7 @@ configMapGenerator:
     namespace: cliproxyapi-system
     files:
       - config.yaml=cliproxyapi.bootstrap-config.yaml
+  - name: cliproxyapi-usage-exporter
+    namespace: cliproxyapi-system
+    files:
+      - collector.py=cliproxyapi.usage-exporter.py

@@ -5,5 +5,6 @@ remote-management:
   disable-control-panel: false
 auth-dir: "/var/lib/cliproxyapi/pgstore/auths"
 logging-to-file: false
-usage-statistics-enabled: false
+usage-statistics-enabled: true
+redis-usage-queue-retention-seconds: 3600
 request-retry: 3

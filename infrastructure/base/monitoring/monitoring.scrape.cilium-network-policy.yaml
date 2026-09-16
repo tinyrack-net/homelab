@@ -64,3 +64,11 @@ spec:
               protocol: TCP
             - port: "10259"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: cliproxyapi-system
+            app: cliproxyapi
+      toPorts:
+        - ports:
+            - port: "9101"
+              protocol: TCP

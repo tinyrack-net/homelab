@@ -16,6 +16,7 @@ spec:
         app: cliproxyapi
         observability.tinyrack.net/otlp-client: "true"
     spec:
+      automountServiceAccountToken: false
       initContainers:
         - name: copy-bootstrap-config
           image: busybox:1.37.0
@@ -83,6 +84,63 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+        - name: usage-exporter
+          image: python:3.13-alpine@sha256:7415fbc3c9e4979cc717d92377ab2bc7b2b4a2af1ac03cc52b5f3f88efedaf3a
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - /app/collector.py
+          ports:
+            - name: metrics
+              containerPort: 9101
+              protocol: TCP
+          env:
+            - name: MANAGEMENT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cliproxyapi-secrets
+                  key: MANAGEMENT_PASSWORD
+            - name: CLIPROXYAPI_MANAGEMENT_URL
+              value: http://127.0.0.1:8317
+            - name: EXPORTER_PORT
+              value: "9101"
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          volumeMounts:
+            - name: usage-exporter
+              mountPath: /app
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
       volumes:
         - name: bootstrap-config
           configMap:
@@ -91,3 +149,6 @@ spec:
           emptyDir: {}
         - name: runtime-data
           emptyDir: {}
+        - name: usage-exporter
+          configMap:
+            name: cliproxyapi-usage-exporter
