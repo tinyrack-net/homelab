@@ -45,6 +45,12 @@ def format_labels(labels):
     return "{" + rendered + "}"
 
 
+def format_number(value):
+    if isinstance(value, int):
+        return str(value)
+    return format(float(value), ".17g")
+
+
 def encode_resp_command(*parts):
     encoded = [f"*{len(parts)}\r\n".encode("ascii")]
     for part in parts:
@@ -145,13 +151,13 @@ class MetricsRegistry:
             if name != last_name:
                 lines.append(f"# TYPE {name} counter")
                 last_name = name
-            lines.append(f"{name}{format_labels(dict(labels))} {value:g}")
+            lines.append(f"{name}{format_labels(dict(labels))} {format_number(value)}")
         last_name = None
         for (name, labels), value in gauges:
             if name != last_name:
                 lines.append(f"# TYPE {name} gauge")
                 last_name = name
-            lines.append(f"{name}{format_labels(dict(labels))} {value:g}")
+            lines.append(f"{name}{format_labels(dict(labels))} {format_number(value)}")
         last_name = None
         for (name, labels), histogram in histograms:
             label_map = dict(labels)
@@ -161,12 +167,18 @@ class MetricsRegistry:
             for bucket, count in sorted(histogram["buckets"].items()):
                 bucket_labels = dict(label_map)
                 bucket_labels["le"] = str(bucket)
-                lines.append(f"{name}_bucket{format_labels(bucket_labels)} {count:g}")
+                lines.append(f"{name}_bucket{format_labels(bucket_labels)} {format_number(count)}")
             bucket_labels = dict(label_map)
             bucket_labels["le"] = "+Inf"
-            lines.append(f"{name}_bucket{format_labels(bucket_labels)} {histogram['count']:g}")
-            lines.append(f"{name}_sum{format_labels(label_map)} {histogram['sum']:g}")
-            lines.append(f"{name}_count{format_labels(label_map)} {histogram['count']:g}")
+            lines.append(
+                f"{name}_bucket{format_labels(bucket_labels)} {format_number(histogram['count'])}"
+            )
+            lines.append(
+                f"{name}_sum{format_labels(label_map)} {format_number(histogram['sum'])}"
+            )
+            lines.append(
+                f"{name}_count{format_labels(label_map)} {format_number(histogram['count'])}"
+            )
         return "\n".join(lines) + "\n"
 
 
