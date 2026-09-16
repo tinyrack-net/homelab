@@ -53,7 +53,7 @@ spec:
             - name: ZIGBEE2MQTT_CONFIG_PERMIT_JOIN
               value: "false"
             - name: ZIGBEE2MQTT_CONFIG_SERIAL_PORT
-              value: tcp://10.132.247.47:6638
+              value: tcp://10.132.245.48:6638
             - name: ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER
               value: ember
             - name: ZIGBEE2MQTT_CONFIG_FRONTEND_ENABLED

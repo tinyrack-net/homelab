@@ -38,7 +38,7 @@ spec:
             - port: "1883"
               protocol: TCP
     - toCIDR:
-        - 10.132.247.47/32
+        - 10.132.245.48/32
       toPorts:
         - ports:
             - port: "6638"
