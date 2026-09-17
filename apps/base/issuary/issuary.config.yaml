@@ -49,6 +49,17 @@ auth:
 terms: []
 
 clients:
+  - id: home-assistant
+    name: Home Assistant
+    client_id: home-assistant
+    redirect_uris:
+      - https://home-assistant.winetree94.com/auth/oidc/callback
+    response_types:
+      - code
+    grant_types:
+      - authorization_code
+    scope: openid profile email
+    skip_consent: true
   - id: 5f4d8c3b-2a1e-4b9f-8c7d-6e5a4f3b2c1d
     name: Homelab Test Client
     client_id: homelab-test-client

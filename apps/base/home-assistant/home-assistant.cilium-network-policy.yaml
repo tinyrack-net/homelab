@@ -43,6 +43,14 @@ specs:
                 protocol: TCP
               - port: "443"
                 protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
       - toCIDR:
           - 10.132.244.0/22
       - toEndpoints:

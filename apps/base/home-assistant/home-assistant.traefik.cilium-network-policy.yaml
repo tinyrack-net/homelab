@@ -6,13 +6,22 @@ metadata:
   labels:
     networking.tinyrack.net/owner: home-assistant
   annotations:
-    networking.tinyrack.net/hosts: home-assistant.winetree94.com
+    networking.tinyrack.net/hosts: home-assistant.winetree94.com,auth.winetree94.com
 spec:
-  description: Allow the home-assistant.winetree94.com route
+  description: Allow the Home Assistant route and its OIDC backchannel through external Traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: home-assistant-system
+            app: home-assistant
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
   egress:
     - toServices:
         - k8sService:
