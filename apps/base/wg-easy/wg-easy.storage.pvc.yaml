@@ -7,8 +7,6 @@ metadata:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     app.kubernetes.io/name: wg-easy
-    recurring-job.longhorn.io/source: enabled
-    recurring-job-group.longhorn.io/longhorn-backup: enabled
 spec:
   accessModes:
     - ReadWriteOnce
