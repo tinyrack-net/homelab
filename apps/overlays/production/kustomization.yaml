@@ -10,7 +10,6 @@ resources:
   - searxng.yaml
   - issuary.yaml
   - proxer.yaml
-  - wg-easy.yaml
   - rustdesk.yaml
   - home-assistant.yaml
   - immich.yaml

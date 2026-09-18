@@ -112,8 +112,7 @@ flux bootstrap github \
 
 Flux reconciles the `cilium` HelmRelease in `kube-system` and takes over the
 release installed by Ansible. Multus remains the first CNI configuration and
-delegates the primary Pod network to Cilium while continuing to provide the
-`wg-easy` macvlan attachment.
+delegates the primary Pod network to Cilium.
 
 ## Configuration files
 

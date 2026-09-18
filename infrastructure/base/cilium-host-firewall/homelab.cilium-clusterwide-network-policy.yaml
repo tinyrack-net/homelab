@@ -66,8 +66,6 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
-            - port: "51820"
-              protocol: UDP
     - fromCIDR:
         - 10.132.244.0/22
         - 10.8.0.0/24
