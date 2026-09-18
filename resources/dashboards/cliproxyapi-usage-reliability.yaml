@@ -5,8 +5,13 @@ metadata:
   annotations:
     grafana.app/folder: efxqvg37f12wwf
 spec:
-  title: "CLIProxyAPI · Usage & Reliability"
-  tags: [cliproxyapi, llm, usage, homelab]
+  title: CLIProxyAPI · Usage & Reliability
+  tags:
+    - cliproxyapi
+    - llm
+    - usage
+    - reliability
+    - homelab
   timezone: browser
   schemaVersion: 39
   refresh: 30s
@@ -22,7 +27,7 @@ spec:
           type: prometheus
           uid: VictoriaMetrics
         query:
-          query: label_values(cliproxyapi_usage_requests_total, provider)
+          query: label_values(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system"}, provider)
           refId: provider
         includeAll: true
         allValue: .*
@@ -30,6 +35,8 @@ spec:
         current:
           text: All
           value: $__all
+        refresh: 2
+        sort: 1
       - name: model
         label: Model
         type: query
@@ -37,7 +44,7 @@ spec:
           type: prometheus
           uid: VictoriaMetrics
         query:
-          query: label_values(cliproxyapi_usage_requests_total{provider=~"$provider"}, model)
+          query: label_values(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider"}, model)
           refId: model
         includeAll: true
         allValue: .*
@@ -45,6 +52,8 @@ spec:
         current:
           text: All
           value: $__all
+        refresh: 2
+        sort: 1
       - name: alias
         label: Alias
         type: query
@@ -52,7 +61,7 @@ spec:
           type: prometheus
           uid: VictoriaMetrics
         query:
-          query: label_values(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model"}, alias)
+          query: label_values(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model"}, alias)
           refId: alias
         includeAll: true
         allValue: .*
@@ -60,45 +69,138 @@ spec:
         current:
           text: All
           value: $__all
+        refresh: 2
+        sort: 1
+      - name: timing
+        label: TPS timing
+        type: custom
+        query: 'Generation (excludes TTFT) : generation, End to end (includes TTFT) : end_to_end'
+        includeAll: false
+        multi: false
+        current:
+          text: Generation (excludes TTFT)
+          value: generation
+      - name: tps_window
+        label: TPS trend window
+        type: custom
+        query: 5m,15m,1h
+        multi: false
+        includeAll: false
+        current:
+          text: 15m
+          value: 15m
   panels:
     - id: 1
-      title: Request Rate
+      title: Requests in range
+      description: Total requests received during the selected time range. Missing series means data unavailable; zero is shown only when supported by collected counters.
       type: stat
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 5, w: 6, x: 0, y: 0}
+      gridPos:
+        x: 0
+        y: 0
+        w: 4
+        h: 4
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: sum(rate(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval]))
+          expr: sum(increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range]))
           legendFormat: Requests
+          instant: true
+          range: false
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: locale
+          decimals: 0
+          noValue: No data
+          min: 0
+          color:
+            mode: fixed
+            fixedColor: blue
+        overrides: []
+      options:
+        colorMode: value
+        graphMode: none
+        justifyMode: auto
+        textMode: auto
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+    - id: 2
+      title: Current request rate
+      description: Requests per second over Grafana's adaptive rate interval. Missing series means data unavailable; zero is shown only when supported by collected
+        counters.
+      type: stat
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 4
+        y: 0
+        w: 4
+        h: 4
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: sum(rate(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval]))
+          legendFormat: Requests/s
+          instant: true
+          range: false
+          interval: 30s
       fieldConfig:
         defaults:
           unit: reqps
           decimals: 2
+          noValue: No data
+          min: 0
+          color:
+            mode: fixed
+            fixedColor: blue
         overrides: []
       options:
         colorMode: value
-        graphMode: area
+        graphMode: none
         justifyMode: auto
         textMode: auto
-    - id: 2
-      title: Error Ratio
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+    - id: 3
+      title: Error ratio
+      description: Failed / total recorded requests over the selected range. Success-only traffic = 0%; zero requests or missing counters = No data. Yellow >=2%,
+        red >=5%; these are dashboard guideposts, not alert rules.
       type: stat
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 5, w: 6, x: 6, y: 0}
+      gridPos:
+        x: 8
+        y: 0
+        w: 4
+        h: 4
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: sum(increase(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model",alias=~"$alias",failed="true"}[$__range])) / clamp_min(sum(increase(cliproxyapi_usage_requests_total{provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])), 1) or vector(0)
+          expr: ((sum (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",failed="true"}[$__range])))
+            or (0 * (sum (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])))))
+            / ((sum (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])))
+            > 0)
           legendFormat: Errors
+          instant: true
+          range: false
+          interval: 30s
       fieldConfig:
         defaults:
           unit: percentunit
@@ -112,50 +214,168 @@ spec:
                 value: 0.02
               - color: red
                 value: 0.05
+          noValue: No data
+          min: 0
         overrides: []
       options:
         colorMode: background
         graphMode: none
         justifyMode: auto
         textMode: auto
-    - id: 3
-      title: Tokens in Range
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+    - id: 4
+      title: Tokens in range
+      description: Total reported tokens during the selected time range. Missing series means data unavailable; zero is shown only when supported by collected counters.
       type: stat
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 5, w: 6, x: 12, y: 0}
+      gridPos:
+        x: 12
+        y: 0
+        w: 4
+        h: 4
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: sum(increase(cliproxyapi_usage_tokens_total{provider=~"$provider",model=~"$model",alias=~"$alias",direction="total"}[$__range]))
+          expr: sum(increase(cliproxyapi_usage_tokens_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",direction="total"}[$__range]))
           legendFormat: Tokens
+          instant: true
+          range: false
+          interval: 30s
       fieldConfig:
         defaults:
           unit: short
-          decimals: 0
+          decimals: 1
+          noValue: No data
+          min: 0
+          color:
+            mode: fixed
+            fixedColor: blue
         overrides: []
       options:
         colorMode: value
-        graphMode: area
+        graphMode: none
         justifyMode: auto
         textMode: auto
-    - id: 4
-      title: Exporter Freshness
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+    - id: 5
+      title: Request p95
+      description: Estimated p95 over the selected range from reported positive durations. Histogram buckets limit precision; no observations means no data.
       type: stat
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 5, w: 6, x: 18, y: 0}
+      gridPos:
+        x: 16
+        y: 0
+        w: 4
+        h: 4
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: time() - max(cliproxyapi_usage_collector_last_success_timestamp_seconds)
+          expr: histogram_quantile(0.95, sum by (le) (increase(cliproxyapi_usage_request_latency_seconds_bucket{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])))
+          legendFormat: Request p95
+          instant: true
+          range: false
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: s
+          decimals: 2
+          noValue: No data
+          min: 0
+          color:
+            mode: fixed
+            fixedColor: blue
+        overrides: []
+      options:
+        colorMode: value
+        graphMode: none
+        justifyMode: auto
+        textMode: auto
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+    - id: 6
+      title: TTFT p95
+      description: Estimated p95 over the selected range from reported positive durations. Histogram buckets limit precision; no observations means no data.
+      type: stat
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 20
+        y: 0
+        w: 4
+        h: 4
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: histogram_quantile(0.95, sum by (le) (increase(cliproxyapi_usage_ttft_seconds_bucket{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])))
+          legendFormat: TTFT p95
+          instant: true
+          range: false
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: s
+          decimals: 2
+          noValue: No data
+          min: 0
+          color:
+            mode: fixed
+            fixedColor: blue
+        overrides: []
+      options:
+        colorMode: value
+        graphMode: none
+        justifyMode: auto
+        textMode: auto
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+    - id: 7
+      title: Usage collection · seconds since connected scrape
+      description: Service-wide, independent of model filters. Timestamp advances on scrape while the subscription is connected; it is not the last usage-event time
+        and does not guarantee event delivery. Yellow >=60s; red >=180s. No data means collection cannot be assessed.
+      type: stat
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 0
+        y: 4
+        w: 24
+        h: 2
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: time() - max(cliproxyapi_usage_collector_last_success_timestamp_seconds{cluster="homelab",namespace="cliproxyapi-system"})
           legendFormat: Seconds since success
+          instant: true
+          range: false
+          interval: 30s
       fieldConfig:
         defaults:
           unit: s
@@ -169,143 +389,624 @@ spec:
                 value: 60
               - color: red
                 value: 180
+          noValue: No data
+          min: 0
         overrides: []
       options:
         colorMode: background
         graphMode: none
         justifyMode: auto
-        textMode: auto
-    - id: 5
-      title: Tokens by Direction
+        textMode: value
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+        text:
+          valueSize: 24
+    - id: 8
+      title: Requests over time
+      description: Request rate split between successful and failed requests. Missing series means data unavailable; zero is shown only when supported by collected
+        counters.
       type: timeseries
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 9, w: 12, x: 0, y: 5}
+      gridPos:
+        x: 0
+        y: 6
+        w: 12
+        h: 10
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: sum by (direction) (rate(cliproxyapi_usage_tokens_total{provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval])) * 60
-          legendFormat: "{{direction}}"
+          expr: sum by (failed) (rate(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval]))
+          legendFormat: failed={{failed}}
+          range: true
+          interval: 30s
       fieldConfig:
         defaults:
-          unit: short
-          decimals: 1
+          unit: reqps
+          decimals: 2
           custom:
             drawStyle: line
-            lineInterpolation: smooth
-            fillOpacity: 12
+            lineInterpolation: linear
+            fillOpacity: 15
             showPoints: never
-            spanNulls: true
-        overrides: []
+            spanNulls: false
+          noValue: No data
+          min: 0
+        overrides:
+          - matcher:
+              id: byName
+              options: failed=true
+            properties:
+              - id: color
+                value:
+                  fixedColor: red
+                  mode: fixed
+              - id: custom.lineWidth
+                value: 2
+              - id: displayName
+                value: Failed
+          - matcher:
+              id: byName
+              options: failed=false
+            properties:
+              - id: color
+                value:
+                  fixedColor: green
+                  mode: fixed
+              - id: displayName
+                value: Successful
       options:
         legend:
           displayMode: table
           placement: bottom
           showLegend: true
-          calcs: [mean, max]
+          calcs:
+            - lastNotNull
+            - max
         tooltip:
           mode: multi
           sort: desc
-    - id: 6
-      title: Latency and TTFT p95
+    - id: 9
+      title: Mean output TPS trend · provider / model
+      description: Arithmetic mean of per-request output TPS in the selected moving window (default 15m). Each successful eligible request has equal weight. Series
+        are grouped by provider/model; aliases are combined after filtering. Top 10 pairs by eligible samples over the selected range. Idle/missing windows leave
+        gaps, not 0. Generation requires streaming and valid TTFT; End to end includes waiting time. Samples start at exporter deployment and cannot be reconstructed
+        from old token counters.
       type: timeseries
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 9, w: 12, x: 12, y: 5}
+      gridPos:
+        x: 12
+        y: 6
+        w: 12
+        h: 10
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: histogram_quantile(0.95, sum by (le) (rate(cliproxyapi_usage_request_latency_seconds_bucket{provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval])))
-          legendFormat: Request p95
+          expr: ((sum by (provider, model) (increase(cliproxyapi_usage_output_tokens_per_second_sum{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",timing="$timing"}[$tps_window])))
+            / ((sum by (provider, model) (increase(cliproxyapi_usage_output_tokens_per_second_count{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",timing="$timing"}[$tps_window])))
+            > 0)) and on (provider, model) (topk(10, sum by (provider, model) (increase(cliproxyapi_usage_output_tokens_per_second_count{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",timing="$timing"}[$__range]
+            @ end()))))
+          legendFormat: '{{provider}} / {{model}}'
+          instant: false
+          range: true
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: short
+          decimals: 2
+          custom:
+            drawStyle: line
+            lineInterpolation: linear
+            fillOpacity: 12
+            showPoints: never
+            spanNulls: false
+            axisLabel: mean request TPS (tokens/s)
+          noValue: No data
+          min: 0
+        overrides: []
+      options:
+        legend:
+          displayMode: list
+          placement: bottom
+          showLegend: true
+          calcs: []
+        tooltip:
+          mode: multi
+          sort: desc
+    - id: 19
+      title: Mean output TPS · selected range
+      description: Arithmetic mean of per-request output TPS over the entire selected time range, grouped by provider/model. Sample count uses the same eligible requests
+        and timing basis. Aliases combine after filtering. Generation = output_tokens / (latency - TTFT), successful streaming requests with 0 < TTFT < latency only;
+        End to end = output_tokens / latency, successful output-bearing requests only. Invalid timing is excluded, never replaced with another formula. Values are
+        estimates from upstream usage timing, recorded on completion; new samples only.
+      type: table
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 0
+        y: 16
+        w: 24
+        h: 9
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: (sum by (provider, model) (increase(cliproxyapi_usage_output_tokens_per_second_sum{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",timing="$timing"}[$__range])))
+            / ((sum by (provider, model) (increase(cliproxyapi_usage_output_tokens_per_second_count{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",timing="$timing"}[$__range])))
+            > 0)
+          format: table
+          instant: true
+          range: false
+          interval: 30s
+          legendFormat: '{{provider}} / {{model}}'
         - refId: B
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: histogram_quantile(0.95, sum by (le) (rate(cliproxyapi_usage_ttft_seconds_bucket{provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval])))
-          legendFormat: TTFT p95
+          expr: (sum by (provider, model) (increase(cliproxyapi_usage_output_tokens_per_second_count{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",timing="$timing"}[$__range])))
+            > 0
+          format: table
+          instant: true
+          range: false
+          interval: 30s
+          legendFormat: '{{provider}} / {{model}}'
+      transformations:
+        - id: merge
+          options: {}
+        - id: organize
+          options:
+            excludeByName:
+              Time: true
+            indexByName:
+              provider: 0
+              model: 1
+              'Value #A': 2
+              'Value #B': 3
+            renameByName:
+              provider: Provider
+              model: Model
+              'Value #A': Mean TPS
+              'Value #B': Samples
+      fieldConfig:
+        defaults:
+          unit: suffix:tokens/s
+          decimals: 2
+          min: 0
+          noValue: No data
+        overrides:
+          - matcher:
+              id: byName
+              options: Samples
+            properties:
+              - id: unit
+                value: locale
+              - id: decimals
+                value: 0
+      options:
+        showHeader: true
+        sortBy:
+          - desc: true
+            displayName: Mean TPS
+    - id: 12
+      title: Top models by tokens
+      description: Models ranked by total reported tokens during the selected time range. Missing series means data unavailable; zero is shown only when supported
+        by collected counters.
+      type: table
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 0
+        y: 25
+        w: 24
+        h: 9
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: topk(15, sum by (provider, model, alias) (increase(cliproxyapi_usage_tokens_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",direction="total"}[$__range])))
+          format: table
+          instant: true
+          legendFormat: '{{provider}} / {{model}} / {{alias}}'
+          range: false
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: short
+          decimals: 0
+          noValue: No data
+          min: 0
+        overrides: []
+      options:
+        showHeader: true
+        sortBy:
+          - desc: true
+            displayName: Tokens
+      transformations:
+        - id: organize
+          options:
+            excludeByName:
+              Time: true
+            indexByName:
+              provider: 0
+              model: 1
+              alias: 2
+              Value: 3
+            renameByName:
+              provider: Provider
+              model: Model
+              alias: Alias
+              Value: Tokens
+    - id: 10
+      title: Request latency by model · p50 / p95
+      description: Reported positive durations by provider/model. Dashed lines are p50; solid lines are p95. Missing observations leave gaps. Only the 10 busiest
+        models in the selected range are shown; histogram percentiles are estimates.
+      type: timeseries
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 0
+        y: 34
+        w: 12
+        h: 9
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: (histogram_quantile(0.50, sum by (provider, model, le) (rate(cliproxyapi_usage_request_latency_seconds_bucket{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval]))))
+            and on (provider, model) (topk(10, sum by (provider, model) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range]
+            @ end()))))
+          legendFormat: '{{provider}} / {{model}} · p50'
+          range: true
+          interval: 30s
+        - refId: B
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: (histogram_quantile(0.95, sum by (provider, model, le) (rate(cliproxyapi_usage_request_latency_seconds_bucket{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval]))))
+            and on (provider, model) (topk(10, sum by (provider, model) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range]
+            @ end()))))
+          legendFormat: '{{provider}} / {{model}} · p95'
+          range: true
+          interval: 30s
       fieldConfig:
         defaults:
           unit: s
           decimals: 2
           custom:
             drawStyle: line
-            lineInterpolation: smooth
-            fillOpacity: 8
+            lineInterpolation: linear
+            fillOpacity: 10
             showPoints: never
-            spanNulls: true
-        overrides: []
+            spanNulls: false
+          noValue: No data
+          min: 0
+        overrides:
+          - matcher:
+              id: byRegexp
+              options: .* · p50$
+            properties:
+              - id: custom.lineStyle
+                value:
+                  fill: dash
+                  dash:
+                    - 6
+                    - 4
       options:
         legend:
-          displayMode: table
+          displayMode: list
           placement: bottom
           showLegend: true
-          calcs: [mean, max]
+          calcs: []
         tooltip:
           mode: multi
           sort: desc
-    - id: 7
-      title: Top Models by Tokens
-      type: table
+    - id: 11
+      title: TTFT by model · p50 / p95
+      description: Reported positive durations by provider/model. Dashed lines are p50; solid lines are p95. Missing observations leave gaps. Only the 10 busiest
+        models in the selected range are shown; histogram percentiles are estimates.
+      type: timeseries
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 9, w: 12, x: 0, y: 14}
+      gridPos:
+        x: 12
+        y: 34
+        w: 12
+        h: 9
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: topk(10, sum by (provider, model, alias) (increase(cliproxyapi_usage_tokens_total{provider=~"$provider",model=~"$model",alias=~"$alias",direction="total"}[$__range])))
+          expr: (histogram_quantile(0.50, sum by (provider, model, le) (rate(cliproxyapi_usage_ttft_seconds_bucket{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval]))))
+            and on (provider, model) (topk(10, sum by (provider, model) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range]
+            @ end()))))
+          legendFormat: '{{provider}} / {{model}} · p50'
+          range: true
+          interval: 30s
+        - refId: B
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: (histogram_quantile(0.95, sum by (provider, model, le) (rate(cliproxyapi_usage_ttft_seconds_bucket{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__rate_interval]))))
+            and on (provider, model) (topk(10, sum by (provider, model) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range]
+            @ end()))))
+          legendFormat: '{{provider}} / {{model}} · p95'
+          range: true
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: s
+          decimals: 2
+          custom:
+            drawStyle: line
+            lineInterpolation: linear
+            fillOpacity: 10
+            showPoints: never
+            spanNulls: false
+          noValue: No data
+          min: 0
+        overrides:
+          - matcher:
+              id: byRegexp
+              options: .* · p50$
+            properties:
+              - id: custom.lineStyle
+                value:
+                  fill: dash
+                  dash:
+                    - 6
+                    - 4
+      options:
+        legend:
+          displayMode: list
+          placement: bottom
+          showLegend: true
+          calcs: []
+        tooltip:
+          mode: multi
+          sort: desc
+    - id: 13
+      title: Requests by model
+      description: Models ranked by request count during the selected time range. Missing series means data unavailable; zero is shown only when supported by collected
+        counters.
+      type: table
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 0
+        y: 43
+        w: 12
+        h: 8
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: topk(15, sum by (provider, model, alias) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])))
           format: table
           instant: true
-          legendFormat: "{{provider}} / {{model}} / {{alias}}"
+          legendFormat: '{{provider}} / {{model}} / {{alias}}'
+          range: false
+          interval: 30s
       fieldConfig:
         defaults:
           unit: short
           decimals: 0
+          noValue: No data
+          min: 0
         overrides: []
       options:
         showHeader: true
         sortBy:
           - desc: true
-            displayName: Value
-    - id: 8
-      title: Exporter Poll Failures
-      type: timeseries
+            displayName: Requests
+      transformations:
+        - id: organize
+          options:
+            excludeByName:
+              Time: true
+            indexByName:
+              provider: 0
+              model: 1
+              alias: 2
+              Value: 3
+            renameByName:
+              provider: Provider
+              model: Model
+              alias: Alias
+              Value: Requests
+    - id: 14
+      title: Error rate by model
+      description: Top 15 provider/model/alias combinations by selected-range failure ratio. Success-only traffic is 0%; zero-request combinations are omitted. Yellow
+        >=2%, red >=5%. Compare with request counts before judging low-volume models.
+      type: table
       datasource:
         type: prometheus
         uid: VictoriaMetrics
-      gridPos: {h: 9, w: 12, x: 12, y: 14}
+      gridPos:
+        x: 12
+        y: 43
+        w: 12
+        h: 8
       targets:
         - refId: A
           datasource:
             type: prometheus
             uid: VictoriaMetrics
-          expr: sum by (result) (rate(cliproxyapi_usage_collector_polls_total{result!="success"}[$__rate_interval]))
-          legendFormat: "{{result}}"
+          expr: topk(15, ((sum by (provider, model, alias) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias",failed="true"}[$__range])))
+            or (0 * (sum by (provider, model, alias) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])))))
+            / ((sum by (provider, model, alias) (increase(cliproxyapi_usage_requests_total{cluster="homelab",namespace="cliproxyapi-system",provider=~"$provider",model=~"$model",alias=~"$alias"}[$__range])))
+            > 0))
+          format: table
+          instant: true
+          legendFormat: '{{provider}} / {{model}} / {{alias}}'
+          range: false
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: percentunit
+          decimals: 2
+          thresholds:
+            mode: absolute
+            steps:
+              - color: green
+                value: null
+              - color: yellow
+                value: 0.02
+              - color: red
+                value: 0.05
+          noValue: No data
+          min: 0
+        overrides:
+          - matcher:
+              id: byName
+              options: Error ratio
+            properties:
+              - id: custom.cellOptions
+                value:
+                  type: color-text
+              - id: min
+                value: 0
+              - id: max
+                value: 1
+      options:
+        showHeader: true
+        sortBy:
+          - desc: true
+            displayName: Error ratio
+      transformations:
+        - id: organize
+          options:
+            excludeByName:
+              Time: true
+            indexByName:
+              provider: 0
+              model: 1
+              alias: 2
+              Value: 3
+            renameByName:
+              provider: Provider
+              model: Model
+              alias: Alias
+              Value: Error ratio
+    - id: 15
+      title: Usage subscription failures
+      description: Service-wide subscription connection/authentication failures per second, independent of model filters. Zero fallback requires an observed collector
+        counter. Check freshness and scrape availability when failures are zero or missing.
+      type: timeseries
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 0
+        y: 51
+        w: 18
+        h: 7
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: (sum(rate(cliproxyapi_usage_collector_polls_total{cluster="homelab",namespace="cliproxyapi-system",result="error"}[$__rate_interval]))) or (0 * (sum(rate(cliproxyapi_usage_collector_polls_total{cluster="homelab",namespace="cliproxyapi-system"}[$__rate_interval]))))
+          legendFormat: Connection error
+          range: true
+          instant: false
+          interval: 30s
+        - refId: B
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: (sum(rate(cliproxyapi_usage_collector_polls_total{cluster="homelab",namespace="cliproxyapi-system",result="auth_error"}[$__rate_interval]))) or (0
+            * (sum(rate(cliproxyapi_usage_collector_polls_total{cluster="homelab",namespace="cliproxyapi-system"}[$__rate_interval]))))
+          legendFormat: Authentication error
+          range: true
+          instant: false
+          interval: 30s
       fieldConfig:
         defaults:
           unit: ops
           decimals: 2
           custom:
             drawStyle: line
-            lineInterpolation: smooth
+            lineInterpolation: linear
             fillOpacity: 16
             showPoints: never
-            spanNulls: true
+            spanNulls: false
+            axisSoftMax: 0.01
+          noValue: No data
+          min: 0
         overrides: []
       options:
         legend:
           displayMode: table
           placement: bottom
           showLegend: true
-          calcs: [mean, max]
+          calcs:
+            - lastNotNull
+            - max
         tooltip:
           mode: multi
           sort: desc
+    - id: 16
+      title: Last connected scrape
+      description: Service-wide last connected scrape timestamp, not last usage-event timestamp. It advances even during idle periods while the subscription is connected.
+      type: stat
+      datasource:
+        type: prometheus
+        uid: VictoriaMetrics
+      gridPos:
+        x: 18
+        y: 51
+        w: 6
+        h: 7
+      targets:
+        - refId: A
+          datasource:
+            type: prometheus
+            uid: VictoriaMetrics
+          expr: max(cliproxyapi_usage_collector_last_success_timestamp_seconds{cluster="homelab",namespace="cliproxyapi-system"}) * 1000
+          legendFormat: Seconds since success
+          instant: true
+          range: false
+          interval: 30s
+      fieldConfig:
+        defaults:
+          unit: dateTimeAsIso
+          noValue: No data
+          color:
+            mode: fixed
+            fixedColor: blue
+        overrides: []
+      options:
+        colorMode: value
+        graphMode: none
+        justifyMode: auto
+        textMode: value
+        reduceOptions:
+          calcs:
+            - last
+          fields: ''
+          values: false
+        text:
+          valueSize: 20
+  description: Homelab CLIProxyAPI usage and reliability. TPS compares arithmetic means of successful per-request output speeds by provider/model. Selected-range
+    means and moving-window trends use separate generation/end-to-end timing bases. TPS history begins with the new exporter deployment; old aggregate counters cannot
+    recover request-speed averages.

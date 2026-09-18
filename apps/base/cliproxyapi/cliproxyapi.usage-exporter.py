@@ -18,6 +18,7 @@ USAGE_CHANNEL = "usage"
 
 LATENCY_BUCKETS = (0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 30, 60, 120, 300)
 TTFT_BUCKETS = (0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 30, 60)
+OUTPUT_TPS_BUCKETS = (0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000)
 
 
 def normalize_label(value, default="unknown"):
@@ -300,6 +301,30 @@ class ExporterState:
                 TTFT_BUCKETS,
                 token_labels,
             )
+
+        # Keep timing bases separate so missing TTFT never changes the meaning
+        # of the generation-speed average. Each successful request has weight 1.
+        output_tokens = as_int(tokens.get("output_tokens"))
+        if (
+            failed == "false"
+            and record.get("generate") is not False
+            and output_tokens > 0
+            and latency_seconds > 0
+        ):
+            tps_labels = {"provider": provider, "model": model, "alias": alias}
+            self.metrics.observe_histogram(
+                "cliproxyapi_usage_output_tokens_per_second",
+                output_tokens / latency_seconds,
+                OUTPUT_TPS_BUCKETS,
+                {**tps_labels, "timing": "end_to_end"},
+            )
+            if stream == "true" and 0 < ttft_seconds < latency_seconds:
+                self.metrics.observe_histogram(
+                    "cliproxyapi_usage_output_tokens_per_second",
+                    output_tokens / (latency_seconds - ttft_seconds),
+                    OUTPUT_TPS_BUCKETS,
+                    {**tps_labels, "timing": "generation"},
+                )
 
     def run_subscription_cycle(self):
         if not self.management_password:
