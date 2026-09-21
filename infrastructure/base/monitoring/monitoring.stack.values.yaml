@@ -53,6 +53,8 @@ internal:
   vmauth:
     spec:
       disableSelfServiceScrape: true
+      extraArgs:
+        maxQueueDuration: 45s
       userNamespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: monitoring-system
@@ -786,7 +788,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: label_replace(increase(otelcol_exporter_send_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "export_send", "", "") or label_replace(increase(otelcol_exporter_enqueue_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "export_enqueue", "", "") or label_replace(increase(otelcol_receiver_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "receiver_refused", "", "") or label_replace(increase(otelcol_processor_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "processor_refused", "", "") or label_replace(increase(vm_concurrent_insert_limit_timeout_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "insert_timeout", "", "")
+                  expr: label_replace(increase(otelcol_exporter_send_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack",error_permanent="true"}[5m]) > bool 0, "failure_type", "export_send", "", "") or label_replace(increase(otelcol_exporter_enqueue_failed_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "export_enqueue", "", "") or label_replace(increase(otelcol_receiver_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "receiver_refused", "", "") or label_replace(increase(otelcol_processor_refused_metric_points_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "processor_refused", "", "") or label_replace(increase(vm_concurrent_insert_limit_timeout_total{cluster=~"homelab|mail-server|tinyrack"}[5m]) > bool 0, "failure_type", "insert_timeout", "", "")
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -821,7 +823,7 @@ grafana:
                   expression: A
               noDataState: OK
               execErrState: Error
-              for: 0s
+              for: 2m
               annotations:
                 summary: '{{`{{ $labels.cluster }} metric delivery failure`}}'
                 description: '{{`Failure type={{ $labels.failure_type }}, instance={{ $labels.instance }}, component={{ $labels.component_id }}.`}}'
