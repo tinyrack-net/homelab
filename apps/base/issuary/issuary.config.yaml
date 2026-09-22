@@ -53,7 +53,7 @@ clients:
     name: Apache Guacamole
     client_id: guacamole
     redirect_uris:
-      - https://remote.intranet.winetree94.com/guacamole/
+      - https://remote.intranet.winetree94.com/
     response_types:
       - id_token
     grant_types:

@@ -62,7 +62,7 @@ spec:
             - name: OPENID_CLIENT_ID
               value: guacamole
             - name: OPENID_REDIRECT_URI
-              value: https://remote.intranet.winetree94.com/guacamole/
+              value: https://remote.intranet.winetree94.com/
             - name: OPENID_USERNAME_CLAIM_TYPE
               value: preferred_username
             - name: OPENID_SCOPE
@@ -70,7 +70,7 @@ spec:
             - name: EXTENSION_PRIORITY
               value: "openid, *"
             - name: WEBAPP_CONTEXT
-              value: guacamole
+              value: ROOT
             - name: REMOTE_IP_VALVE_ENABLED
               value: "true"
           ports:
@@ -84,20 +84,20 @@ spec:
                 - ALL
           startupProbe:
             httpGet:
-              path: /guacamole/
+              path: /
               port: http
             periodSeconds: 5
             timeoutSeconds: 3
             failureThreshold: 60
           readinessProbe:
             httpGet:
-              path: /guacamole/
+              path: /
               port: http
             periodSeconds: 10
             timeoutSeconds: 3
           livenessProbe:
             httpGet:
-              path: /guacamole/
+              path: /
               port: http
             periodSeconds: 30
             timeoutSeconds: 3
