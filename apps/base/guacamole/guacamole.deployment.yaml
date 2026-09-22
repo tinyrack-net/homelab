@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guacamole
+  namespace: guacamole-system
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: guacamole
+  template:
+    metadata:
+      labels:
+        app: guacamole
+        observability.tinyrack.net/otlp-client: "true"
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: guacamole
+          image: guacamole/guacamole:1.6.0@sha256:50484043eadd8d9562053940c0ed523dbddaf9086c370127b2f4acabb8bddddc
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GUACD_HOSTNAME
+              value: guacd-service
+            - name: GUACD_PORT
+              value: "4822"
+            - name: POSTGRESQL_ENABLED
+              value: "true"
+            - name: POSTGRESQL_HOSTNAME
+              value: guacamole-database-cluster-rw.guacamole-system.svc.cluster.local
+            - name: POSTGRESQL_PORT
+              value: "5432"
+            - name: POSTGRESQL_DATABASE
+              value: guacamole_db
+            - name: POSTGRESQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: guacamole-database-user-secret
+                  key: username
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: guacamole-database-user-secret
+                  key: password
+            - name: POSTGRESQL_AUTO_CREATE_ACCOUNTS
+              value: "true"
+            - name: OPENID_ENABLED
+              value: "true"
+            - name: OPENID_AUTHORIZATION_ENDPOINT
+              value: https://auth.winetree94.com/oauth/authorize
+            - name: OPENID_JWKS_ENDPOINT
+              value: https://auth.winetree94.com/oauth/.well-known/jwks
+            - name: OPENID_ISSUER
+              value: https://auth.winetree94.com
+            - name: OPENID_CLIENT_ID
+              value: guacamole
+            - name: OPENID_REDIRECT_URI
+              value: https://remote.intranet.winetree94.com/guacamole/
+            - name: OPENID_USERNAME_CLAIM_TYPE
+              value: preferred_username
+            - name: OPENID_SCOPE
+              value: openid profile email
+            - name: EXTENSION_PRIORITY
+              value: "openid, *"
+            - name: WEBAPP_CONTEXT
+              value: guacamole
+            - name: REMOTE_IP_VALVE_ENABLED
+              value: "true"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          startupProbe:
+            httpGet:
+              path: /guacamole/
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /guacamole/
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /guacamole/
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi

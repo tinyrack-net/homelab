@@ -49,6 +49,17 @@ auth:
 terms: []
 
 clients:
+  - id: guacamole
+    name: Apache Guacamole
+    client_id: guacamole
+    redirect_uris:
+      - https://remote.intranet.winetree94.com/guacamole/
+    response_types:
+      - id_token
+    grant_types:
+      - implicit
+    scope: openid profile email
+    skip_consent: true
   - id: home-assistant
     name: Home Assistant
     client_id: home-assistant

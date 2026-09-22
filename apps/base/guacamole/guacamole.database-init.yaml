@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: guacamole-database-init
+  namespace: guacamole-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/force: enabled
+spec:
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: guacamole-database-init
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      containers:
+        - name: psql
+          image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              export PGPASSWORD="$POSTGRES_PASSWORD"
+              until pg_isready --host="$POSTGRES_HOST" --username="$POSTGRES_USER" --dbname="$POSTGRES_DB"; do
+                sleep 5
+              done
+              if psql --host="$POSTGRES_HOST" --username="$POSTGRES_USER" --dbname="$POSTGRES_DB" --tuples-only --command="SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'guacamole_connection'" | grep -q 1; then
+                echo 'Guacamole schema already exists.'
+                exit 0
+              fi
+              psql --host="$POSTGRES_HOST" --username="$POSTGRES_USER" --dbname="$POSTGRES_DB" --file=/schema/001-create-schema.sql
+          env:
+            - name: POSTGRES_HOST
+              value: guacamole-database-cluster-rw.guacamole-system.svc.cluster.local
+            - name: POSTGRES_DB
+              value: guacamole_db
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: guacamole-database-user-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: guacamole-database-user-secret
+                  key: password
+          volumeMounts:
+            - name: schema
+              mountPath: /schema
+              readOnly: true
+      volumes:
+        - name: schema
+          configMap:
+            name: guacamole-database-schema

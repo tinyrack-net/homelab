@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guacd
+  namespace: guacamole-system
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: guacd
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[{"name":"guacamole-lan","interface":"net1"}]'
+      labels:
+        app: guacd
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: guacd
+          image: guacamole/guacd:1.6.0@sha256:f39258e35244b6bf79bc6ac4e60eee176aea6f6a5adb13e8c3090e48df8ae515
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: guacd
+              containerPort: 4822
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            tcpSocket:
+              port: guacd
+            periodSeconds: 10
+            timeoutSeconds: 2
+          livenessProbe:
+            tcpSocket:
+              port: guacd
+            periodSeconds: 30
+            timeoutSeconds: 2
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
