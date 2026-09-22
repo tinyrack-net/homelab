@@ -142,3 +142,20 @@ specs:
                 protocol: TCP
               - port: "9187"
                 protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: kube-system
+              k8s-app: kube-dns
+        toPorts:
+          - ports:
+              - port: "53"
+                protocol: UDP
+              - port: "53"
+                protocol: TCP
+      - toCIDR:
+          - 10.132.246.1/32
+        toPorts:
+          - ports:
+              - port: "443"
+                protocol: TCP
