@@ -63,7 +63,7 @@ spec:
             - name: N8N_AGENTS_TRACING_RECORD_OUTPUTS
               value: "false"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: deployment.environment.name=production,service.version=2.36.8
+              value: deployment.environment.name=production,service.version=2.40.5
             - name: OTEL_SDK_DISABLED
               value: "false"
             - name: DB_TYPE

@@ -5,7 +5,7 @@ metadata:
   namespace: searxng-system
 spec:
   kubernetesConfig:
-    image: quay.io/opstree/redis:v7.4.11@sha256:115d8e221b1459b9f2db7d927ed40318ffac4eb2cddb5702974bce92d32b7a51
+    image: quay.io/opstree/redis:v8.10.1@sha256:1ee437bf63f00a36d23f58ca576dc0c4e7e233a9c606959c003a14f39eb40da4
     imagePullPolicy: IfNotPresent
     redisSecret:
       name: searxng-redis-secret

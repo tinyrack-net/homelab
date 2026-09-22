@@ -19,7 +19,7 @@ spec:
       automountServiceAccountToken: false
       initContainers:
         - name: copy-bootstrap-config
-          image: busybox:1.37.0
+          image: busybox:1.38.0@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
           command: ["sh", "-c", "cp /bootstrap/config.yaml /config/config.yaml"]
           volumeMounts:
             - name: bootstrap-config
@@ -29,7 +29,7 @@ spec:
               mountPath: /config
       containers:
         - name: cliproxyapi
-          image: eceasy/cli-proxy-api:v7.3.10@sha256:ee21d2cc4b8f89d0df142724479e6d8107e69ea91c5dc6c14abfd837e42c2422
+          image: eceasy/cli-proxy-api:v7.3.11@sha256:d8cdc054cbe7659d42e7d071e17d40d6d7ed082f94eaa3c0988ac2faa7700b12
           imagePullPolicy: IfNotPresent
           command:
             - /CLIProxyAPI/CLIProxyAPI
@@ -52,7 +52,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: cliproxyapi
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: deployment.environment.name=production,service.version=v7.3.10
+              value: deployment.environment.name=production,service.version=v7.3.11
             - name: OTEL_SDK_DISABLED
               value: "false"
           envFrom:
@@ -85,7 +85,7 @@ spec:
             capabilities:
               drop: ["ALL"]
         - name: usage-exporter
-          image: python:3.13-alpine@sha256:7415fbc3c9e4979cc717d92377ab2bc7b2b4a2af1ac03cc52b5f3f88efedaf3a
+          image: python:3.14-alpine@sha256:4677924bcc0e94505a3270e87cb1601c2af54cd92d021b8dc306618a14333bbe
           imagePullPolicy: IfNotPresent
           command:
             - python

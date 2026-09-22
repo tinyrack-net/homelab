@@ -3,7 +3,7 @@ controllers:
     containers:
       main:
         image:
-          tag: v3.1.0
+          tag: v3.2.2
         env:
           DB_HOSTNAME: immich-database-cluster-rw.immich-system.svc.cluster.local
           DB_DATABASE_NAME: immich
@@ -52,7 +52,7 @@ server:
             OTEL_EXPORTER_OTLP_ENDPOINT: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4318
             OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
             OTEL_SERVICE_NAME: immich
-            OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production,service.version=3.1.0
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production,service.version=3.2.2
             OTEL_TRACES_SAMPLER: parentbased_always_on
             OTEL_SDK_DISABLED: "false"
           probes:

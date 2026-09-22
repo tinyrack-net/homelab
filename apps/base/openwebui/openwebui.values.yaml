@@ -2,7 +2,7 @@ fullnameOverride: open-webui
 tika:
   enabled: true
   image:
-    tag: 3.3.1.0-full
+    tag: 4.0.0-full@sha256:6c244af88e8575ebe8bf0bc5e2da03c49663dd0acc7809cd99c8e9ff8741cbfb
   resources:
     requests:
       cpu: 250m
@@ -66,11 +66,14 @@ extraEnvVars:
   - name: OTEL_SERVICE_NAME
     value: open-webui
   - name: OTEL_RESOURCE_ATTRIBUTES
-    value: deployment.environment.name=production,service.version=0.11.3
+    value: deployment.environment.name=production,service.version=0.11.4
   - name: OTEL_TRACES_SAMPLER
     value: parentbased_always_on
   - name: OTEL_SDK_DISABLED
     value: "false"
+  # Tika
+  - name: TIKA_SERVER_VERSION
+    value: "4"
   # DB
   - name: DATABASE_USER
     valueFrom:
