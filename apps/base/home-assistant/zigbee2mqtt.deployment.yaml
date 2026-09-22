@@ -28,7 +28,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: zigbee2mqtt
-          image: ghcr.io/koenkk/zigbee2mqtt:2.14.1@sha256:fef0de769dcd04c27b3a6d277b61046eb96284bdd4198dcb1687c3a01b3020f3
+          image: ghcr.io/koenkk/zigbee2mqtt:2.14.1@sha256:5be1023be48fbe3385812dbe31658fa34866d15706d7befac2390fe66f7f6814
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
