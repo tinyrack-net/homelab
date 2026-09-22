@@ -64,7 +64,7 @@ spec:
             - name: OPENID_REDIRECT_URI
               value: https://remote.intranet.winetree94.com/
             - name: OPENID_USERNAME_CLAIM_TYPE
-              value: preferred_username
+              value: email
             - name: OPENID_SCOPE
               value: openid profile email
             - name: EXTENSION_PRIORITY
