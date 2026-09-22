@@ -51,6 +51,12 @@ specs:
           - ports:
               - port: "443"
                 protocol: TCP
+      - toCIDR:
+          - 10.132.246.2/32
+        toPorts:
+          - ports:
+              - port: "443"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
