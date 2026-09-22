@@ -5,7 +5,7 @@ controller:
   provisioner: true
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 256Mi
     limits:
       cpu: "1"
@@ -20,7 +20,7 @@ node:
       value: Never
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 256Mi
     limits:
       cpu: "1"
@@ -38,7 +38,7 @@ globalConfig:
           storage.tinyrack.net/profile: immich
       resources:
         requests:
-          cpu: 500m
+          cpu: 100m
           memory: 512Mi
         limits:
           cpu: "1"

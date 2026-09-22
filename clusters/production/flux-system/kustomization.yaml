@@ -32,3 +32,10 @@ patches:
       name: allow-webhooks
       namespace: flux-system
     path: allow-webhooks.network-policy.patch.yaml
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      namespace: flux-system
+      labelSelector: app.kubernetes.io/part-of=flux
+    path: controller-resources.deployment.patch.yaml

@@ -18,7 +18,7 @@ spec:
           image: n8nio/runners:2.40.5@sha256:7e01a4e9013661f1a2a9d2de23edcd9d644a6612b50afc55a122a4abc4bf6bb6
           resources:
             requests:
-              cpu: "250m"
+              cpu: "100m"
               memory: "512Mi"
             limits:
               cpu: "2"

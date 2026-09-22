@@ -36,7 +36,7 @@ spec:
   imageName: ghcr.io/cloudnative-pg/postgresql:18-standard-trixie@sha256:c2a773217853c6e0ffe7da9c37ea456466efb20cf844f27511a73fa6a81e3152
   resources:
     requests:
-      cpu: 500m
+      cpu: 250m
       memory: 512Mi
     limits:
       cpu: "1"

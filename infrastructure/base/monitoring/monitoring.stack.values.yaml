@@ -166,7 +166,7 @@ vmsingle:
       maxConcurrentInserts: "4"
     resources:
       requests:
-        cpu: "1"
+        cpu: 250m
         memory: 2Gi
       limits:
         cpu: "2"
@@ -185,7 +185,7 @@ vlsingle:
     retentionPeriod: 7d
     resources:
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 256Mi
       limits:
         cpu: "1"
@@ -204,7 +204,7 @@ vtsingle:
     retentionPeriod: 7d
     resources:
       requests:
-        cpu: 50m
+        cpu: 25m
         memory: 128Mi
       limits:
         cpu: 500m
@@ -298,7 +298,7 @@ grafana:
       readOnlyRootFilesystem: false
     resources:
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 256Mi
       limits:
         cpu: "2"
@@ -333,7 +333,7 @@ grafana:
     enabled: false
   resources:
     requests:
-      cpu: 50m
+      cpu: 25m
       memory: 128Mi
     limits:
       cpu: 500m
