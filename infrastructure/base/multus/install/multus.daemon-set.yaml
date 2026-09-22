@@ -45,7 +45,7 @@ spec:
             - name: cni-bin
               mountPath: /host-cni
         - name: install-multus-binary
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick@sha256:2b9671447f3ea4e7e56730843dbf59445b9307246f393b61386b896d56ae51c9
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.1-thick@sha256:d3a3e029a27cd9c23aa904e8c881af5f2db01245419f8e1147f08238dd85f764
           command:
             - /usr/src/multus-cni/bin/install_multus
             - -d
@@ -60,7 +60,7 @@ spec:
               mountPropagation: Bidirectional
       containers:
         - name: kube-multus
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick@sha256:2b9671447f3ea4e7e56730843dbf59445b9307246f393b61386b896d56ae51c9
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.1-thick@sha256:d3a3e029a27cd9c23aa904e8c881af5f2db01245419f8e1147f08238dd85f764
           command:
             - /usr/src/multus-cni/bin/multus-daemon
           securityContext:
