@@ -159,3 +159,36 @@ specs:
           - ports:
               - port: "443"
                 protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-guacamole-database-backup
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: guacamole
+  annotations:
+    networking.tinyrack.net/hosts: storage.intranet.winetree94.com
+spec:
+  description: Allow the Guacamole database to reach object storage through internal Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: guacamole-system
+            cnpg.io/cluster: guacamole-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
