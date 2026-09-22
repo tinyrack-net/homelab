@@ -52,7 +52,6 @@ specs:
               - port: "443"
                 protocol: TCP
       - toCIDR:
-          - 10.132.246.1/32
           - 10.132.246.2/32
         toPorts:
           - ports:
@@ -152,12 +151,6 @@ specs:
               - port: "53"
                 protocol: UDP
               - port: "53"
-                protocol: TCP
-      - toCIDR:
-          - 10.132.246.1/32
-        toPorts:
-          - ports:
-              - port: "443"
                 protocol: TCP
       - toEndpoints:
           - matchLabels:
