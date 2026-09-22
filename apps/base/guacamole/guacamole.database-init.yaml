@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: guacamole-database-init
+        app: guacamole
     spec:
       restartPolicy: OnFailure
       automountServiceAccountToken: false
