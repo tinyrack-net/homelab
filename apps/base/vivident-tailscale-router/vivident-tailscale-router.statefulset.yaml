@@ -46,6 +46,19 @@ spec:
                   -m comment --comment vivident-tailscale-router \
                   -j MASQUERADE
               fi
+              for direction in -i -o; do
+                if ! iptables-legacy -t mangle -C FORWARD \
+                  "$direction" tailscale0 \
+                  -p tcp --tcp-flags SYN,RST SYN \
+                  -m comment --comment vivident-tailscale-mss \
+                  -j TCPMSS --clamp-mss-to-pmtu 2>/dev/null; then
+                  iptables-legacy -t mangle -A FORWARD \
+                    "$direction" tailscale0 \
+                    -p tcp --tcp-flags SYN,RST SYN \
+                    -m comment --comment vivident-tailscale-mss \
+                    -j TCPMSS --clamp-mss-to-pmtu
+                fi
+              done
           securityContext:
             privileged: true
       containers:
