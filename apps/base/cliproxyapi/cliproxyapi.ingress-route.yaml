@@ -10,7 +10,7 @@ spec:
     - websecure
     - cloudflare
   routes:
-    - match: Host(`llm.winetree94.com`) && !Path(`/management.html`) && !PathPrefix(`/v0/management`) && !PathPrefix(`/v0/resource/plugins`)
+    - match: Host(`llm.winetree94.com`) && !Path(`/management.html`) && !PathPrefix(`/v0/management`) && !PathPrefix(`/v0/resource/plugins`) && !PathPrefix(`/v8/management`)
       kind: Rule
       services:
         - name: cliproxyapi-service
