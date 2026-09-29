@@ -10,22 +10,22 @@ spec:
       k8s:io.kubernetes.pod.namespace: rustdesk-system
       app.kubernetes.io/name: rustdesk
   ingress:
-    - fromCIDR:
-        - 10.132.244.0/22
-        - 10.198.0.0/16
-        - 10.199.0.0/16
-        - 100.64.0.0/10
+    - fromCIDRSet:
+        - cidrGroupRef: lan
+        - cidrGroupRef: vpn-server
+        - cidrGroupRef: vpn-control
+        - cidrGroupRef: tailscale
       toPorts:
         - ports:
             - port: "21115"
-              protocol: TCP
+              protocol: TCP # NAT type test
             - port: "21116"
-              protocol: TCP
+              protocol: TCP # ID registry
             - port: "21116"
-              protocol: UDP
+              protocol: UDP # ID registry heartbeat
             - port: "21117"
-              protocol: TCP
+              protocol: TCP # relay
             - port: "21118"
-              protocol: TCP
+              protocol: TCP # web client
             - port: "21119"
-              protocol: TCP
+              protocol: TCP # web client (TLS)

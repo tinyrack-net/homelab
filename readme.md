@@ -143,9 +143,24 @@ one-time migration and rollback playbooks were removed after verification.
   `route-<owner>`, and add the `networking.tinyrack.net/owner` label and
   `networking.tinyrack.net/hosts` annotation.
 - Use `toServices` with the backend target port for Kubernetes Services and
-  `toCIDR` with explicit ports for LAN or ExternalName backends.
+  `toCIDRSet` with a `cidrGroupRef` plus explicit ports for LAN or ExternalName
+  backends.
 - Group routes that share a backend into one owner policy. Host annotations are
   documentation and do not enable Cilium L7 HTTP filtering.
+
+## Cilium CIDR groups
+
+CIDR literals in network policies are replaced by `CiliumCIDRGroup` aliases so a
+reader can tell which network or host a rule targets.
+
+- Define network groups (`lan`, `vpn-server`, `vpn-control`, `tailscale`) and
+  one group per LAN host in `infrastructure/base/network-security`.
+- Reference groups with `fromCIDRSet`/`toCIDRSet` and `cidrGroupRef`; list
+  several refs when a rule needs several networks.
+- `homelab-host-firewall` depends on the `network-security` Kustomization, so a
+  group always exists before a policy that references it is applied.
+- Cilium has no alias for ports and `except` only accepts literal CIDRs, so those
+  stay explicit and carry a comment describing their purpose.
 
 ## Sealed Secrets
 

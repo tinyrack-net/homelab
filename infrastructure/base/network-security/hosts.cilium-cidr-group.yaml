@@ -1,0 +1,109 @@
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: opnsense
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # OPNsense router and firewall (LAN gateway).
+  externalCIDRs:
+    - 10.132.244.1/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: openmediavault
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # OpenMediaVault NAS host (SMB, NFS, Garage S3).
+  externalCIDRs:
+    - 10.132.245.8/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: ubuntu-gpu
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # Ubuntu GPU server (local LLM inference).
+  externalCIDRs:
+    - 10.132.245.37/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: xeon-nanokvm
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # NanoKVM attached to the Xeon Proxmox host.
+  externalCIDRs:
+    - 10.132.245.39/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: proxmox
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # Proxmox hypervisor management interface.
+  externalCIDRs:
+    - 10.132.245.40/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: macmini-nanokvm
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # NanoKVM attached to the Mac mini.
+  externalCIDRs:
+    - 10.132.245.43/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: openmediavault-nanokvm
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # NanoKVM attached to the OpenMediaVault host.
+  externalCIDRs:
+    - 10.132.245.44/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: slzb-ultima3
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # SLZB-Ultima3 Zigbee coordinator.
+  externalCIDRs:
+    - 10.132.245.48/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: traefik-external
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # Internal LoadBalancer IP of traefik-external.
+  externalCIDRs:
+    - 10.132.246.2/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: desktop
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # Windows desktop development machine.
+  externalCIDRs:
+    - 10.132.247.31/32

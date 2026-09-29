@@ -67,18 +67,20 @@ specs:
           - ports:
               - port: "8443"
                 protocol: TCP
-      - toCIDR:
-          - 10.132.245.37/32
+      # Local LLM inference on the GPU server.
+      - toCIDRSet:
+          - cidrGroupRef: ubuntu-gpu
         toPorts:
           - ports:
               - port: "8080"
-                protocol: TCP
-      - toCIDR:
-          - 10.132.247.31/32
+                protocol: TCP # inference API
+      # Model/service endpoint on the Windows desktop.
+      - toCIDRSet:
+          - cidrGroupRef: desktop
         toPorts:
           - ports:
               - port: "8000"
-                protocol: TCP
+                protocol: TCP # model API
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

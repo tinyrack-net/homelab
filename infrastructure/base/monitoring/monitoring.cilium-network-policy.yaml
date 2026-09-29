@@ -59,17 +59,19 @@ spec:
               protocol: TCP
     - toEntities:
         - kube-apiserver
+    # Alert delivery to the public SMTP/HTTPS endpoints, excluding internal ranges.
+    # CiliumCIDRGroup cannot be referenced from `except`, so these stay literal.
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:
-            - 10.0.0.0/8
-            - 100.64.0.0/10
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
+            - 10.0.0.0/8 # RFC1918 private
+            - 100.64.0.0/10 # RFC6598 CGNAT (Tailscale)
+            - 169.254.0.0/16 # Link-local
+            - 172.16.0.0/12 # RFC1918 private
+            - 192.168.0.0/16 # RFC1918 private
       toPorts:
         - ports:
             - port: "443"
-              protocol: TCP
+              protocol: TCP # HTTPS
             - port: "587"
-              protocol: TCP
+              protocol: TCP # SMTP submission

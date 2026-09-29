@@ -1,0 +1,43 @@
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: lan
+  labels:
+    networking.tinyrack.net/cidr-scope: network
+spec:
+  # Cluster LAN. Hosts, virtual machines, and the LAN gateway live here.
+  externalCIDRs:
+    - 10.132.244.0/22
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: vpn-server
+  labels:
+    networking.tinyrack.net/cidr-scope: network
+spec:
+  # OPNsense WireGuard VPN server range.
+  externalCIDRs:
+    - 10.198.0.0/16
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: vpn-control
+  labels:
+    networking.tinyrack.net/cidr-scope: network
+spec:
+  # OPNsense WireGuard VPN control range.
+  externalCIDRs:
+    - 10.199.0.0/16
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: tailscale
+  labels:
+    networking.tinyrack.net/cidr-scope: network
+spec:
+  # Tailscale CGNAT range (100.64.0.0/10).
+  externalCIDRs:
+    - 100.64.0.0/10

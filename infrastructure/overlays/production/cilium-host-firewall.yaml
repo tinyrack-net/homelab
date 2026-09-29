@@ -14,3 +14,4 @@ spec:
     name: flux-system
   dependsOn:
     - name: cilium
+    - name: network-security

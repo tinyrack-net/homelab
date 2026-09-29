@@ -2,3 +2,5 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - isolated-namespaces.cilium-clusterwide-network-policy.yaml
+  - networks.cilium-cidr-group.yaml
+  - hosts.cilium-cidr-group.yaml

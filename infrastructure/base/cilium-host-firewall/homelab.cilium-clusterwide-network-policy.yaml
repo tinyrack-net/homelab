@@ -3,46 +3,51 @@ kind: CiliumClusterwideNetworkPolicy
 metadata:
   name: homelab-host-firewall
 spec:
+  description: Host firewall for the control-plane nodes of the homelab cluster
   nodeSelector:
     matchLabels:
       node-role.kubernetes.io/control-plane: "true"
   ingress:
-    - fromCIDR:
-        - 10.132.244.0/22
-        - 10.198.0.0/16
-        - 10.199.0.0/16
-        - 100.64.0.0/10
+    # Administrative access from the LAN, VPN, and Tailscale networks.
+    - fromCIDRSet:
+        - cidrGroupRef: lan
+        - cidrGroupRef: vpn-server
+        - cidrGroupRef: vpn-control
+        - cidrGroupRef: tailscale
       toPorts:
         - ports:
             - port: "22"
-              protocol: TCP
+              protocol: TCP # SSH
             - port: "68"
-              protocol: UDP
+              protocol: UDP # DHCP client
             - port: "6443"
-              protocol: TCP
-    - fromCIDR:
-        - 10.132.244.0/22
-        - 10.198.0.0/16
-        - 10.199.0.0/16
-        - 100.64.0.0/10
+              protocol: TCP # Kubernetes API server
+    # ICMP echo requests from the same internal networks.
+    - fromCIDRSet:
+        - cidrGroupRef: lan
+        - cidrGroupRef: vpn-server
+        - cidrGroupRef: vpn-control
+        - cidrGroupRef: tailscale
       icmps:
         - fields:
             - family: IPv4
               type: 8
+    # Cluster-internal traffic between nodes and Cilium agents.
     - fromEntities:
         - cluster
       toPorts:
         - ports:
             - port: "4240"
-              protocol: TCP
+              protocol: TCP # Cilium health endpoint
             - port: "4244"
-              protocol: TCP
+              protocol: TCP # Hubble gRPC (agent)
             - port: "6443"
-              protocol: TCP
+              protocol: TCP # Kubernetes API server
             - port: "8472"
-              protocol: UDP
+              protocol: UDP # VXLAN tunnel
             - port: "10250"
-              protocol: TCP
+              protocol: TCP # kubelet
+    # Node, etcd, Cilium, and control-plane metrics scraped by Alloy.
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: monitoring-system
@@ -50,19 +55,20 @@ spec:
       toPorts:
         - ports:
             - port: "2381"
-              protocol: TCP
+              protocol: TCP # etcd metrics
             - port: "9100"
-              protocol: TCP
+              protocol: TCP # node-exporter
             - port: "9962"
-              protocol: TCP
+              protocol: TCP # Cilium agent metrics
             - port: "9963"
-              protocol: TCP
+              protocol: TCP # Cilium operator metrics
             - port: "10250"
-              protocol: TCP
+              protocol: TCP # kubelet
             - port: "10257"
-              protocol: TCP
+              protocol: TCP # kube-controller-manager
             - port: "10259"
-              protocol: TCP
+              protocol: TCP # kube-scheduler
+    # Public HTTP(S) ingress.
     - fromEntities:
         - world
       toPorts:
@@ -71,27 +77,29 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
-    - fromCIDR:
-        - 10.132.244.0/22
-        - 10.198.0.0/16
-        - 10.199.0.0/16
-        - 100.64.0.0/10
+    # RustDesk relay and ID server from the internal networks.
+    - fromCIDRSet:
+        - cidrGroupRef: lan
+        - cidrGroupRef: vpn-server
+        - cidrGroupRef: vpn-control
+        - cidrGroupRef: tailscale
       toPorts:
         - ports:
             - port: "21115"
-              protocol: TCP
+              protocol: TCP # NAT type test
             - port: "21116"
-              protocol: TCP
+              protocol: TCP # ID registry
             - port: "21116"
-              protocol: UDP
+              protocol: UDP # ID registry heartbeat
             - port: "21117"
-              protocol: TCP
+              protocol: TCP # relay
             - port: "21118"
-              protocol: TCP
+              protocol: TCP # web client
             - port: "21119"
-              protocol: TCP
-    - fromCIDR:
-        - 10.132.244.0/22
+              protocol: TCP # web client (TLS)
+    # PostgreSQL exposed to the LAN only.
+    - fromCIDRSet:
+        - cidrGroupRef: lan
       toPorts:
         - ports:
             - port: "5432"

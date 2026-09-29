@@ -27,5 +27,5 @@ specs:
           - ports:
               - port: "4318"
                 protocol: TCP
-      - toCIDR:
-          - 10.132.244.0/22
+      - toCIDRSet:
+          - cidrGroupRef: lan

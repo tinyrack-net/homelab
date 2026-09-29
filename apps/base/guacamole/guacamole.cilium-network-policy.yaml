@@ -51,12 +51,13 @@ specs:
           - ports:
               - port: "443"
                 protocol: TCP
-      - toCIDR:
-          - 10.132.246.2/32
+      # Guacamole OIDC discovery through the traefik-external LoadBalancer IP.
+      - toCIDRSet:
+          - cidrGroupRef: traefik-external
         toPorts:
           - ports:
               - port: "443"
-                protocol: TCP
+                protocol: TCP # HTTPS
       - toEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-external-system
@@ -90,28 +91,29 @@ specs:
                 protocol: UDP
               - port: "53"
                 protocol: TCP
-      - toCIDR:
-          - 10.132.244.0/22
+      # Remote desktop and Wake-on-LAN access to LAN hosts.
+      - toCIDRSet:
+          - cidrGroupRef: lan
         toPorts:
           - ports:
               - port: "22"
-                protocol: TCP
+                protocol: TCP # SSH
               - port: "3389"
-                protocol: TCP
+                protocol: TCP # RDP
               - port: "5900"
-                protocol: TCP
+                protocol: TCP # VNC display :0
               - port: "5901"
-                protocol: TCP
+                protocol: TCP # VNC display :1
               - port: "5902"
-                protocol: TCP
+                protocol: TCP # VNC display :2
               - port: "5903"
-                protocol: TCP
+                protocol: TCP # VNC display :3
               - port: "5904"
-                protocol: TCP
+                protocol: TCP # VNC display :4
               - port: "5905"
-                protocol: TCP
+                protocol: TCP # VNC display :5
               - port: "9"
-                protocol: UDP
+                protocol: UDP # Wake-on-LAN
       - toEntities:
           - world
         toPorts:

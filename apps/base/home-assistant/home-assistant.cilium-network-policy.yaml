@@ -18,8 +18,8 @@ specs:
           - ports:
               - port: "8123"
                 protocol: TCP
-      - fromCIDR:
-          - 10.132.244.0/22
+      - fromCIDRSet:
+          - cidrGroupRef: lan
         toPorts:
           - ports:
               - port: "8123"
@@ -51,8 +51,8 @@ specs:
           - ports:
               - port: "8443"
                 protocol: TCP
-      - toCIDR:
-          - 10.132.244.0/22
+      - toCIDRSet:
+          - cidrGroupRef: lan
       - toEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: home-assistant-system

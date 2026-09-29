@@ -37,9 +37,10 @@ spec:
         - ports:
             - port: "1883"
               protocol: TCP
-    - toCIDR:
-        - 10.132.245.48/32
+    # Zigbee coordinator TCP serial bridge.
+    - toCIDRSet:
+        - cidrGroupRef: slzb-ultima3
       toPorts:
         - ports:
             - port: "6638"
-              protocol: TCP
+              protocol: TCP # SLZB-Ultima3 serial over TCP

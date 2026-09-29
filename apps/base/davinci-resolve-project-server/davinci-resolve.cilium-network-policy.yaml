@@ -10,8 +10,8 @@ spec:
       k8s:io.kubernetes.pod.namespace: davinci-resolve-system
       cnpg.io/cluster: davinci-resolve-database-cluster
   ingress:
-    - fromCIDR:
-        - 10.132.244.0/22
+    - fromCIDRSet:
+        - cidrGroupRef: lan
       toPorts:
         - ports:
             - port: "5432"
