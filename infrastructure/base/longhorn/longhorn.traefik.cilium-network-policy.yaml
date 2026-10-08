@@ -45,3 +45,28 @@ spec:
         - ports:
             - port: "8443"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-longhorn
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: longhorn
+  annotations:
+    networking.tinyrack.net/hosts: longhorn.intranet.winetree94.com
+spec:
+  description: Allow the longhorn.intranet.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: longhorn-system
+            serviceName: longhorn-frontend
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
