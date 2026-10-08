@@ -3,7 +3,7 @@ controllers:
     containers:
       main:
         image:
-          tag: v3.2.2
+          tag: v3.3.0
         env:
           DB_HOSTNAME: immich-database-cluster-rw.immich-system.svc.cluster.local
           DB_DATABASE_NAME: immich
@@ -40,7 +40,7 @@ server:
         main:
           image:
             repository: ghcr.io/immich-app/immich-server
-            tag: v3.2.2@sha256:6b0eaf8cfea6d4d6f86a45dfd0c9e3b068ed4493d8b7fa1efeca4cc87792fbe8
+            tag: v3.3.0@sha256:fecc1545758435d16677bc925036e79a1a8c28e069496300c9ffae3b5230db19
           resources:
             requests:
               cpu: 250m
@@ -52,7 +52,7 @@ server:
             OTEL_EXPORTER_OTLP_ENDPOINT: http://monitoring-trace-sampler.monitoring-system.svc.cluster.local:4318
             OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
             OTEL_SERVICE_NAME: immich
-            OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production,service.version=3.2.2
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production,service.version=3.3.0
             OTEL_TRACES_SAMPLER: parentbased_always_on
             OTEL_SDK_DISABLED: "false"
           probes:
@@ -78,7 +78,7 @@ machine-learning:
         main:
           image:
             repository: ghcr.io/immich-app/immich-machine-learning
-            tag: v3.2.2@sha256:390453a571ca73b563cc3d9a12a37a4d71217b12608de72f26884f5e2ebc4896
+            tag: v3.3.0@sha256:7ee42146a771fa8ca335f6b7604603e488a95730fdcfb2da71b40428fcefb7f2
           resources:
             requests:
               cpu: 100m

@@ -28,8 +28,15 @@ spec:
           type: RuntimeDefault
       containers:
         - name: mosquitto
-          image: docker.io/library/eclipse-mosquitto:2.0.22@sha256:212f89e1eaeb2c322d6441b64396e3346026674db8fa9c27beac293405c32b3c
+          image: docker.io/library/eclipse-mosquitto:2.1.2-alpine@sha256:12436df85d6b2b91e63c71184da35ec89400a98abdc688a78b1403a11ecf44b4
           imagePullPolicy: IfNotPresent
+          env:
+            # mosquitto 2.1 refuses to load sensitive files (password_file, acl_file)
+            # through symbolic links. Kubernetes ConfigMap/Secret volumes are symlink
+            # trees, so opt back in with the escape hatch mosquitto provides for
+            # container environments. Without it the broker fails to start and exits.
+            - name: MOSQUITTO_UNSAFE_ALLOW_SYMLINKS
+              value: "true"
           ports:
             - name: mqtt
               containerPort: 1883
