@@ -7,13 +7,16 @@ spec:
   chart:
     spec:
       chart: longhorn
-      version: "1.12.1"
+      version: "1.13.0"
       sourceRef:
         kind: HelmRepository
         name: longhorn
         namespace: flux-system
   interval: 5m
-  timeout: 5m
+  # The chart's pre-upgrade hook Job has activeDeadlineSeconds: 900, and
+  # spec.timeout bounds hook Jobs. Keep this at or above 15m so the upgrade
+  # is not aborted while the Longhorn pre-upgrade check is running.
+  timeout: 15m
   releaseName: longhorn
   valuesFrom:
     - kind: ConfigMap
