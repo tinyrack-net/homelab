@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - syncthing.home.pvc.yaml
+  - syncthing.network-attachment.yaml
+  - syncthing.deployment.yaml
+  - syncthing.service.yaml
+  - syncthing.ingress-route.yaml
+  - syncthing.cilium-network-policy.yaml
+  - syncthing.traefik.cilium-network-policy.yaml

@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - syncthing.namespace.yaml
+  - syncthing.database-user.secret.yaml
+  - syncthing.database.yaml
+  - syncthing.database.cilium-network-policy.yaml

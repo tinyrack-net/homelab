@@ -1,0 +1,39 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-syncthing
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: syncthing
+  annotations:
+    networking.tinyrack.net/hosts: syncthing.intranet.winetree94.com
+spec:
+  description: Allow the internal Syncthing route and its Garage S3 clients
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            app: juicefs-csi-node
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            app.kubernetes.io/name: juicefs-mount
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: syncthing-system
+            cnpg.io/cluster: syncthing-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: syncthing-system
+            serviceName: syncthing
+      toPorts:
+        - ports:
+            - port: "8384"
+              protocol: TCP

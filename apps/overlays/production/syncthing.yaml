@@ -1,0 +1,55 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: syncthing-database
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/syncthing/database
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: syncthing-storage
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/syncthing/storage
+  prune: true
+  timeout: 10m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: syncthing-database
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: syncthing-deployment
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/syncthing/app
+  prune: true
+  timeout: 20m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: syncthing-database
+    - name: syncthing-storage
+    - name: multus-deployment
+    - name: juicefs-csi-driver
+    - name: prometheus-operator-crds

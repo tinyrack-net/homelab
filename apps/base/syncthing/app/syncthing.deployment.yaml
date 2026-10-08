@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncthing
+  namespace: syncthing-system
+spec:
+  # Held at 0 until the OpenMediaVault config and data are copied into the PVCs.
+  replicas: 0
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: syncthing
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[{"name":"syncthing-lan","interface":"net1"}]'
+      labels:
+        app: syncthing
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      initContainers:
+        - name: prepare-permissions
+          image: syncthing/syncthing:2.1.6@sha256:92e9a8bf559062b955ab45c7a60bc33d0b97ebdb1e5e86959b40714b482f740a
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              chown -R 1000:100 /var/syncthing
+              chown 1000:100 /data
+          securityContext:
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: home
+              mountPath: /var/syncthing
+            - name: data
+              mountPath: /data
+      containers:
+        - name: syncthing
+          image: syncthing/syncthing:2.1.6@sha256:92e9a8bf559062b955ab45c7a60bc33d0b97ebdb1e5e86959b40714b482f740a
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "100"
+            - name: TZ
+              value: Asia/Seoul
+            - name: HOME
+              value: /var/syncthing
+            - name: STHOMEDIR
+              value: /var/syncthing/config
+            - name: STGUIADDRESS
+              value: 0.0.0.0:8384
+          ports:
+            - name: http
+              containerPort: 8384
+              protocol: TCP
+            - name: sync-tcp
+              containerPort: 22000
+              protocol: TCP
+            - name: sync-udp
+              containerPort: 22000
+              protocol: UDP
+            - name: discovery
+              containerPort: 21027
+              protocol: UDP
+          securityContext:
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          startupProbe:
+            httpGet:
+              path: /rest/noauth/health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /rest/noauth/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /rest/noauth/health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 3
+          volumeMounts:
+            - name: home
+              mountPath: /var/syncthing
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: syncthing-home
+        - name: data
+          persistentVolumeClaim:
+            claimName: syncthing-data
