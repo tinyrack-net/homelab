@@ -4,8 +4,7 @@ metadata:
   name: syncthing
   namespace: syncthing-system
 spec:
-  # Held at 0 until the OpenMediaVault config and data are copied into the PVCs.
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 2
   strategy:
     type: Recreate
