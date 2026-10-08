@@ -73,7 +73,9 @@ kubectl --context homelab -n syncthing-system port-forward svc/syncthing 8080:83
 - `syncthing-data`는 JuiceFS(네트워크 파일시스템)이므로 Syncthing의 파일 감시자가
   완전하지 않다. OMV와 동일하게 **주기 스캔 폴백**을 전제로 한다.
 - macvlan 구간은 Cilium 정책이 적용되지 않아 OMV와 같은 LAN 노출 수준을 유지한다.
-- Syncthing egress는 DNS, LAN 전체, `world` TCP 443·22067(TCP/UDP QUIC)만 연다.
-  공인망 피어는 주로 relay/QUIC로 붙고, LAN 피어는 22000으로 직결한다.
+- Syncthing egress는 앱 정책에서 DNS, LAN 전체, `world` TCP 443·22067(TCP/UDP QUIC)을
+  열고, 네임스페이스 공통 격리 정책이 내부 대역을 제외한 공인 egress를 함께
+  허용한다(정책은 additive). 따라서 LAN·공인망 피어 모두 22000 직결이 가능하고,
+  `lan` CIDR group 같은 내부 대역은 열어 둔 포트만 통과한다.
 - OMV나 CNPG가 죽으면 동기화 데이터에 접근할 수 없다. 복구는 Garage 객체와
   CNPG Barman 백업을 함께 복원해야 한다.
