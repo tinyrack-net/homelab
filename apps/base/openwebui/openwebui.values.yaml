@@ -2,7 +2,7 @@ fullnameOverride: open-webui
 tika:
   enabled: true
   image:
-    tag: 4.0.0-full@sha256:6c244af88e8575ebe8bf0bc5e2da03c49663dd0acc7809cd99c8e9ff8741cbfb
+    tag: 4.1.0-full@sha256:d7607239d4e9c2dc1fd396f41a370576a334aef28f767e5bc5511247a1e1adf7
   resources:
     requests:
       cpu: 100m
