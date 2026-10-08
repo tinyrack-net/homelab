@@ -17,3 +17,4 @@ spec:
       storage: 2Gi
   storageClassName: longhorn-strict-local
   volumeMode: Filesystem
+  volumeName: zigbee2mqtt-data
