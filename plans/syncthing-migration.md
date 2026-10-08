@@ -51,7 +51,7 @@ Garage 버킷/키는 `openmediavault`의 `garage-garaged-1` 컨테이너에서 �
 5. `apps/base/syncthing/app/syncthing.deployment.yaml`의 `replicas`를 `1`로 바꿔
    커밋한다.
 6. 기기 12대가 재연결되고 `Obsidian` 폴더가 Up to Date가 되면 OMV UI에서 서비스를
-   제거한다.
+   제거한다. **(남은 작업: OMV UI에서 서비스 제거만 남음)**
 
 ## 검증
 
@@ -79,3 +79,23 @@ kubectl --context homelab -n syncthing-system port-forward svc/syncthing 8080:83
   `lan` CIDR group 같은 내부 대역은 열어 둔 포트만 통과한다.
 - OMV나 CNPG가 죽으면 동기화 데이터에 접근할 수 없다. 복구는 Garage 객체와
   CNPG Barman 백업을 함께 복원해야 한다.
+
+## 완료 기록 (2026-10-08)
+
+- 사용자가 OMV UI에서 `syncthing` 컨테이너를 중지(`Exited (0)`)한 뒤 마이그레이션을
+  수행했다. 복사는 임시 Pod으로 tar를 스트리밍해 중간 평문 저장 없이 옮겼다.
+- `/config` → `syncthing-home`(`/var/syncthing/config`): `config.xml` sha256 일치,
+  `cert.pem`·`key.pem`·`https-*.pem`·`index-v2` 포함.
+- `/data/Obsidian` → `syncthing-data`(`/data/Obsidian`): 943 files / 216 dirs /
+  117,989,361 bytes로 원본과 일치. `.stfolder` 마커와 `.stignore`도 함께 복사됐다.
+- `replicas: 1`로 전환 후 검증:
+  - device ID `XPIMBVJ-PQPJGOH-IIOFHXK-I3GHSS3-3QPCG3H-ROWF3RC-AUVIQCG-QSWJSQ2`
+    (OMV 원본과 동일, 재페어링 없음)
+  - 폴더 `lqgdq-zq5vo` `Obsidian`: `state=idle`, `needFiles=0`, `errors=0` → Up to Date
+  - `localFiles=163` vs `globalFiles=224` 차이는 `.stversions`(763 files)와
+    `.obsidian/syncthing-ignore.txt` ignore 목록 때문이며 정상이다.
+  - 피어 5/11 접속: LAN 3대는 `22000/tcp` 직결, 공인망 2대는 relay(`22067`).
+  - 신규 파일 1건 생성 시 5초 내 LAN 피어로 전송됨(`needItems` 67→68→67).
+  - 내부 Traefik: `https://syncthing.intranet.winetree94.com/rest/noauth/health` 200,
+    미인증 `/rest/system/status` 403(기존 GUI 계정 유지), macvlan `10.132.246.251`
+    ping/22000/8384 응답.
