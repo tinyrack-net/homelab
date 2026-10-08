@@ -306,14 +306,14 @@ Wave 5  K3s 노드 업그레이드     ─ 최고위험, 단일 노드 전면 �
       - 권장: **A 유지**. `version:` 필드가 실제 업그레이드 대상을 결정하므로 실익이 크고, 결정 4(Renovate 불변)와 충돌하지 않는다
 - [x] 로컬 검증: `kubectl kustomize ./infrastructure/base/k3s-upgrade`
 - [x] 커밋 & 푸시: `chore(k3s): upgrade plan to v1.37.1+k3s1`
-- [ ] 업그레이드 진행 관찰:
+- [x] 업그레이드 진행 관찰:
       ```bash
       kubectl --context homelab -n system-upgrade get plan,job
       kubectl --context homelab -n system-upgrade get jobs -w
       kubectl --context homelab get nodes
       kubectl --context homelab -n system-upgrade logs -l upgrade.cattle.io/plan=k3s-server
       ```
-- [ ] 노드 업그레이드 완료 후 확인:
+- [x] 노드 업그레이드 완료 후 확인:
       ```bash
       kubectl --context homelab get node -o wide          # v1.37.1+k3s1, Ready, uncordoned
       kubectl --context homelab get kustomizations -A     # 전부 Ready
@@ -321,16 +321,16 @@ Wave 5  K3s 노드 업그레이드     ─ 최고위험, 단일 노드 전면 �
       kubectl --context homelab get cluster -A            # CNPG 7개 healthy
       kubectl --context homelab -n longhorn-system get pods
       ```
-- [ ] 긴급 시 되돌리기: Plan `version`을 이전 값으로 되돌려 재실행 (`k3s-upgrade`는 다운그레이드도 동일 경로로 수행 가능)
+- [x] 긴급 시 되돌리기: Plan `version`을 이전 값으로 되돌려 재실행 (`k3s-upgrade`는 다운그레이드도 동일 경로로 수행 가능)
 
 ### Wave 6 — 운영 문서화 (수동 스윕 런북)
 
-- [ ] `readme.md`에 "주기적 버전 스윕" 섹션 추가, 다음을 담는다:
+- [x] `readme.md`에 "주기적 버전 스윕" 섹션 추가, 다음을 담는다:
       - Renovate는 현재 GitHub에 PR/Dashboard가 없어 **동작하지 않는다**는 사실과 그 확인 방법(`gh issue list`, `gh pr list`, `.github/workflows` 부재)
       - 스윕 체크리스트: Flux는 `flux install --export` 비교, 차트는 `helm search repo --versions`, 이미지는 `docker buildx imagetools inspect`, 노드는 K3s GitHub releases
       - Renovate를 되살리려면 별도 결정이 필요하다는 메모(이번 범위 밖)
-- [ ] `renovate.json5`는 **변경하지 않는다**
-- [ ] 커밋 & 푸시: `docs: add manual version sweep runbook`
+- [x] `renovate.json5`는 **변경하지 않는다**
+- [x] 커밋 & 푸시: `docs: add manual version sweep runbook`
 
 ---
 
