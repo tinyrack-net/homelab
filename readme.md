@@ -4,7 +4,7 @@
 
 **A Flux GitOps repository for my personal homelab Kubernetes cluster.**
 
-[GitOps](#gitops) · [Disaster Recovery](#disaster-recovery) · [Bootstrap](#bootstrap)
+[GitOps](#gitops) · [Disaster Recovery](#disaster-recovery) · [Bootstrap](#bootstrap) · [Version sweep](#version-sweep)
 
 </div>
 
@@ -127,6 +127,91 @@ delegates the primary Pod network to Cilium.
   Helm values and Alloy's externally managed, dynamically reloaded ConfigMap.
 - Keep credentials out of values and configuration files. Secrets remain
   encrypted SealedSecret manifests or references to existing Secrets.
+
+## Version sweep
+
+Renovate is **not running**. `renovate.json5` is kept in the repository, but
+there is no Dependency Dashboard issue, no Renovate pull request, and no
+`.github/workflows` directory for a scheduled run, so nothing refreshes the
+pinned versions automatically. Component versions are updated by a manual
+sweep.
+
+Confirm the state before assuming an automatic update:
+
+```bash
+gh issue list --repo tinyrack-net/homelab --search renovate
+gh pr list --repo tinyrack-net/homelab --search renovate
+ls .github/workflows 2>/dev/null
+```
+
+Reviving Renovate, or replacing it with another updater, needs its own decision
+and is out of scope for the sweep. Leave `renovate.json5` untouched.
+
+### Sweep checklist
+
+Refresh one layer at a time, commit per layer, and verify before moving on.
+
+1. **Flux controllers** — `clusters/production/flux-system/gotk-components.yaml`
+   is generated, so compare its `# Flux Version:` header and image tags with the
+   latest upstream release by exporting that release:
+   `flux install --version=<v> --components=source-controller,kustomize-controller,helm-controller,notification-controller,image-reflector-controller,image-automation-controller --export`,
+   then check `kubectl kustomize ./clusters/production/flux-system`.
+2. **K3s** — take the version from the K3s release channel
+   (`curl -s https://update.k3s.io/v1-release/channels`) or the upstream GitHub
+   releases, and update both
+   `infrastructure/base/k3s-upgrade/k3s-server-plan.yaml` (the `version:` field
+   drives the upgrade; `upgrade.image` stays untagged) and
+   `ansible/roles/setup_k3s_server/defaults/main.yml`.
+3. **Helm charts** — `helm search repo <repo>/<chart> --versions` and bump
+   `spec.chart.spec.version` in the owning `*.helm-release.yaml`. Render the base
+   with `helm template` and `kubectl kustomize ./infrastructure/base/<name>`
+   before committing, because a new chart minor can rename values keys and
+   silently drop configuration.
+4. **Remote release manifests** — `infrastructure/base/cloudnative-pg` and
+   `infrastructure/base/system-upgrade-controller` pull manifests from upstream
+   release URLs. Check their releases and diff the rendered output.
+5. **Container images** — `docker buildx imagetools inspect <ref>` for the
+   newest tag, then re-pin the digest.
+6. **Node components** — K3s ships its own coredns, metrics-server,
+   local-path-provisioner, and kubectl. They move with the node and are not
+   pinned in this repository.
+
+### Image digests
+
+Every `@sha256:` must be refreshed together with its tag. The node is
+`linux/amd64`:
+
+```bash
+docker buildx imagetools inspect <registry>/<path>:<tag> --format '{{json .Manifest}}' \
+  | jq -r 'if .manifests then (.manifests[] | select(.platform.os == "linux" and .platform.architecture == "amd64") | .digest) else .digest end'
+```
+
+Most images pin the platform digest the command above prints.
+`eceasy/cli-proxy-api` and `library/postgres` pin the **index** digest instead,
+so check the existing pin and match its convention.
+
+### Pitfalls found by hand
+
+- Registry tags drift into pre-release channels: `n8nio/n8n` publishes `2.43.x`
+  with `prerelease: true` while `2.42.5` is the promoted stable release. Check
+  the GitHub release `prerelease` flag and the image `stable` tag before bumping.
+- A new image tag may not exist for every distribution: `eclipse-mosquitto`
+  publishes `2.1.x` only as `-alpine`, and `tailscale/tailscale` tags a release
+  before it publishes an image. Verify the image, not just the release. Mosquitto
+  2.1 refuses ConfigMap and Secret files that Kubernetes mounts through symlinks
+  unless `MOSQUITTO_UNSAFE_ALLOW_SYMLINKS=true` is set.
+- Docker Hub throttles anonymous pulls per egress IP, and the workstation and the
+  node share one, so probing registries during a rollout can break it with `429
+  Too Many Requests`. Pre-seed the node from a pull-through mirror instead of
+  waiting: `k3s ctr -n k8s.io images pull mirror.gcr.io/<path>:<tag>` and then
+  `k3s ctr -n k8s.io images tag mirror.gcr.io/<path>:<tag> docker.io/<path>:<tag>`.
+- `kubectl get backup -A` resolves to MariaDB backups. Name the resource
+  explicitly: `kubectl get backups.postgresql.cnpg.io -A`.
+- The Traefik LoadBalancer IPs are not reachable from the workstation. Verify an
+  ingress with `kubectl -n <namespace> port-forward service/<service> <local>:<port>`.
+- Snapshot stateful volumes before a sweep that touches storage or the node: a
+  Longhorn `Snapshot` per volume, a Longhorn `SystemBackup`, and a manual CNPG
+  `Backup` in every namespace.
 
 ## CNI migration
 
