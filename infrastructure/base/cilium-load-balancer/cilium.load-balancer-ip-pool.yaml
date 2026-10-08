@@ -4,8 +4,9 @@ metadata:
   name: homelab-l2
 spec:
   blocks:
+    # Reserve .251 and above for macvlan static pod addresses.
     - start: 10.132.246.1
-      stop: 10.132.246.251
+      stop: 10.132.246.250
   serviceSelector:
     matchLabels:
       networking.tinyrack.net/load-balancer: cilium-l2
