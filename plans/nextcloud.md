@@ -126,3 +126,43 @@ kubectl --context homelab -n nextcloud-system exec -it "$POD" -- occ files:scan 
   사용자 파일은 S3 백업 정책에 의존한다.
 - RWX는 볼륨당 share-manager 파드 1개이며 노드 장애 시 90초 NFS grace 동안 I/O가 막힌다.
   `rwx-volume-fast-failover`는 실험적이라 off로 둔다.
+
+## 배포 중 발생한 문제와 수정
+
+- k3s kubelet `max-pods`가 110이라 노드가 포화되어 CNPG가 Pending이 됐다.
+  `ansible/roles/setup_k3s_server`에 `kubelet-arg: max-pods=200`을 추가해 200으로 올렸다.
+- Longhorn `storageOverProvisioningPercentage`가 100이라 nominal 412Gi가 상한(≈425Gi)을 넘겨
+  PVC 스케줄링이 실패했다. `infrastructure/base/longhorn/install/longhorn.values.yaml`에서 150으로
+  올렸다.
+- 최초 기동이 RWX 볼륨으로 코드를 복사하느라 ~7분 걸려 차트 기본 liveness에 죽었다.
+  `startupProbe`를 켜서 최초 성공 전까지 liveness를 막는다.
+- 네임스페이스 격리로 Redis 파드에 default-deny가 적용돼 앱→Redis 통신이 막혔다.
+  `app-nextcloud` CNP에 Redis ingress(6379, app·cronjob)를 추가했다.
+- CronJob 파드가 root로 떠서 `config/config.php`(uid 33) 소유자 검사에 걸렸다.
+  `cronjob.cronjob.securityContext`로 uid/gid 33 + `runAsNonRoot`를 지정했다.
+- traefik-external → 앱 egress가 Service 포트(8080)만 허용했는데, Cilium은 **DNAT된 백엔드
+  포트(80)** 기준으로 판정해 공개 요청이 30초 후 504가 됐다. `route-nextcloud`
+  (traefik-external-system) egress에 80을 추가했다.
+- metrics exporter(serverinfo API)가 앱 파드 ingress에 없어 스크레이프가 타임아웃했다.
+  `app-nextcloud` ingress에 `component: metrics`를 추가하고 `serverinfo token`을 설정했으며,
+  잘못된 토큰으로 누적된 bruteforce 지연은 `occ security:bruteforce:reset`으로 풀었다.
+- OIDC discovery가 `auth.winetree94.com`(내부 LB 사설 IP)에서 실패했다. Nextcloud HTTP 클라이언트가
+  사설 주소를 거부하므로 `local-server.config.php`에 `allow_local_remote_servers => true`를 추가했다.
+- 첫 설치가 중단되며 `Templates/Photo book.odt.part`(fileid 40)가 오브젝트 없는 상태로 남아
+  미리보기 오류를 냈다. `occ files:delete 40 --skip-trash`로 정리했다.
+
+`occ`는 파드 안에서 `su -s /bin/sh www-data -c "php occ ..."`로 실행한다(루트로 실행하면
+config.php 소유자 검사에 걸린다).
+
+## 검증 결과 (2026-10-10)
+
+- HelmRelease `nextcloud` Ready, Deployment `nextcloud` 1/1, CNPG·Redis·metrics 모두 Running.
+- `kubectl kustomize ./apps/base/nextcloud/{database,redis,app}`, `./apps/overlays/production`,
+  `./infrastructure/base/monitoring` 빌드 통과.
+- 공개 접속: `https://cloud.winetree94.com/status.php` 200, `/login` 302 → Issuary authorize 303.
+  `?direct=1`은 200(브레이크글래스).
+- 오브젝트 스토리지: `occ files:object:list` 55건, 미리보기 객체 생성 확인.
+- 메트릭: VictoriaMetrics에서 `up{job=~"nextcloud.*"}` = 1 (앱 `:80` openmetrics, exporter `:9205`).
+- CronJob: uid 33 적용 후 5분 주기 Job이 Complete.
+- 아직 미검증: 다음 03:30/15:30 KST `backups.longhorn.io` 생성, 노드 재부팅 후 RWX 재마운트,
+  Longhorn 백업에서의 복구 리허설.
