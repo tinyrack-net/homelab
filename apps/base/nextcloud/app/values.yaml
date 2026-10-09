@@ -32,6 +32,16 @@ nextcloud:
         'overwriteprotocol' => 'https',
         'overwrite.cli.url' => 'https://cloud.winetree94.com',
         'forwarded_for_headers' => ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR'],
+        // The image only pushes NEXTCLOUD_TRUSTED_DOMAINS into config.php while
+        // it runs its first-boot install; that step was interrupted by the old
+        // liveness probe, leaving trusted_domains as ['localhost']. Declare the
+        // domains here so they are always rendered into config.php.
+        'trusted_domains' => [
+          'cloud.winetree94.com',
+          'nextcloud.nextcloud-system.svc',
+          'nextcloud.nextcloud-system.svc.cluster.local',
+          'localhost',
+        ],
       );
 
   # Nextcloud defaults its temp directory to /tmp on the container root
@@ -137,7 +147,9 @@ startupProbe:
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 5
-  failureThreshold: 60
+  # The first boot copies the code (~7 min over RWX NFS) and installs the
+  # database schema, so allow a generous window before liveness kicks in.
+  failureThreshold: 120
   successThreshold: 1
 livenessProbe:
   initialDelaySeconds: 30
