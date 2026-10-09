@@ -1,14 +1,14 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: route-issuary
+  name: route-nextcloud
   namespace: traefik-external-system
   labels:
-    networking.tinyrack.net/owner: issuary
+    networking.tinyrack.net/owner: nextcloud
   annotations:
-    networking.tinyrack.net/hosts: auth.winetree94.com
+    networking.tinyrack.net/hosts: cloud.winetree94.com
 spec:
-  description: Allow the auth.winetree94.com route
+  description: Allow the cloud.winetree94.com route
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -16,13 +16,9 @@ spec:
   ingress:
     - fromEndpoints:
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: guacamole-system
-            app: guacamole
-        # Nextcloud resolves auth.winetree94.com to the internal
-        # traefik-external LoadBalancer when running OIDC discovery/token calls.
-        - matchLabels:
             k8s:io.kubernetes.pod.namespace: nextcloud-system
             app.kubernetes.io/name: nextcloud
+            app.kubernetes.io/component: app
       toPorts:
         - ports:
             - port: "8443"
@@ -30,8 +26,8 @@ spec:
   egress:
     - toServices:
         - k8sService:
-            namespace: issuary-system
-            serviceName: issuary-service
+            namespace: nextcloud-system
+            serviceName: nextcloud
       toPorts:
         - ports:
             - port: "8080"
@@ -40,14 +36,14 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: route-issuary
+  name: route-nextcloud
   namespace: traefik-system
   labels:
-    networking.tinyrack.net/owner: issuary
+    networking.tinyrack.net/owner: nextcloud
   annotations:
-    networking.tinyrack.net/hosts: auth.winetree94.com
+    networking.tinyrack.net/hosts: cloud.winetree94.com
 spec:
-  description: Allow Issuary database clients to reach internal Traefik
+  description: Allow Nextcloud pods to reach Garage S3 through internal Traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -55,8 +51,12 @@ spec:
   ingress:
     - fromEndpoints:
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: issuary-system
-            cnpg.io/cluster: issuary-database-cluster
+            k8s:io.kubernetes.pod.namespace: nextcloud-system
+            app.kubernetes.io/name: nextcloud
+        # Barman WAL/backup archiving from the CloudNativePG instance.
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: nextcloud-system
+            cnpg.io/cluster: nextcloud-database-cluster
       toPorts:
         - ports:
             - port: "8443"

@@ -1,0 +1,151 @@
+# Nextcloud 9.4.0 (appVersion 35.0.1) - Apache flavor
+# Files live in Garage S3 (primary object storage); the PVC keeps app code,
+# config.php, instanceid, apps and themes only.
+
+replicaCount: 1
+
+nextcloud:
+  host: cloud.winetree94.com
+  datadir: /var/www/html/data
+  # Keep the internal service DNS name trusted so the metrics exporter and
+  # in-cluster occ-style calls are accepted.
+  trustedDomains:
+    - cloud.winetree94.com
+    - nextcloud.nextcloud-system.svc
+    - nextcloud.nextcloud-system.svc.cluster.local
+  existingSecret:
+    enabled: true
+    secretName: nextcloud-admin-secret
+    usernameKey: username
+    passwordKey: password
+    tokenKey: nextcloud-token
+
+  # PHP config file mounted into /var/www/html/config/. Traefik terminates TLS
+  # and speaks plain HTTP to the pod, so the proxy ranges must be trusted and
+  # the public URL pinned.
+  configs:
+    proxy.config.php: |-
+      <?php
+      $CONFIG = array (
+        'trusted_proxies' => ['10.61.0.0/16', '10.62.0.0/16'],
+        'overwritehost' => 'cloud.winetree94.com',
+        'overwriteprotocol' => 'https',
+        'overwrite.cli.url' => 'https://cloud.winetree94.com',
+        'forwarded_for_headers' => ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR'],
+      );
+
+  # Nextcloud defaults its temp directory to /tmp on the container root
+  # filesystem. Pin it to a bounded emptyDir so archive/upload staging cannot
+  # fill the node disk.
+  extraVolumes:
+    - name: tmp
+      emptyDir:
+        sizeLimit: 20Gi
+  extraVolumeMounts:
+    - name: tmp
+      mountPath: /tmp
+
+  # /metrics endpoint access list (pod + service CIDRs).
+  openmetrics:
+    allowedClients:
+      - "10.61.0.0/16"
+      - "10.62.0.0/16"
+
+  strategy:
+    type: Recreate
+
+  # Primary object storage: Garage S3.
+  objectStore:
+    s3:
+      enabled: true
+      host: storage.intranet.winetree94.com
+      port: "443"
+      ssl: true
+      region: home
+      bucket: tinyrack-homelab-nextcloud-storage
+      usePathStyle: true
+      autoCreate: false
+      existingSecret: tinyrack-homelab-s3-secret
+      secretKeys:
+        accessKey: AWS_ACCESS_KEY_ID
+        secretKey: AWS_SECRET_ACCESS_KEY
+
+# Application PVC: config.php, instanceid, apps, themes, log. Files are in S3.
+persistence:
+  enabled: true
+  storageClass: longhorn-rwx
+  accessMode: ReadWriteMany
+  size: 16Gi
+  labels:
+    recurring-job.longhorn.io/source: enabled
+    recurring-job-group.longhorn.io/longhorn-backup: enabled
+  nextcloudData:
+    enabled: false
+
+# Database: CloudNativePG (see ../database).
+internalDatabase:
+  enabled: false
+externalDatabase:
+  enabled: true
+  type: postgresql
+  host: nextcloud-database-cluster-rw.nextcloud-system.svc
+  database: nextcloud
+  user: nextcloud
+  existingSecret:
+    enabled: true
+    secretName: nextcloud-database-user-secret
+    usernameKey: username
+    passwordKey: password
+mariadb:
+  enabled: false
+postgresql:
+  enabled: false
+
+# Cache + file locking: opstree Redis operator (see ../redis).
+redis:
+  enabled: false
+externalRedis:
+  enabled: true
+  host: nextcloud-redis.nextcloud-system.svc
+  port: "6379"
+  existingSecret:
+    enabled: true
+    secretName: nextcloud-redis-secret
+    passwordKey: password
+
+# Background jobs as a dedicated CronJob rather than an in-pod crond sidecar.
+cronjob:
+  enabled: true
+  type: cronjob
+  cronjob:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    memory: 2Gi
+
+# Metrics: /metrics openmetrics on the app service + nextcloud-exporter.
+metrics:
+  enabled: true
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+
+prometheus:
+  serviceMonitor:
+    enabled: true
+
+# Public entry point is a Traefik IngressRoute (cloud.winetree94.com).
+ingress:
+  enabled: false

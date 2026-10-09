@@ -72,3 +72,15 @@ spec:
         - ports:
             - port: "9101"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: nextcloud-system
+            app.kubernetes.io/name: nextcloud
+      toPorts:
+        - ports:
+            # Nextcloud /metrics (openmetrics) on the app service.
+            - port: "80"
+              protocol: TCP
+            # nextcloud-exporter.
+            - port: "9205"
+              protocol: TCP

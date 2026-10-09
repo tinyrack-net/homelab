@@ -17,3 +17,4 @@ resources:
   - cliproxyapi.yaml
   - guacamole.yaml
   - vivident-tailscale-router.yaml
+  - nextcloud.yaml

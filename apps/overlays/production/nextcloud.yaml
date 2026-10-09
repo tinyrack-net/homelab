@@ -1,0 +1,58 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nextcloud-database
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/nextcloud/database
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: cloudnative-pg
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nextcloud-redis
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/nextcloud/redis
+  prune: true
+  timeout: 10m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: nextcloud-database
+    - name: ot-redis-operator-deployment
+    - name: sealed-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nextcloud-deployment
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/nextcloud/app
+  prune: true
+  timeout: 20m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: nextcloud-database
+    - name: nextcloud-redis
+    - name: prometheus-operator-crds
+    - name: monitoring
+    - name: reflector

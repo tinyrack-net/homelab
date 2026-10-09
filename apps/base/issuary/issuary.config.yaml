@@ -138,6 +138,19 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+  - id: nextcloud
+    name: Nextcloud
+    client_id: nextcloud
+    client_secret: ${ISSUARY_NEXTCLOUD_CLIENT_SECRET}
+    redirect_uris:
+      - https://cloud.winetree94.com/apps/user_oidc/code
+    response_types:
+      - code
+    grant_types:
+      - authorization_code
+      - refresh_token
+    scope: openid profile email
+    skip_consent: true
   - id: stalwart-webui
     name: Stalwart WebUI
     client_id: stalwart-webui

@@ -1,0 +1,105 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-nextcloud
+  namespace: nextcloud-system
+specs:
+  # Nextcloud web + background job pods.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: nextcloud-system
+        app.kubernetes.io/name: nextcloud
+      matchExpressions:
+        - key: app.kubernetes.io/component
+          operator: In
+          values:
+            - app
+            - cronjob
+    ingress:
+      # Public route through traefik-external.
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "80"
+                protocol: TCP
+      # Internal Traefik (diagnostics) and Prometheus/Alloy scraping /metrics.
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "80"
+                protocol: TCP
+    egress:
+      # PostgreSQL (CloudNativePG).
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-system
+              cnpg.io/cluster: nextcloud-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      # Redis (opstree operator).
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-system
+              app: nextcloud-redis
+        toPorts:
+          - ports:
+              - port: "6379"
+                protocol: TCP
+      # Garage S3 primary object storage via internal Traefik.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+      # OIDC discovery, authorize and token calls to Issuary through the
+      # public hostname, which resolves to the internal traefik-external LB.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+  # nextcloud-exporter sidecar deployment.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: nextcloud-system
+        app.kubernetes.io/name: nextcloud
+        app.kubernetes.io/component: metrics
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "9205"
+                protocol: TCP
+    egress:
+      # Exporter queries the Nextcloud serverinfo API through the app service.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-system
+              app.kubernetes.io/name: nextcloud
+              app.kubernetes.io/component: app
+        toPorts:
+          - ports:
+              - port: "80"
+                protocol: TCP
