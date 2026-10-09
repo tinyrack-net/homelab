@@ -30,7 +30,12 @@ spec:
             serviceName: nextcloud
       toPorts:
         - ports:
+            # The Service maps 8080 -> the pod's 80, and Cilium evaluates this
+            # egress against the DNATed backend port, so both the Service port
+            # and the container port have to be permitted here.
             - port: "8080"
+              protocol: TCP
+            - port: "80"
               protocol: TCP
 ---
 apiVersion: cilium.io/v2
