@@ -125,6 +125,26 @@ cronjob:
       limits:
         memory: 1Gi
 
+# The first boot copies the Nextcloud code from the image into the RWX
+# Longhorn volume (~500MB of small files over NFS), which takes minutes. The
+# chart's default liveness probe (10s delay, 3 failures) killed the container
+# mid-copy, so the pod never became ready, the Deployment hit
+# ProgressDeadlineExceeded and the Helm install was marked failed. Gate the
+# liveness/readiness probes behind a startup probe that allows a slow first
+# initialization; it only runs until the first successful /status.php.
+startupProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 60
+  successThreshold: 1
+livenessProbe:
+  initialDelaySeconds: 30
+  failureThreshold: 6
+readinessProbe:
+  initialDelaySeconds: 10
+
 resources:
   requests:
     cpu: 250m
