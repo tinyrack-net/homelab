@@ -24,6 +24,17 @@ nextcloud:
   # and speaks plain HTTP to the pod, so the proxy ranges must be trusted and
   # the public URL pinned.
   configs:
+    # auth.winetree94.com (Issuary) resolves to the internal Traefik LB from
+    # inside the cluster, so the OIDC discovery and token calls target a private
+    # address. Nextcloud's HTTP client refuses private targets unless this is
+    # enabled, which made every user_oidc login fail with
+    # "Could not reach the provider at URL .../.well-known/openid-configuration".
+    local-server.config.php: |-
+      <?php
+      $CONFIG = array (
+        'allow_local_remote_servers' => true,
+      );
+
     proxy.config.php: |-
       <?php
       $CONFIG = array (
