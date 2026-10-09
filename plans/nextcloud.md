@@ -92,7 +92,7 @@ kubectl --context homelab -n nextcloud-system exec -it "$POD" -- occ user_oidc:p
   --discoveryuri=https://auth.winetree94.com/.well-known/openid-configuration \
   --scope="openid profile email"
 
-# 2) OIDC 전용 전환 (브레이크글래스는 ?direct=1)
+# 2) OIDC 전용 전환 (Nextcloud 35 + user_oidc 8.11은 /login만 리다이렉트한다)
 kubectl --context homelab -n nextcloud-system exec -it "$POD" -- \
   occ config:app:set user_oidc allow_multiple_user_backends --value=0
 
@@ -102,9 +102,30 @@ kubectl --context homelab -n nextcloud-system exec -it "$POD" -- \
 
 # 4) 초기 파일 스캔
 kubectl --context homelab -n nextcloud-system exec -it "$POD" -- occ files:scan --all
+
+# 5) 로컬 로그인 차단: 로컬 admin 계정 비활성화
+#    allow_multiple_user_backends=0은 /login만 user_oidc로 리다이렉트할 뿐,
+#    /login?direct=1로 들어오는 비밀번호 로그인은 그대로 통과한다(실측 확인).
+#    남아 있는 로컬 계정을 비활성화해야 web·DAV·OCS 어디서도 비밀번호 인증이 막힌다.
+kubectl --context homelab -n nextcloud-system exec -it "$POD" -- occ user:disable nextcloud
 ```
 
 `occ list user_oidc`로 실제 플래그 이름을 먼저 확인한다.
+`occ`는 파드 안에서 `su -s /bin/sh www-data -c "php occ ..."` 형태로 실행한다(아래 참고).
+
+브레이크글래스는 로컬 계정을 되살리는 절차다. IdP 장애 시에도 쿠버네티스에서 직접 실행할 수 있다.
+
+```bash
+kubectl --context homelab -n nextcloud-system exec -it "$POD" -- \
+  su -s /bin/sh www-data -c "php occ user:enable nextcloud"
+# 비밀번호를 모르면 함께 재설정한다.
+kubectl --context homelab -n nextcloud-system exec -it "$POD" -- \
+  su -s /bin/sh www-data -c "php occ user:resetpassword nextcloud"
+```
+
+`configs/sso-only.config.php`(`hide_login_form`, `lost_password_link`)는 UI에서 비밀번호 폼과
+비밀번호 재설정 링크를 감추는 보조 장치다. `?direct=1`에서는 폼이 계속 렌더되므로 위 브레이크글래스가
+그대로 동작한다.
 
 ## 검증
 
@@ -115,7 +136,9 @@ kubectl --context homelab -n nextcloud-system exec -it "$POD" -- occ files:scan 
   `backups.longhorn.io` 생성 여부.
 - `occ status`, `occ config:system:get objectstore`, 파일 업로드 후 Garage 버킷에 객체 생성 +
   PVC 사용량(`df -h /var/www/html/data`)이 늘지 않는지 확인.
-- `?direct=1` 브레이크글래스 로그인, 정상 OIDC 리다이렉트, Alloy 타깃 `up`, Cloudflare 경유 외부 접속.
+- `?direct=1`에서 비밀번호 폼이 렌더되는지(브레이크글래스 유지), 같은 폼으로 로컬 계정
+  자격증명을 넣었을 때 인증이 거부되는지(`303 → /login?direct=1&user=...`), 정상 OIDC 리다이렉트,
+  Alloy 타깃 `up`, Cloudflare 경유 외부 접속.
 - 노드 재부팅 후 파드·RWX 재마운트, Longhorn 백업에서 config/app 복구 리허설.
 
 ## 가정과 한계
@@ -160,7 +183,9 @@ config.php 소유자 검사에 걸린다).
 - `kubectl kustomize ./apps/base/nextcloud/{database,redis,app}`, `./apps/overlays/production`,
   `./infrastructure/base/monitoring` 빌드 통과.
 - 공개 접속: `https://cloud.winetree94.com/status.php` 200, `/login` 302 → Issuary authorize 303.
-  `?direct=1`은 200(브레이크글래스).
+- SSO 전용: `/login?direct=1`은 200으로 폼을 렌더하지만, 유효한 로컬 비밀번호로 POST하면
+  `303 → /login?direct=1&user=nextcloud`로 되돌아온다(로컬 `nextcloud` 계정 비활성화). OIDC
+  계정은 admin 그룹을 유지한다.
 - 오브젝트 스토리지: `occ files:object:list` 55건, 미리보기 객체 생성 확인.
 - 메트릭: VictoriaMetrics에서 `up{job=~"nextcloud.*"}` = 1 (앱 `:80` openmetrics, exporter `:9205`).
 - CronJob: uid 33 적용 후 5분 주기 Job이 Complete.

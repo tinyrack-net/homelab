@@ -55,6 +55,19 @@ nextcloud:
         ],
       );
 
+    # SSO-only policy. user_oidc already redirects /login to Issuary
+    # (allow_multiple_user_backends=0), so this only removes the last ways the
+    # web UI could still show a password form: the form itself and the
+    # "forgot password" link. `?direct=1` still renders the classic form, which
+    # is the documented break-glass path once `occ user:enable nextcloud` has
+    # restored the local account.
+    sso-only.config.php: |-
+      <?php
+      $CONFIG = array (
+        'hide_login_form' => true,
+        'lost_password_link' => 'disabled',
+      );
+
   # Nextcloud defaults its temp directory to /tmp on the container root
   # filesystem. Pin it to a bounded emptyDir so archive/upload staging cannot
   # fill the node disk.
