@@ -103,3 +103,25 @@ specs:
           - ports:
               - port: "80"
                 protocol: TCP
+  # redis, which the opstree operator runs in this namespace. The namespace is
+  # isolated, so the cluster-wide default deny also applies to the Redis pod and
+  # it needs an explicit ingress grant for the Nextcloud pods.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: nextcloud-system
+        app: nextcloud-redis
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-system
+              app.kubernetes.io/name: nextcloud
+              app.kubernetes.io/component: app
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-system
+              app.kubernetes.io/name: nextcloud
+              app.kubernetes.io/component: cronjob
+        toPorts:
+          - ports:
+              - port: "6379"
+                protocol: TCP

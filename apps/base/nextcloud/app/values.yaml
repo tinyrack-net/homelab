@@ -128,6 +128,13 @@ cronjob:
   enabled: true
   type: cronjob
   cronjob:
+    # The CronJob shares the app PVC, but the chart leaves the pod running as
+    # root, and cron.php refuses to start when config/config.php is owned by
+    # uid 33. Run the job as the same user as the web container.
+    securityContext:
+      runAsUser: 33
+      runAsGroup: 33
+      runAsNonRoot: true
     resources:
       requests:
         cpu: 50m
