@@ -26,7 +26,8 @@ specs:
           - ports:
               - port: "80"
                 protocol: TCP
-      # Internal Traefik (diagnostics) and Prometheus/Alloy scraping /metrics.
+      # Internal Traefik (diagnostics), the nextcloud-exporter sidecar
+      # deployment (serverinfo API) and Prometheus/Alloy scraping /metrics.
       - fromEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-system
@@ -34,6 +35,10 @@ specs:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: monitoring-system
               app.kubernetes.io/name: alloy
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-system
+              app.kubernetes.io/name: nextcloud
+              app.kubernetes.io/component: metrics
         toPorts:
           - ports:
               - port: "80"
