@@ -10,6 +10,13 @@ longhornGlobalManager:
   replicas: 1
 defaultSettings:
   defaultReplicaCount: 1
+  # Longhorn's default of 100% caps *scheduled* (nominal) replica size at
+  # (storageMaximum - storageReserved) = ~425Gi with the 15% default-disk
+  # reservation below. The single node is physically half empty (~245Gi of
+  # ~500Gi used) but was already carrying ~412Gi of nominal scheduling, so new
+  # PVC replicas were rejected as "insufficient storage". 150% keeps the
+  # reservation (real free space guard) while allowing thin volumes to commit.
+  storageOverProvisioningPercentage: 150
   concurrentAutomaticEngineUpgradePerNodeLimit: 1
   storageReservedPercentageForDefaultDisk: 15
   guaranteedInstanceManagerCPU: 5
