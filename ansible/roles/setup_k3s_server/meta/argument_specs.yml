@@ -28,6 +28,9 @@ argument_specs:
       setup_k3s_server_disable_kube_proxy:
         type: bool
         required: true
+      setup_k3s_server_max_pods:
+        type: int
+        required: true
       setup_k3s_server_inotify_settings:
         type: dict
         required: true

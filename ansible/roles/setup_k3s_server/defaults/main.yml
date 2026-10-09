@@ -9,6 +9,11 @@ setup_k3s_server_disabled_components:
 setup_k3s_server_flannel_backend: none
 setup_k3s_server_disable_network_policy: true
 setup_k3s_server_disable_kube_proxy: true
+# k3s defaults to 110 pods per node. The single-node cluster already runs
+# ~110 non-terminated pods, so the scheduler rejects every new pod. Raise the
+# kubelet limit; keep it below the ~253 addresses Cilium hands out per node
+# (cluster-pool with cluster-pool-ipv4-mask-size: 24).
+setup_k3s_server_max_pods: 200
 setup_k3s_server_inotify_settings:
   fs.inotify.max_queued_events: 32768
   fs.inotify.max_user_instances: 8192

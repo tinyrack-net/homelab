@@ -6,6 +6,8 @@ flannel-backend: {{ setup_k3s_server_flannel_backend }}
 disable-network-policy: {{ setup_k3s_server_disable_network_policy | lower }}
 disable-kube-proxy: {{ setup_k3s_server_disable_kube_proxy | lower }}
 etcd-expose-metrics: true
+kubelet-arg:
+  - max-pods={{ setup_k3s_server_max_pods }}
 kube-controller-manager-arg:
   - bind-address={{ setup_k3s_server_metrics_bind_address }}
 kube-scheduler-arg:
