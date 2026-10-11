@@ -103,6 +103,8 @@ extraEnvVars:
   - name: ENABLE_SIGNUP
     value: "false"
   # CONFIG
+  - name: ENABLE_VERSION_UPDATE_CHECK
+    value: "false"
   - name: BYPASS_MODEL_ACCESS_CONTROL
     value: "false"
   - name: ENABLE_FORWARD_USER_INFO_HEADERS
