@@ -21,6 +21,20 @@ websocket:
 terminals:
   enabled: false
 replicaCount: 2
+startupProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 120
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  failureThreshold: 3
 podLabels:
   observability.tinyrack.net/otlp-client: "true"
 persistence:
