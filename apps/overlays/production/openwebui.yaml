@@ -11,7 +11,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  timeout: 3m0s
+  timeout: 15m0s
   wait: true
   dependsOn:
     - name: load-repositories
