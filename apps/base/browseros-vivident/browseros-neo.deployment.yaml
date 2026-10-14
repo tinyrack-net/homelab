@@ -19,12 +19,16 @@ spec:
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       securityContext:
-        # Chromium's sandbox needs unprivileged user namespaces, which the
-        # runtime default seccomp and AppArmor profiles block.
+        # Chromium's sandbox needs unprivileged user namespaces. The node
+        # restricts them to programs with an AppArmor profile
+        # (kernel.apparmor_restrict_unprivileged_userns=1), so the pod requests
+        # Ubuntu's stock `chrome` profile, which grants userns and nothing
+        # else, plus an unconfined seccomp profile.
         seccompProfile:
           type: Unconfined
         appArmorProfile:
-          type: Unconfined
+          type: Localhost
+          localhostProfile: chrome
       containers:
         - name: browseros-neo
           image: ghcr.io/tinyrack-net/browseros-neo:0.51.1.2@sha256:ad540101b15a9246a25b66c6380a088669a979b907e39c4c2522e33c4279d99b
