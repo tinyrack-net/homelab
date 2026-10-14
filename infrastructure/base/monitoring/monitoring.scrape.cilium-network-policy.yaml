@@ -84,3 +84,15 @@ spec:
             # nextcloud-exporter.
             - port: "9205"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: immich-system
+            app.kubernetes.io/name: server
+      toPorts:
+        - ports:
+            # immich-api /metrics.
+            - port: "8081"
+              protocol: TCP
+            # immich microservices /metrics.
+            - port: "8082"
+              protocol: TCP
