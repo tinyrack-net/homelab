@@ -65,7 +65,7 @@
       - setup_k3s_server_chrome_apparmor_profile.stat.exists
       - >-
         (setup_k3s_server_apparmor_profiles.content | b64decode).splitlines()
-        | select('match', '^chrome\b') | list | length > 0
+        | select('match', '^chrome( |$)') | list | length > 0
     fail_msg: >-
       The chrome AppArmor profile must exist and be loaded. Pods that request
       it for unprivileged user namespaces fail to start otherwise.
