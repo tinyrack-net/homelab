@@ -164,6 +164,9 @@ vmsingle:
     extraArgs:
       opentelemetry.usePrometheusNaming: "true"
       maxConcurrentInserts: "4"
+      # OTel target_info promotion adds process/host attributes to every scraped
+      # series, so application metrics can exceed the default 30 label limit.
+      maxLabelsPerTimeseries: "50"
     resources:
       requests:
         cpu: 250m
