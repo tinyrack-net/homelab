@@ -19,6 +19,11 @@ setup_k3s_server_inotify_settings:
   fs.inotify.max_user_instances: 8192
   fs.inotify.max_user_watches: 1048576
 setup_k3s_server_inotify_sysctl_path: /etc/sysctl.d/90-k3s-inotify.conf
+# Ubuntu's stock `chrome` AppArmor profile grants unprivileged user
+# namespaces and nothing else. Browser pods request it to enable the Chromium
+# sandbox, because the node restricts userns to profiled programs.
+setup_k3s_server_apparmor_profiles_path: /sys/kernel/security/apparmor/profiles
+setup_k3s_server_chrome_apparmor_profile_path: /etc/apparmor.d/chrome
 setup_k3s_server_packages:
   - ca-certificates
   - cryptsetup

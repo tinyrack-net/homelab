@@ -49,6 +49,27 @@
   loop_control:
     label: "{{ item.item }}"
 
+- name: Inspect the Chromium AppArmor profile
+  ansible.builtin.stat:
+    path: "{{ setup_k3s_server_chrome_apparmor_profile_path }}"
+  register: setup_k3s_server_chrome_apparmor_profile
+
+- name: Read the loaded AppArmor profiles
+  ansible.builtin.slurp:
+    src: "{{ setup_k3s_server_apparmor_profiles_path }}"
+  register: setup_k3s_server_apparmor_profiles
+
+- name: Verify the Chromium AppArmor profile is installed and loaded
+  ansible.builtin.assert:
+    that:
+      - setup_k3s_server_chrome_apparmor_profile.stat.exists
+      - >-
+        (setup_k3s_server_apparmor_profiles.content | b64decode).splitlines()
+        | select('match', '^chrome\b') | list | length > 0
+    fail_msg: >-
+      The chrome AppArmor profile must exist and be loaded. Pods that request
+      it for unprivileged user namespaces fail to start otherwise.
+
 - name: Read the persisted K3s inotify limits
   ansible.builtin.slurp:
     src: "{{ setup_k3s_server_inotify_sysctl_path }}"
