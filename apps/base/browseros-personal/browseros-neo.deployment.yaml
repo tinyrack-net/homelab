@@ -27,7 +27,7 @@ spec:
           type: Unconfined
       containers:
         - name: browseros-neo
-          image: ghcr.io/tinyrack-net/browseros-neo:0.51.1.2@sha256:c583175c45343fcc58a97b008dc0dcb5cc817319203a4c3e683851a9463733a1
+          image: ghcr.io/tinyrack-net/browseros-neo:0.51.1.2@sha256:ad540101b15a9246a25b66c6380a088669a979b907e39c4c2522e33c4279d99b
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
