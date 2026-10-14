@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - browseros-neo.namespace.yaml
   - browseros-neo.mcp.secret.yaml
+  - browseros-neo.web.secret.yaml
   - browseros-neo.config.pvc.yaml
   - browseros-neo.deployment.yaml
   - browseros-neo.service.yaml

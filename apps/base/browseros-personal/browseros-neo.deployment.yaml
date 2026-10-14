@@ -43,6 +43,22 @@ spec:
                 secretKeyRef:
                   name: browseros-neo-mcp
                   key: MCP_AUTH_TOKEN
+            # Login page in front of the web GUI. TLS terminates at Traefik, so the
+            # container serves plain HTTP inside the cluster.
+            - name: WEB_AUTHENTICATION
+              value: "1"
+            - name: WEB_AUTHENTICATION_ALLOW_INSECURE
+              value: "1"
+            - name: WEB_AUTHENTICATION_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: browseros-neo-web
+                  key: WEB_AUTHENTICATION_USERNAME
+            - name: WEB_AUTHENTICATION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: browseros-neo-web
+                  key: WEB_AUTHENTICATION_PASSWORD
           ports:
             - name: gui
               containerPort: 5800
