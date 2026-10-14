@@ -334,10 +334,10 @@ grafana:
   resources:
     requests:
       cpu: 25m
-      memory: 128Mi
+      memory: 256Mi
     limits:
       cpu: 500m
-      memory: 512Mi
+      memory: 3Gi
   testFramework:
     enabled: false
   grafana.ini:
