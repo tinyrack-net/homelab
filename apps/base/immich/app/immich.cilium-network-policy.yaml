@@ -21,6 +21,19 @@ specs:
           - ports:
               - port: "2283"
                 protocol: TCP
+      # Prometheus/Alloy scraping of the immich metrics endpoints.
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              # immich-api /metrics.
+              - port: "8081"
+                protocol: TCP
+              # immich microservices /metrics.
+              - port: "8082"
+                protocol: TCP
     egress:
       - toEndpoints:
           - matchLabels:
