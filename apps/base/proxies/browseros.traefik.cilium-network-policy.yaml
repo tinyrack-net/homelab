@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-browseros
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: browseros
+  annotations:
+    networking.tinyrack.net/hosts: personal.browseros.intranet.winetree94.com,vivident.browseros.intranet.winetree94.com
+spec:
+  description: Allow the internal BrowserOS neo routes to the desktop
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDRSet:
+        - cidrGroupRef: desktop
+      toPorts:
+        - ports:
+            - port: "9300"
+              protocol: TCP
+            - port: "9301"
+              protocol: TCP

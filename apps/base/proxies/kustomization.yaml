@@ -10,6 +10,8 @@ resources:
   - openmediavault-nanokvm.proxy.yaml
   - photos.proxy.yaml
   - slzb-ultima3.proxy.yaml
+  - browseros.proxy.yaml
+  - browseros.traefik.cilium-network-policy.yaml
   - garage.traefik.cilium-network-policy.yaml
   - macmini-nanokvm.traefik.cilium-network-policy.yaml
   - openmediavault.traefik.cilium-network-policy.yaml

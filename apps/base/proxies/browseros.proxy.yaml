@@ -1,0 +1,64 @@
+# BrowserOS neo runs on the desktop (Docker). Each instance serves its web GUI
+# and MCP (/mcp, Bearer token) on one port.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: browseros-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: browseros-proxy-service
+  namespace: browseros-proxy
+spec:
+  type: ExternalName
+  ports:
+    - port: 9300
+      name: personal
+    - port: 9301
+      name: vivident
+  externalName: 10.132.247.31
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: browseros-personal-ingress-route
+  namespace: browseros-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`personal.browseros.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: browseros-proxy-service
+          kind: Service
+          port: 9300
+          passHostHeader: true
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: browseros-vivident-ingress-route
+  namespace: browseros-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`vivident.browseros.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: browseros-proxy-service
+          kind: Service
+          port: 9301
+          passHostHeader: true
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert

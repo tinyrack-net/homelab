@@ -18,5 +18,3 @@ resources:
   - guacamole.yaml
   - vivident-tailscale-router.yaml
   - nextcloud.yaml
-  - browseros-personal.yaml
-  - browseros-vivident.yaml
