@@ -31,7 +31,7 @@ spec:
           localhostProfile: chrome
       containers:
         - name: browseros-neo
-          image: ghcr.io/tinyrack-net/browseros-neo:0.51.1.2@sha256:ad540101b15a9246a25b66c6380a088669a979b907e39c4c2522e33c4279d99b
+          image: ghcr.io/tinyrack-net/browseros-neo:0.51.1.2@sha256:dcd46559063a4fe0428f0d420e7f1b2f4cb2fda72cce3c5bd1a2450745fe3c6b
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
@@ -42,6 +42,13 @@ spec:
               value: "1000"
             - name: BROWSER_SANDBOX
               value: auto
+            # The image serves the web GUI and MCP on one port by default. Keep
+            # them apart here: the GUI goes through Traefik, while MCP has its
+            # own LoadBalancer IP restricted to internal networks.
+            - name: WEB_LISTENING_PORT
+              value: "5800"
+            - name: MCP_LISTENING_PORT
+              value: "9300"
             - name: MCP_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:
