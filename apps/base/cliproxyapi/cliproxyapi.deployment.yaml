@@ -29,7 +29,7 @@ spec:
               mountPath: /config
       containers:
         - name: cliproxyapi
-          image: eceasy/cli-proxy-api:v8.0.27@sha256:b7cf456bf6ef7f6489f18144e7cc166dbb8b2e5f46d6ee8881a321aaea563730
+          image: eceasy/cli-proxy-api:v8.0.29@sha256:b98590c932e2a372e61d53e175a3abe4e8a22118667b2de3ad71514cbf1e3eb6
           imagePullPolicy: IfNotPresent
           command:
             - /CLIProxyAPI/CLIProxyAPI
@@ -52,7 +52,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: cliproxyapi
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: deployment.environment.name=production,service.version=v8.0.10
+              value: deployment.environment.name=production,service.version=v8.0.29
             - name: OTEL_SDK_DISABLED
               value: "false"
           envFrom:
