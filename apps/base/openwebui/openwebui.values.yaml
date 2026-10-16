@@ -22,9 +22,14 @@ terminals:
   enabled: false
 replicaCount: 2
 # Open WebUI migrates its schema on startup and does not support mixed-version
-# replicas, so replace every pod at once instead of rolling.
+# replicas. Stop every old pod before any new one starts. This keeps the
+# RollingUpdate type because server-side apply cannot clear the defaulted
+# rollingUpdate field that a switch to Recreate would require removing.
 strategy:
-  type: Recreate
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 100%
 image:
   tag: v0.12.2@sha256:ea2398210f28ef4f55d9c11426359950a7bf6681d5a8c160d476225bbd991fad
 startupProbe:
