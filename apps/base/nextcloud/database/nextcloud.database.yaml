@@ -33,7 +33,7 @@ metadata:
     cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-standard-bookworm@sha256:d92906e5d4c9018365f26282d15bac23bd76932d492c033da86bf0346f4f8589
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm@sha256:e81844c6d409b1b45b75e7419758978a2761a7a7ee42aeb4aeadbc26e214c908
   resources:
     requests:
       cpu: 250m

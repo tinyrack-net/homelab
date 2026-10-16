@@ -31,7 +31,7 @@ metadata:
   namespace: monitoring-system
 spec:
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm@sha256:cdb5c283a473507f7c597ea7e045d1a5e8efcbc4c5101aada013af9bd37ccc43
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm@sha256:e81844c6d409b1b45b75e7419758978a2761a7a7ee42aeb4aeadbc26e214c908
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true

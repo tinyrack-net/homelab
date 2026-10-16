@@ -24,6 +24,32 @@ spec:
       compression: gzip
       maxParallel: 8
 ---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: n8n-database-backup-store-pg18
+  namespace: n8n-system
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://tinyrack-homelab/apps/n8n/database-18
+    endpointURL: https://storage.intranet.winetree94.com
+    s3Credentials:
+      region:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_REGION
+      accessKeyId:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -33,12 +59,13 @@ metadata:
     cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
   instances: 1
-  imageName: ghcr.io/cloudnative-pg/postgresql:17.11-standard-bookworm@sha256:e8ffaff9d17011fb71f264d857c3b4c54cb86ed0443a4ecb0298cb96be708d4e
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm@sha256:e81844c6d409b1b45b75e7419758978a2761a7a7ee42aeb4aeadbc26e214c908
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: n8n-database-backup-store
+        barmanObjectName: n8n-database-backup-store-pg18
+        serverName: n8n-database-pg18
   postgresql:
     parameters:
       max_connections: "500"
@@ -56,8 +83,8 @@ spec:
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
-          barmanObjectName: n8n-database-backup-store
-          serverName: n8n-database-cluster
+          barmanObjectName: n8n-database-backup-store-pg18
+          serverName: n8n-database-pg18
 
   enableSuperuserAccess: true
   superuserSecret:
