@@ -112,24 +112,33 @@ spec:
             - name: usage-exporter
               mountPath: /app
               readOnly: true
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 30
           livenessProbe:
             httpGet:
               path: /healthz
               port: metrics
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 2
           readinessProbe:
             httpGet:
               path: /healthz
               port: metrics
             initialDelaySeconds: 3
             periodSeconds: 10
+            timeoutSeconds: 2
           resources:
             requests:
               cpu: 5m
               memory: 32Mi
             limits:
-              cpu: 100m
+              cpu: 500m
               memory: 128Mi
           securityContext:
             allowPrivilegeEscalation: false
