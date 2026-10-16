@@ -29,7 +29,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: configure-forwarding
-          image: tailscale/tailscale:v1.102.5@sha256:08a1bc6c82fee62d1a135788fb67fefa9d22deea3830e8a45ebe1a3cb116e325
+          image: tailscale/tailscale:v1.104.1@sha256:99691662a2e82fbfd2bf55db0fd52bacd2f4664ce6fd1deca3746a024144a2b7
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -63,7 +63,7 @@ spec:
             privileged: true
       containers:
         - name: tailscale
-          image: tailscale/tailscale:v1.102.5@sha256:08a1bc6c82fee62d1a135788fb67fefa9d22deea3830e8a45ebe1a3cb116e325
+          image: tailscale/tailscale:v1.104.1@sha256:99691662a2e82fbfd2bf55db0fd52bacd2f4664ce6fd1deca3746a024144a2b7
           imagePullPolicy: IfNotPresent
           env:
             - name: TS_USERSPACE

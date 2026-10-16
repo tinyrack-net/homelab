@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: home-assistant
-          image: ghcr.io/home-assistant/home-assistant:2026.10.0@sha256:956a5d9effc091888cd34cb0b6fb4f66c448d257d20519e72302557682734fd0
+          image: ghcr.io/home-assistant/home-assistant:2026.10.1@sha256:a7ecc966ffed643296af32d576ee081910a0362c01e695db24fbee6816175fbe
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ

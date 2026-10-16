@@ -20,5 +20,5 @@ spec:
             - --hide-scrollbars
             - --disable-blink-features=AutomationControlled
             - --window-size=1440,900
-          image: ghcr.io/karakeep-app/karakeep-chrome:151.0.7922.47-r1@sha256:5b19bbb160e9ff60681a3abd97e1c4ec9f64212301410de658c3900ab7ef31e7
+          image: ghcr.io/karakeep-app/karakeep-chrome:154.0.8037.57-r1@sha256:ee540547a695708e35e20da8e5032e2f9760499e2f91283b265f6f132f81d503
           name: chrome

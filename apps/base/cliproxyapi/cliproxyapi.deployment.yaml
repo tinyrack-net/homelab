@@ -29,7 +29,7 @@ spec:
               mountPath: /config
       containers:
         - name: cliproxyapi
-          image: eceasy/cli-proxy-api:v8.0.29@sha256:b98590c932e2a372e61d53e175a3abe4e8a22118667b2de3ad71514cbf1e3eb6
+          image: eceasy/cli-proxy-api:v8.0.31@sha256:db1812ea5fc703ae228ef53e75e03f502211a2c9194cc2e8152000d4b974da74
           imagePullPolicy: IfNotPresent
           command:
             - /CLIProxyAPI/CLIProxyAPI
@@ -85,7 +85,7 @@ spec:
             capabilities:
               drop: ["ALL"]
         - name: usage-exporter
-          image: python:3.14-alpine@sha256:4677924bcc0e94505a3270e87cb1601c2af54cd92d021b8dc306618a14333bbe
+          image: python:3.14-alpine@sha256:7f2ec713f0436c59df2362d973b6a05af9e87ba78f0e94f5245c302984a7a1fd
           imagePullPolicy: IfNotPresent
           command:
             - python

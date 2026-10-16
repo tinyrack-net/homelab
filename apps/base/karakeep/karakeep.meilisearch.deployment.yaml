@@ -26,7 +26,7 @@ spec:
                 name: karakeep-secrets
             - configMapRef:
                 name: karakeep-config-map
-          image: getmeili/meilisearch:v1.54.3@sha256:e95d49060218260d5c843f8dd70850c8fbbdf9c5148addccbd45eaa246d874d3
+          image: getmeili/meilisearch:v1.55.0@sha256:cad32322d74319f2076f41828094774fbbacacff6bda32e317933293b76db616
           name: meilisearch
           volumeMounts:
             - mountPath: /meili_data

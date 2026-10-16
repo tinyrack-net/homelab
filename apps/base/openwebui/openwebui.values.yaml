@@ -21,6 +21,12 @@ websocket:
 terminals:
   enabled: false
 replicaCount: 2
+# Open WebUI migrates its schema on startup and does not support mixed-version
+# replicas, so replace every pod at once instead of rolling.
+strategy:
+  type: Recreate
+image:
+  tag: v0.12.2@sha256:ea2398210f28ef4f55d9c11426359950a7bf6681d5a8c160d476225bbd991fad
 startupProbe:
   httpGet:
     path: /health
@@ -80,7 +86,7 @@ extraEnvVars:
   - name: OTEL_SERVICE_NAME
     value: open-webui
   - name: OTEL_RESOURCE_ATTRIBUTES
-    value: deployment.environment.name=production,service.version=0.11.4
+    value: deployment.environment.name=production,service.version=0.12.2
   - name: OTEL_TRACES_SAMPLER
     value: parentbased_always_on
   - name: OTEL_SDK_DISABLED
