@@ -1,0 +1,16 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: browseros-deployment
+  namespace: flux-system
+spec:
+  interval: 30m0s
+  path: ./apps/base/browseros
+  prune: true
+  retryInterval: 2m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  # Two browser instances pull the image and start X/Chromium on first boot.
+  timeout: 10m0s
+  wait: true

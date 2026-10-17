@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: browseros-personal-service
+  namespace: browseros-system
+  labels:
+    app.kubernetes.io/name: browseros-neo
+    app.kubernetes.io/instance: personal
+spec:
+  selector:
+    app: browseros-personal
+  ports:
+    - name: http
+      port: 9300
+      targetPort: http
+      protocol: TCP

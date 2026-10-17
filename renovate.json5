@@ -65,6 +65,20 @@
     },
     {
       customType: 'regex',
+      description: 'BrowserOS neo release packaged as the browseros-neo image',
+      managerFilePatterns: ['/apps/base/browseros/.+\\.deployment\\.yaml$/'],
+      matchStrings: [
+        'image: (?<depName>ghcr\\.io/tinyrack-net/browseros-neo):(?<currentValue>\\d+\\.\\d+\\.\\d+\\.\\d+)',
+      ],
+      datasourceTemplate: 'github-releases',
+      depNameTemplate: 'browseros-ai/BrowserOS',
+      extractVersionTemplate: '^browserclaw/v(?<version>.*)$',
+      versioningTemplate:
+        'regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\.(?<build>\\d+)$',
+      autoReplaceStringTemplate: 'image: {{{depName}}}:{{{newValue}}}',
+    },
+    {
+      customType: 'regex',
       description: 'Barman Cloud plugin release manifest',
       managerFilePatterns: ['/infrastructure/base/cloudnative-pg/kustomization\\.yaml$/'],
       matchStrings: [

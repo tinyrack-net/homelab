@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: browseros-vivident-service
+  namespace: browseros-system
+  labels:
+    app.kubernetes.io/name: browseros-neo
+    app.kubernetes.io/instance: vivident
+spec:
+  selector:
+    app: browseros-vivident
+  ports:
+    - name: http
+      port: 9300
+      targetPort: http
+      protocol: TCP
