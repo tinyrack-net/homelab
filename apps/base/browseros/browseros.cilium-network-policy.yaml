@@ -25,6 +25,16 @@ specs:
       # serves the intranet applications.
       - toCIDRSet:
           - cidrGroupRef: lan
+      # Internal Traefik itself, in case the service translation resolves the
+      # LoadBalancer IP to the traefik pods before the policy is evaluated.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
       # WireGuard VPN and Tailscale ranges.
       - toCIDRSet:
           - cidrGroupRef: vpn-server
