@@ -8,11 +8,21 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: personal.browseros.intranet.winetree94.com,vivident.browseros.intranet.winetree94.com
 spec:
-  description: Allow the internal BrowserOS neo routes
+  description: Allow the internal BrowserOS neo routes and intranet access
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
+  # The browsers reach the intranet applications through this Traefik, the same
+  # way LAN clients do, instead of talking to the platform's pods directly.
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: browseros-system
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
   egress:
     - toServices:
         - k8sService:
