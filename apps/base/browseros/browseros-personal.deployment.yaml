@@ -58,13 +58,15 @@ spec:
               containerPort: 9300
               protocol: TCP
           securityContext:
-            # Chromium's sandbox needs user namespaces, which the container's
-            # seccomp profile and the node's AppArmor profile both block.
-            # The browser falls back to --no-sandbox without these.
+            # Chromium's sandbox needs unprivileged user namespaces. The node
+            # restricts those to profiled programs and the stock chrome profile
+            # exists only to grant the userns permission, so request it along
+            # with a seccomp profile that lets the namespaces through.
             seccompProfile:
               type: Unconfined
             appArmorProfile:
-              type: Unconfined
+              type: Localhost
+              localhostProfile: chrome
           resources:
             requests:
               cpu: 200m
