@@ -4,8 +4,11 @@ resources:
   - browseros.namespace.yaml
   - browseros.secrets.yaml
   - browseros-personal.pvc.yaml
+  - browseros-personal.deployment.yaml
   - browseros-personal.service.yaml
   - browseros-vivident.pvc.yaml
+  - browseros-vivident.deployment.yaml
   - browseros-vivident.service.yaml
+  - browseros.ingress-route.yaml
   - browseros.cilium-network-policy.yaml
   - browseros.traefik.cilium-network-policy.yaml

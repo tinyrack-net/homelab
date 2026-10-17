@@ -1,0 +1,27 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: browseros-ingress-route
+  namespace: browseros-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`personal.browseros.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: browseros-personal-service
+          kind: Service
+          port: 9300
+          scheme: http
+    - match: Host(`vivident.browseros.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: browseros-vivident-service
+          kind: Service
+          port: 9300
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert

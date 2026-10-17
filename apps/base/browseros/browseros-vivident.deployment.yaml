@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: browseros-vivident
+  namespace: browseros-system
+  labels:
+    app.kubernetes.io/name: browseros-neo
+    app.kubernetes.io/instance: vivident
+    app.kubernetes.io/component: browser
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  # A ReadWriteOnce volume can only be attached to one pod at a time.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: browseros-vivident
+  template:
+    metadata:
+      labels:
+        app: browseros-vivident
+        app.kubernetes.io/name: browseros-neo
+        app.kubernetes.io/instance: vivident
+        app.kubernetes.io/component: browser
+    spec:
+      automountServiceAccountToken: false
+      # Chromium and the X server need time to shut down cleanly.
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: browseros
+          image: ghcr.io/tinyrack-net/browseros-neo:0.51.1.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Asia/Seoul
+            # The container starts as root to set up X/nginx and then runs the
+            # app as this user, so USER_ID/GROUP_ID are set instead of
+            # runAsUser/runAsNonRoot.
+            - name: USER_ID
+              value: "1000"
+            - name: GROUP_ID
+              value: "1000"
+            - name: WEB_AUTHENTICATION
+              value: "1"
+            # TLS terminates at the internal Traefik, so the web GUI itself is
+            # reached over plain HTTP.
+            - name: WEB_AUTHENTICATION_ALLOW_INSECURE
+              value: "1"
+            - name: WEB_AUTHENTICATION_USERNAME
+              value: winetree94
+          envFrom:
+            - secretRef:
+                name: browseros-secrets
+          ports:
+            - name: http
+              # Web GUI (/), MCP (/mcp) and health check (/healthz).
+              containerPort: 9300
+              protocol: TCP
+          securityContext:
+            # Chromium's sandbox needs user namespaces, which the container's
+            # seccomp profile and the node's AppArmor profile both block.
+            # The browser falls back to --no-sandbox without these.
+            seccompProfile:
+              type: Unconfined
+            appArmorProfile:
+              type: Unconfined
+          resources:
+            requests:
+              cpu: 200m
+              memory: 1Gi
+            # Includes the 2Gi /dev/shm tmpfs, which counts against the cgroup.
+            limits:
+              cpu: "2"
+              memory: 6Gi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: shm
+              mountPath: /dev/shm
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: browseros-vivident-data
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

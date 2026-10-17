@@ -25,13 +25,3 @@ spec:
         - ports:
             - port: "9300"
               protocol: TCP
-    # Transitional: the desktop instances keep serving their routes until the
-    # cluster deployments take over. Removed with the cutover.
-    - toCIDRSet:
-        - cidrGroupRef: desktop
-      toPorts:
-        - ports:
-            - port: "9300"
-              protocol: TCP
-            - port: "9301"
-              protocol: TCP
