@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-xeon-proxmox
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: xeon-proxmox
+  annotations:
+    networking.tinyrack.net/hosts: xeon.proxmox.intranet.winetree94.com
+spec:
+  description: Allow the internal Xeon Proxmox route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toCIDRSet:
+        - cidrGroupRef: xeon-proxmox
+      toPorts:
+        - ports:
+            - port: "8006"
+              protocol: TCP

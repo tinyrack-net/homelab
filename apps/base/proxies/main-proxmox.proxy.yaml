@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: main-proxmox-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-proxmox-proxy-service
+  namespace: main-proxmox-proxy
+spec:
+  type: ExternalName
+  ports:
+    - name: console
+      port: 8006
+  externalName: 10.132.245.37
+---
+# Proxmox 의 self signed certification 검증 생략
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: main-proxmox-transport
+  namespace: main-proxmox-proxy
+spec:
+  insecureSkipVerify: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: main-proxmox-ingress-route
+  namespace: main-proxmox-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`main.proxmox.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: main-proxmox-proxy-service
+          kind: Service
+          port: 8006
+          serversTransport: main-proxmox-transport
+          scheme: https
+  tls:
+    secretName: letsencrypt-cert

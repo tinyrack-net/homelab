@@ -45,11 +45,22 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumCIDRGroup
 metadata:
-  name: proxmox
+  name: main-proxmox
   labels:
     networking.tinyrack.net/cidr-scope: host
 spec:
-  # Proxmox hypervisor management interface.
+  # Main Proxmox hypervisor management interface.
+  externalCIDRs:
+    - 10.132.245.37/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: xeon-proxmox
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # Xeon Proxmox hypervisor management interface.
   externalCIDRs:
     - 10.132.245.40/32
 ---

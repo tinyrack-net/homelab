@@ -4,7 +4,8 @@ resources:
   - router.proxy.yaml
   - garage.proxy.yaml
   - openmediavault.proxy.yaml
-  - proxmox.proxy.yaml
+  - main-proxmox.proxy.yaml
+  - xeon-proxmox.proxy.yaml
   - macmini-nanokvm.proxy.yaml
   - xeon-nanokvm.proxy.yaml
   - openmediavault-nanokvm.proxy.yaml
@@ -12,10 +13,11 @@ resources:
   - slzb-ultima3.proxy.yaml
   - garage.traefik.cilium-network-policy.yaml
   - macmini-nanokvm.traefik.cilium-network-policy.yaml
+  - main-proxmox.traefik.cilium-network-policy.yaml
   - openmediavault.traefik.cilium-network-policy.yaml
   - openmediavault-nanokvm.traefik.cilium-network-policy.yaml
   - photos.traefik.cilium-network-policy.yaml
-  - proxmox.traefik.cilium-network-policy.yaml
   - router.traefik.cilium-network-policy.yaml
   - slzb-ultima3.traefik.cilium-network-policy.yaml
   - xeon-nanokvm.traefik.cilium-network-policy.yaml
+  - xeon-proxmox.traefik.cilium-network-policy.yaml

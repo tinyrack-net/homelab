@@ -1,21 +1,21 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: route-proxmox
+  name: route-main-proxmox
   namespace: traefik-system
   labels:
-    networking.tinyrack.net/owner: proxmox
+    networking.tinyrack.net/owner: main-proxmox
   annotations:
-    networking.tinyrack.net/hosts: proxmox.intranet.winetree94.com
+    networking.tinyrack.net/hosts: main.proxmox.intranet.winetree94.com
 spec:
-  description: Allow the internal Proxmox route
+  description: Allow the internal main Proxmox route
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
   egress:
     - toCIDRSet:
-        - cidrGroupRef: proxmox
+        - cidrGroupRef: proxmox-main
       toPorts:
         - ports:
             - port: "8006"
