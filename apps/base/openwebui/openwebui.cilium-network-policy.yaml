@@ -67,13 +67,6 @@ specs:
           - ports:
               - port: "8443"
                 protocol: TCP
-      # Local LLM inference on the GPU server.
-      - toCIDRSet:
-          - cidrGroupRef: ubuntu-gpu
-        toPorts:
-          - ports:
-              - port: "8080"
-                protocol: TCP # inference API
       # Model/service endpoint on the Windows desktop.
       - toCIDRSet:
           - cidrGroupRef: desktop

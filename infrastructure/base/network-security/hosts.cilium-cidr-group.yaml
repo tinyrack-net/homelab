@@ -23,17 +23,6 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumCIDRGroup
 metadata:
-  name: ubuntu-gpu
-  labels:
-    networking.tinyrack.net/cidr-scope: host
-spec:
-  # Ubuntu GPU server (local LLM inference).
-  externalCIDRs:
-    - 10.132.245.37/32
----
-apiVersion: cilium.io/v2
-kind: CiliumCIDRGroup
-metadata:
   name: xeon-nanokvm
   labels:
     networking.tinyrack.net/cidr-scope: host
