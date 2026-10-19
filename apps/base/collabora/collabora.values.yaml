@@ -16,7 +16,7 @@ autoscaling:
 
 collabora:
   server_name: office.winetree94.com
-  extra_params: --o:ssl.enable=false --o:ssl.termination=true
+  extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:admin_console.enable=false
   aliasgroups:
     - host: "https://cloud.winetree94.com:443"
   existingSecret:
