@@ -68,6 +68,17 @@ nextcloud:
         'lost_password_link' => 'disabled',
       );
 
+    # Instance-level settings that have no dedicated chart value.
+    instance.config.php: |-
+      <?php
+      $CONFIG = array (
+        // Delay the daily background jobs that are not time sensitive to the
+        // 4 hours after 15:00 UTC (00:00-04:00 KST), when the instance is idle.
+        'maintenance_window_start' => 15,
+        // Validate profile phone numbers entered without a country code.
+        'default_phone_region' => 'KR',
+      );
+
   # Nextcloud defaults its temp directory to /tmp on the container root
   # filesystem. Pin it to a bounded emptyDir so archive/upload staging cannot
   # fill the node disk.
