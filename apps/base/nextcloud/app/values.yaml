@@ -1,4 +1,4 @@
-# Nextcloud 9.4.0 (appVersion 35.0.1) - Apache flavor
+# Nextcloud 9.4.1 (appVersion 35.0.2) - Apache flavor
 # Files live in Garage S3 (primary object storage); the PVC keeps app code,
 # config.php, instanceid, apps and themes only.
 
