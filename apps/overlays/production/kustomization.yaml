@@ -19,3 +19,4 @@ resources:
   - vivident-tailscale-router.yaml
   - nextcloud.yaml
   - browseros.yaml
+  - collabora.yaml

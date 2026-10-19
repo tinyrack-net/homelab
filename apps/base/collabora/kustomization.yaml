@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - collabora.namespace.yaml
+  - collabora.admin.secret.yaml
+  - collabora.proof-key.secret.yaml
+  - collabora.helm-release.yaml
+  - collabora.ingress-route.yaml
+  - collabora.cilium-network-policy.yaml
+  - collabora.traefik.cilium-network-policy.yaml
+configMapGenerator:
+  - name: collabora-values
+    namespace: collabora-system
+    files:
+      - values.yaml=collabora.values.yaml
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled

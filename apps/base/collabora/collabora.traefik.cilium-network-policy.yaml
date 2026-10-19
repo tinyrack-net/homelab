@@ -1,0 +1,35 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-collabora
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: collabora
+  annotations:
+    networking.tinyrack.net/hosts: office.winetree94.com
+spec:
+  description: Allow the office.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    # WOPI callbacks from Collabora to the Nextcloud host reach Traefik here.
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: collabora-system
+            app.kubernetes.io/name: collabora-online
+            type: main
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: collabora-system
+            serviceName: collabora
+      toPorts:
+        - ports:
+            - port: "9980"
+              protocol: TCP

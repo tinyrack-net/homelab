@@ -1,0 +1,53 @@
+# Collabora Online (CODE) for Nextcloud Office.
+#
+# Traefik terminates TLS and forwards plain HTTP to coolwsd, so ssl.enable is
+# off while ssl.termination is on. server_name pins the public URL Collabora
+# advertises, and aliasgroup1 lists the Nextcloud host allowed to embed it.
+
+image:
+  repository: docker.io/collabora/code
+  pullPolicy: IfNotPresent
+
+fullnameOverride: collabora
+
+replicaCount: 1
+autoscaling:
+  enabled: false
+
+collabora:
+  server_name: office.winetree94.com
+  extra_params: --o:ssl.enable=false --o:ssl.termination=true
+  aliasgroups:
+    - host: "https://cloud.winetree94.com:443"
+  existingSecret:
+    enabled: true
+    secretName: collabora-admin-secret
+    usernameKey: username
+    passwordKey: password
+  # Under Flux the chart renders without cluster access, so it cannot read a
+  # generated WOPI proof key back and would rotate it on every sync. The key is
+  # therefore created and sealed outside the release and referenced here.
+  proofKeysSecretRef: collabora-proof-key
+
+service:
+  type: ClusterIP
+  port: 9980
+
+# Exposed through a Traefik IngressRoute instead of a chart-managed Ingress.
+ingress:
+  enabled: false
+
+# Namespace isolation and reachability are handled by Cilium policies.
+networkPolicy:
+  enabled: false
+
+prometheus:
+  servicemonitor:
+    enabled: false
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    memory: 2Gi

@@ -1,0 +1,39 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-collabora
+  namespace: collabora-system
+specs:
+  # coolwsd web + document conversion pods.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: collabora-system
+        app.kubernetes.io/name: collabora-online
+        type: main
+    ingress:
+      # Public route through traefik-external, plus the server-side
+      # reachability check Nextcloud performs when richdocuments settings are
+      # saved.
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-system
+              app.kubernetes.io/name: nextcloud
+        toPorts:
+          - ports:
+              - port: "9980"
+                protocol: TCP
+    egress:
+      # WOPI callbacks to Nextcloud go back out through the public hostname,
+      # which resolves to the internal traefik-external load balancer.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
