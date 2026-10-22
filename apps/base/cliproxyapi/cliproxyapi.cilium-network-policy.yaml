@@ -48,6 +48,13 @@ specs:
                 protocol: TCP
       - toCIDRSet:
           - cidrGroupRef: lan
+      # Vivident CLIProxyAPI upstream over the intranet, bypassing Cloudflare.
+      - toCIDRSet:
+          - cidrGroupRef: vivident-traefik
+        toPorts:
+          - ports:
+              - port: "443"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

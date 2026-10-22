@@ -107,3 +107,14 @@ spec:
   # Windows desktop development machine.
   externalCIDRs:
     - 10.132.247.31/32
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: vivident-traefik
+  labels:
+    networking.tinyrack.net/cidr-scope: host
+spec:
+  # Vivident intranet Traefik LoadBalancer, reached through vivident-tailscale-router.
+  externalCIDRs:
+    - 10.78.147.1/32
