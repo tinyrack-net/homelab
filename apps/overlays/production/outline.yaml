@@ -1,0 +1,78 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: outline-database
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/outline/database
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: cloudnative-pg
+    - name: sealed-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: outline-redis
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/outline/redis
+  prune: true
+  timeout: 10m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: outline-database
+    - name: ot-redis-operator-deployment
+    - name: sealed-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: outline-storage
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/outline/storage
+  prune: true
+  timeout: 10m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: outline-database
+    - name: juicefs-csi-driver
+    - name: sealed-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: outline-deployment
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/outline/app
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: outline-database
+    - name: outline-redis
+    - name: outline-storage
+    - name: juicefs-csi-driver
+    - name: reflector

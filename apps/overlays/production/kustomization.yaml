@@ -20,3 +20,4 @@ resources:
   - nextcloud.yaml
   - browseros.yaml
   - collabora.yaml
+  - outline.yaml

@@ -1,0 +1,83 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-outline
+  namespace: outline-system
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: outline-system
+        app.kubernetes.io/name: outline
+    ingress:
+      # Public route through traefik-external; internal Traefik for diagnostics.
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "3000"
+                protocol: TCP
+    egress:
+      # PostgreSQL (CloudNativePG).
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: outline-system
+              cnpg.io/cluster: outline-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      # Redis (opstree operator).
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: outline-system
+              app: outline-redis
+        toPorts:
+          - ports:
+              - port: "6379"
+                protocol: TCP
+      # OIDC token and userinfo calls to Issuary through the public hostname,
+      # which resolves to the internal traefik-external LB.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+      # Notification mail through the public SMTP submission endpoint.
+      # CiliumCIDRGroup cannot be referenced from `except`, so these stay literal.
+      - toCIDRSet:
+          - cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8 # RFC1918 private
+              - 100.64.0.0/10 # RFC6598 CGNAT (Tailscale)
+              - 169.254.0.0/16 # Link-local
+              - 172.16.0.0/12 # RFC1918 private
+              - 192.168.0.0/16 # RFC1918 private
+        toPorts:
+          - ports:
+              - port: "587"
+                protocol: TCP # SMTP submission
+  # redis, which the opstree operator runs in this namespace. The namespace is
+  # isolated, so it needs an explicit ingress grant for the Outline pod.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: outline-system
+        app: outline-redis
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: outline-system
+              app.kubernetes.io/name: outline
+        toPorts:
+          - ports:
+              - port: "6379"
+                protocol: TCP

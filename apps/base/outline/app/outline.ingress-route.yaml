@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: outline
+  namespace: outline-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+    - cloudflare
+  routes:
+    - match: Host(`notes.winetree94.com`)
+      kind: Rule
+      services:
+        - name: outline
+          port: 3000
+  tls:
+    secretName: letsencrypt-cert

@@ -1,0 +1,64 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-outline
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: outline
+  annotations:
+    networking.tinyrack.net/hosts: notes.winetree94.com
+spec:
+  description: Allow the notes.winetree94.com route and Outline's OIDC calls to Issuary
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: outline-system
+            app.kubernetes.io/name: outline
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: outline-system
+            serviceName: outline
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-outline
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: outline
+  annotations:
+    networking.tinyrack.net/hosts: storage.intranet.winetree94.com
+spec:
+  description: Allow Outline's JuiceFS mounts and database backups to reach Garage S3
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            app: juicefs-csi-node
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            app.kubernetes.io/name: juicefs-mount
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: outline-system
+            cnpg.io/cluster: outline-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
