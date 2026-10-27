@@ -24,8 +24,10 @@ spec:
             - cloudflared
             - tunnel
             - --no-autoupdate
+            # QUIC avoids the HTTP/2 upload stalls seen on OTLP exports.
+            # cloudflared falls back to HTTP/2 when UDP 7844 is unreachable.
             - --protocol
-            - http2
+            - quic
             # In a k8s environment, the metrics server needs to listen outside the pod it runs on.
             # The address 0.0.0.0:2000 allows any pod in the namespace.
             - --metrics

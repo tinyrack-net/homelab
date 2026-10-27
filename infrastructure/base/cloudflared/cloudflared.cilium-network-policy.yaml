@@ -9,6 +9,15 @@ specs:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
         k8s:io.kubernetes.pod.namespace: cloudflared-system
         pod: cloudflared
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: monitoring-system
+              app.kubernetes.io/name: alloy
+        toPorts:
+          - ports:
+              - port: "2000"
+                protocol: TCP
     egress:
       - toEndpoints:
           - matchLabels:

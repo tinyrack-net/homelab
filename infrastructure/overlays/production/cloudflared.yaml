@@ -13,3 +13,4 @@ spec:
     name: flux-system
   dependsOn:
     - name: sealed-secrets
+    - name: prometheus-operator-crds

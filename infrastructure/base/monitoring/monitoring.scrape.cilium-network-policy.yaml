@@ -66,6 +66,15 @@ spec:
               protocol: TCP
     - toEndpoints:
         - matchLabels:
+            k8s:io.kubernetes.pod.namespace: cloudflared-system
+            pod: cloudflared
+      toPorts:
+        - ports:
+            # cloudflared tunnel metrics.
+            - port: "2000"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: cliproxyapi-system
             app: cliproxyapi
       toPorts:
