@@ -19,6 +19,14 @@ setup_k3s_server_inotify_settings:
   fs.inotify.max_user_instances: 8192
   fs.inotify.max_user_watches: 1048576
 setup_k3s_server_inotify_sysctl_path: /etc/sysctl.d/90-k3s-inotify.conf
+# cloudflared runs its Cloudflare Tunnel over QUIC. quic-go asks for 7 MiB
+# UDP socket buffers and falls back to 416 KiB under the 208 KiB kernel
+# default, which drops packets on bursty uploads. Raise only the caps;
+# sockets that do not ask for larger buffers keep the default size.
+setup_k3s_server_network_buffer_settings:
+  net.core.rmem_max: 7500000
+  net.core.wmem_max: 7500000
+setup_k3s_server_network_buffer_sysctl_path: /etc/sysctl.d/90-k3s-network-buffers.conf
 # Ubuntu's stock `chrome` AppArmor profile grants unprivileged user
 # namespaces and nothing else. Browser pods request it to enable the Chromium
 # sandbox, because the node restricts userns to profiled programs.

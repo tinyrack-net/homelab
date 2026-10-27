@@ -25,6 +25,15 @@
     mode: "0644"
   notify: Apply K3s inotify limits
 
+- name: Configure K3s network buffer limits
+  ansible.builtin.template:
+    src: network-buffers.conf.j2
+    dest: "{{ setup_k3s_server_network_buffer_sysctl_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Apply K3s network buffer limits
+
 - name: Install K3s host packages
   ansible.builtin.apt:
     name: "{{ setup_k3s_server_packages }}"

@@ -37,6 +37,12 @@ argument_specs:
       setup_k3s_server_inotify_sysctl_path:
         type: str
         required: true
+      setup_k3s_server_network_buffer_settings:
+        type: dict
+        required: true
+      setup_k3s_server_network_buffer_sysctl_path:
+        type: str
+        required: true
       setup_k3s_server_apparmor_profiles_path:
         type: str
         required: true

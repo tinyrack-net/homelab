@@ -99,6 +99,35 @@
   loop_control:
     label: "{{ item.item.key }}"
 
+- name: Read the persisted K3s network buffer limits
+  ansible.builtin.slurp:
+    src: "{{ setup_k3s_server_network_buffer_sysctl_path }}"
+  register: setup_k3s_server_network_buffer_sysctl_file
+
+- name: Read the active K3s network buffer limits
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/sysctl
+      - -n
+      - "{{ item.key }}"
+  loop: "{{ setup_k3s_server_network_buffer_settings | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: setup_k3s_server_active_network_buffer_settings
+  changed_when: false
+
+- name: Verify the persisted and active K3s network buffer limits
+  ansible.builtin.assert:
+    that:
+      - >-
+        (item.item.key ~ ' = ' ~ item.item.value)
+        in (setup_k3s_server_network_buffer_sysctl_file.content | b64decode).splitlines()
+      - item.stdout | int == item.item.value
+    fail_msg: "The {{ item.item.key }} network buffer limit does not match the managed value."
+  loop: "{{ setup_k3s_server_active_network_buffer_settings.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+
 - name: Read the installed K3s version
   ansible.builtin.command:
     cmd: /usr/local/bin/k3s --version

@@ -12,3 +12,11 @@
       - --load
       - "{{ setup_k3s_server_inotify_sysctl_path }}"
   changed_when: true
+
+- name: Apply K3s network buffer limits
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/sysctl
+      - --load
+      - "{{ setup_k3s_server_network_buffer_sysctl_path }}"
+  changed_when: true
