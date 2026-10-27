@@ -43,3 +43,13 @@ specs:
       # No port restriction: a general-purpose browser reaches arbitrary hosts
       # and ports. In-cluster pod and service ranges stay blocked and must be
       # allowed per endpoint or service when a browser task needs them.
+  # The Vivident browser works on Vivident's intranet sites and devices (*.k8s.intranet.moelive.tech,
+  # office routers and switches), all inside the Vivident ranges. The personal browser stays out.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: browseros-system
+        app: browseros-vivident
+    egress:
+      - toCIDRSet:
+          - cidrGroupRef: vivident-intranet

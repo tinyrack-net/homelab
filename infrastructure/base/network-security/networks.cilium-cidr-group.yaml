@@ -41,3 +41,16 @@ spec:
   # Tailscale CGNAT range (100.64.0.0/10).
   externalCIDRs:
     - 100.64.0.0/10
+---
+apiVersion: cilium.io/v2
+kind: CiliumCIDRGroup
+metadata:
+  name: vivident-intranet
+  labels:
+    networking.tinyrack.net/cidr-scope: network
+spec:
+  # Vivident office (10.78.0.0/16) and old office (10.79.0.0/16) networks, reached through
+  # vivident-tailscale-router (OPNsense routes both ranges to it).
+  externalCIDRs:
+    - 10.78.0.0/16
+    - 10.79.0.0/16
