@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbhub
+  namespace: dbhub-system
+  labels:
+    app.kubernetes.io/name: dbhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dbhub
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dbhub
+    spec:
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: dbhub
+          image: docker.io/bytebase/dbhub:1.5.0@sha256:aa04093100a15911c7ee326e870fa11480e1466342e8433fdd67b45c9af52ccf
+          imagePullPolicy: IfNotPresent
+          args:
+            - --transport
+            - http
+            - --port
+            - "8080"
+            - --config
+            - /etc/dbhub/dbhub.toml
+            # DNS-rebinding protection: only this Host header is accepted
+            # besides loopback and the pod's own addresses.
+            - --allowed-hosts
+            - dbhub.intranet.winetree94.com
+          env:
+            # Bearer token(s), comma-separated. Required on every request
+            # except /healthz, including the Workbench at /.
+            - name: DBHUB_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: dbhub-secrets
+                  key: DBHUB_AUTH_TOKEN
+            - name: PERSONAL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbhub-secrets
+                  key: PERSONAL_DB_PASSWORD
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 20m
+              memory: 96Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: config
+              mountPath: /etc/dbhub
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: dbhub-config
+        - name: tmp
+          emptyDir: {}

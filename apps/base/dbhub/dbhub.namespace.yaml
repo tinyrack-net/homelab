@@ -1,0 +1,20 @@
+# DBHub (bytebase/dbhub): shared database MCP server, internal only.
+# One bearer token reaches every configured source; the per-database boundary
+# is the database role each source connects as, plus readonly on its tools.
+#
+# Adding a database:
+#   1. Create a least-privilege login role for DBHub in the target database.
+#   2. Allow dbhub-system in the target database's own network policy, and add
+#      the target to the egress list in dbhub.cilium-network-policy.yaml.
+#   3. Add <NAME>_DB_PASSWORD to dbhub.secrets.yaml (kubeseal --merge-into).
+#   4. Add one [[sources]] entry and BOTH [[tools]] entries (execute_sql and
+#      search_objects; set readonly = true where writes are not wanted) to
+#      dbhub.toml. Declaring any [[tools]] disables the implicit defaults.
+#   5. Commit. Clients and the token stay unchanged; the new tools appear as
+#      execute_sql_<id> and search_objects_<id>.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dbhub-system
+  labels:
+    networking.tinyrack.net/isolation: enabled

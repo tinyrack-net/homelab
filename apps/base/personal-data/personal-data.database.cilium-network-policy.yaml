@@ -19,6 +19,9 @@ specs:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: postgres-mcp-system
               app.kubernetes.io/name: postgres-mcp
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: dbhub-system
+              app.kubernetes.io/name: dbhub
         toPorts:
           - ports:
               - port: "5432"

@@ -24,3 +24,4 @@ resources:
   - personal-data.yaml
   - mathesar.yaml
   - postgres-mcp.yaml
+  - dbhub.yaml

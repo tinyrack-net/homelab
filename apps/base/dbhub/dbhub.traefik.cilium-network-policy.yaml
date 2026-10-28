@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-dbhub
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: dbhub
+  annotations:
+    networking.tinyrack.net/hosts: dbhub.intranet.winetree94.com
+spec:
+  description: Allow the dbhub.intranet.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: dbhub-system
+            serviceName: dbhub
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

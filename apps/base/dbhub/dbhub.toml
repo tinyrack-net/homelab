@@ -1,0 +1,19 @@
+# Sources and tools for DBHub. Passwords come from dbhub-secrets via ${VAR}.
+# See dbhub.namespace.yaml for the procedure to add a database.
+
+[[sources]]
+id = "personal"
+description = "Personal data (personal-data cluster, database personal). The same tables are edited by hand in Mathesar at tables.intranet.winetree94.com; organise topics as schemas."
+dsn = "postgres://mcp_agent:${PERSONAL_DB_PASSWORD}@personal-data-database-cluster-rw.personal-data-system.svc.cluster.local:5432/personal?sslmode=disable"
+query_timeout = 60
+pool_max_connections = 5
+
+[[tools]]
+name = "execute_sql"
+source = "personal"
+readonly = false
+max_rows = 1000
+
+[[tools]]
+name = "search_objects"
+source = "personal"
