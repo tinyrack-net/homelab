@@ -7,9 +7,11 @@
 #   2. Allow dbhub-system in the target database's own network policy, and add
 #      the target to the egress list in dbhub.cilium-network-policy.yaml.
 #   3. Add <NAME>_DB_PASSWORD to dbhub.secrets.yaml (kubeseal --merge-into).
-#   4. Add one [[sources]] entry and BOTH [[tools]] entries (execute_sql and
-#      search_objects; set readonly = true where writes are not wanted) to
-#      dbhub.toml. Declaring any [[tools]] disables the implicit defaults.
+#   4. Add a [[sources]] entry to dbhub.toml. A source without [[tools]]
+#      entries gets execute_sql (read-write, no row cap) and search_objects
+#      by default. To set readonly or max_rows, declare its tools; declaring
+#      any [[tools]] for a source drops that source's defaults, so declare
+#      both execute_sql and search_objects. Other sources are unaffected.
 #   5. Commit. Clients and the token stay unchanged. With a single source the
 #      tools are named execute_sql and search_objects; from the second source
 #      on, every source's tools are suffixed: execute_sql_<id>,
