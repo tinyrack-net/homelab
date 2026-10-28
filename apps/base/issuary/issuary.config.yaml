@@ -173,7 +173,10 @@ clients:
     grant_types:
       - authorization_code
       - refresh_token
-    scope: openid profile email
+    # Outline re-validates its session against the IdP token and signs the
+    # user out once it expires without a refresh token. Issuary only issues
+    # refresh tokens for offline_access, so it must be allowed here.
+    scope: openid profile email offline_access
     skip_consent: true
   - id: mathesar
     name: Mathesar
