@@ -55,12 +55,18 @@ spec:
           storage: 10Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
+  externalClusters:
+    - name: nocodb-database-recovery-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: nocodb-database-backup-store
+          serverName: nocodb-database-cluster
+  # Initialised with initdb on 2026-10-28; a recreated cluster restores from
+  # the Barman backups instead of starting empty.
   bootstrap:
-    initdb:
-      database: nocodb
-      owner: nocodb
-      secret:
-        name: nocodb-database-user-secret
+    recovery:
+      source: nocodb-database-recovery-source
 ---
 # The juicefs schema holds the JuiceFS metadata of the attachment volume, so
 # the database backups cover both the NocoDB metadata and the file index.
