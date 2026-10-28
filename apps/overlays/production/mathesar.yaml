@@ -1,0 +1,55 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: mathesar-database
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/mathesar/database
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: cloudnative-pg
+    - name: sealed-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: mathesar-storage
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/mathesar/storage
+  prune: true
+  timeout: 10m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: mathesar-database
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: mathesar-deployment
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/mathesar/app
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: mathesar-database
+    - name: mathesar-storage
+    - name: reflector

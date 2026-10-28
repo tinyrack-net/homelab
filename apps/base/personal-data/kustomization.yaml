@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - personal-data.namespace.yaml
+  - personal-data.database-owner.secret.yaml
+  - personal-data.database-mcp.secret.yaml
+  - personal-data.database.yaml
+  - personal-data.database.cilium-network-policy.yaml

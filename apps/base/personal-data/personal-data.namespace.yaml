@@ -1,0 +1,8 @@
+# Standalone personal data database. Applications (Mathesar, postgres-mcp)
+# are only clients: removing or replacing them leaves this database intact.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: personal-data-system
+  labels:
+    networking.tinyrack.net/isolation: enabled

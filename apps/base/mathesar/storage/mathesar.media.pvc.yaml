@@ -1,0 +1,19 @@
+# File columns and imported data files (MEDIA_ROOT=/code/.media).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mathesar-media
+  namespace: mathesar-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    recurring-job.longhorn.io/source: enabled
+    recurring-job-group.longhorn.io/longhorn-backup: enabled
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn
+  volumeMode: Filesystem

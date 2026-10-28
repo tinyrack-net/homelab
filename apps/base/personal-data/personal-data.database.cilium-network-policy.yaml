@@ -1,0 +1,89 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: database-personal-data
+  namespace: personal-data-system
+specs:
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: personal-data-system
+        cnpg.io/cluster: personal-data-database-cluster
+    ingress:
+      # Database clients. Grant new clients here, in the namespace that owns
+      # the data, rather than in the client's namespace.
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: mathesar-system
+              app.kubernetes.io/name: mathesar
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: postgres-mcp-system
+              app.kubernetes.io/name: postgres-mcp
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+              - port: "9187"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: personal-data-system
+              cnpg.io/cluster: personal-data-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: personal-data-system
+              cnpg.io/cluster: personal-data-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP
+      # Barman object storage backups go through internal Traefik (Garage S3).
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-personal-data
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: personal-data
+  annotations:
+    networking.tinyrack.net/hosts: storage.intranet.winetree94.com
+spec:
+  description: Allow personal-data database backups to reach Garage S3
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: personal-data-system
+            cnpg.io/cluster: personal-data-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

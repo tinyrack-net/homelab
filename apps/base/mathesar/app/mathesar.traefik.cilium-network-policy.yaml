@@ -1,0 +1,58 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-mathesar
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: mathesar
+  annotations:
+    networking.tinyrack.net/hosts: tables.intranet.winetree94.com,storage.intranet.winetree94.com
+spec:
+  description: Allow the tables.intranet.winetree94.com route and Mathesar database backups to Garage S3
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: mathesar-system
+            cnpg.io/cluster: mathesar-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: mathesar-system
+            serviceName: mathesar
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-mathesar
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: mathesar
+  annotations:
+    networking.tinyrack.net/hosts: auth.winetree94.com
+spec:
+  description: Allow Mathesar's OIDC calls to Issuary
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: mathesar-system
+            app.kubernetes.io/name: mathesar
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mathesar
+  namespace: mathesar-system
+  labels:
+    app.kubernetes.io/name: mathesar
+spec:
+  replicas: 1
+  # Django migrations run on startup; never run two versions side by side.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mathesar
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mathesar
+    spec:
+      containers:
+        - name: mathesar
+          image: docker.io/mathesar/mathesar:0.12.0@sha256:091757cb01fec9718d627aa672fdd565d76a2da6b53cdab6264e9fbc031472a4
+          imagePullPolicy: IfNotPresent
+          # Same as the image default minus -f, so a missing database setting
+          # fails loudly instead of starting the bundled PostgreSQL.
+          command: ["bash", "./bin/mathesar", "run", "-nse"]
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: mathesar-config
+            - secretRef:
+                name: mathesar-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          startupProbe:
+            httpGet:
+              path: /healthz/live
+              port: http
+            periodSeconds: 10
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: media
+              mountPath: /code/.media
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: mathesar-media

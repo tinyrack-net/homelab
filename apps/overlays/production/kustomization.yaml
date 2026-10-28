@@ -22,3 +22,6 @@ resources:
   - collabora.yaml
   - outline.yaml
   - nocodb.yaml
+  - personal-data.yaml
+  - mathesar.yaml
+  - postgres-mcp.yaml

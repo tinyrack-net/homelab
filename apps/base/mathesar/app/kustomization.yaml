@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - mathesar.secrets.yaml
+  - mathesar.deployment.yaml
+  - mathesar.service.yaml
+  - mathesar.ingress-route.yaml
+  - mathesar.cilium-network-policy.yaml
+  - mathesar.traefik.cilium-network-policy.yaml
+configMapGenerator:
+  - name: mathesar-config
+    namespace: mathesar-system
+    envs:
+      - mathesar.env
