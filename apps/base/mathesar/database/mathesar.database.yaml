@@ -58,8 +58,18 @@ spec:
           storage: 5Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
+  externalClusters:
+    - name: mathesar-database-recovery-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: mathesar-database-backup-store
+          serverName: mathesar-database-cluster
+  # Initialised with initdb on 2026-10-28; a recreated cluster restores from
+  # the Barman backups instead of starting empty.
   bootstrap:
-    initdb:
+    recovery:
+      source: mathesar-database-recovery-source
       database: mathesar_django
       owner: mathesar
       secret:

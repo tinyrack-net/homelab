@@ -73,18 +73,25 @@ spec:
         passwordSecret:
           name: personal-data-database-mcp-secret
         comment: postgres-mcp agent access (session role defaults to personal)
+  externalClusters:
+    - name: personal-data-database-recovery-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: personal-data-database-backup-store
+          serverName: personal-data-database-cluster
+  # Initialised on 2026-10-28 with initdb, which also ran:
+  #   CREATE ROLE mcp_agent NOLOGIN; GRANT personal TO mcp_agent;
+  #   ALTER ROLE mcp_agent SET role = 'personal';
+  # (the managed role above then adopted mcp_agent). Those settings are part
+  # of the backups, so a recreated cluster restores them from Barman.
   bootstrap:
-    initdb:
+    recovery:
+      source: personal-data-database-recovery-source
       database: personal
       owner: personal
       secret:
         name: personal-data-database-owner-secret
-      # The managed role above adopts mcp_agent and sets its login and
-      # password; the per-role setting below is not expressible there.
-      postInitApplicationSQL:
-        - CREATE ROLE mcp_agent NOLOGIN
-        - GRANT personal TO mcp_agent
-        - ALTER ROLE mcp_agent SET role = 'personal'
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
