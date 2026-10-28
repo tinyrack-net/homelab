@@ -96,3 +96,24 @@ globalConfig:
         - put-timeout=3600
         - max-uploads=2
         - upload-delay=10s
+    - pvcSelector:
+        matchLabels:
+          storage.tinyrack.net/profile: nocodb
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: "1"
+          memory: 1Gi
+      env:
+        - name: GOMEMLIMIT
+          value: 800MiB
+      mountOptions:
+        - cache-dir=/var/lib/jfs-cache
+        - cache-size=10240
+        - free-space-ratio=0.2
+        - buffer-size=100
+        - put-timeout=3600
+        - max-uploads=2
+        - upload-delay=10s

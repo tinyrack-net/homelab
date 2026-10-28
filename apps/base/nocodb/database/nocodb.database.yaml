@@ -1,0 +1,96 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: nocodb-database-backup-store
+  namespace: nocodb-system
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://tinyrack-homelab/apps/nocodb/database-18
+    endpointURL: https://storage.intranet.winetree94.com
+    s3Credentials:
+      region:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_REGION
+      accessKeyId:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: nocodb-database-cluster
+  namespace: nocodb-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-trixie@sha256:7de76b3e35aa846a86715a4135f62b2371b8bcf9545c2c33e589b1201e489668
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: nocodb-database-backup-store
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  bootstrap:
+    initdb:
+      database: nocodb
+      owner: nocodb
+      secret:
+        name: nocodb-database-user-secret
+---
+# The juicefs schema holds the JuiceFS metadata of the attachment volume, so
+# the database backups cover both the NocoDB metadata and the file index.
+# Restore the database and the Garage bucket to the same point in time.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: nocodb-database
+  namespace: nocodb-system
+spec:
+  name: nocodb
+  owner: nocodb
+  databaseReclaimPolicy: retain
+  cluster:
+    name: nocodb-database-cluster
+  schemas:
+    - name: juicefs
+      owner: nocodb
+      ensure: present
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: nocodb-backup
+  namespace: nocodb-system
+spec:
+  schedule: "0 0 */4 * * *"
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+  cluster:
+    name: nocodb-database-cluster

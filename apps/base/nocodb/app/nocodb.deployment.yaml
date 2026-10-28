@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nocodb
+  namespace: nocodb-system
+  labels:
+    app.kubernetes.io/name: nocodb
+spec:
+  replicas: 1
+  # Metadata migrations run on startup; never run two versions side by side.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nocodb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nocodb
+    spec:
+      containers:
+        - name: nocodb
+          image: docker.io/nocodb/nocodb:2026.10.0@sha256:a5409df630d1d794676eb5f4d2292816411eed95c8ffe269cb4d5afcf3ebd76c
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: nocodb-config
+            - secretRef:
+                name: nocodb-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          startupProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            periodSeconds: 10
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: data
+              mountPath: /usr/app/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: nocodb-data
