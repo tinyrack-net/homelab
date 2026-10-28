@@ -1,0 +1,25 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-browseros
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: browseros
+spec:
+  description: Allow the BrowserOS neo browsers to reach the public routes
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  # Public hostnames (*.winetree94.com behind the Cloudflare Tunnel) resolve to
+  # the external Traefik LoadBalancer inside the LAN. In-cluster clients are not
+  # "world", so the browsers need an explicit allowance to use those routes the
+  # same way LAN clients do.
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: browseros-system
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

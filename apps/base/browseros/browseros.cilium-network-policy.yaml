@@ -35,6 +35,16 @@ specs:
           - ports:
               - port: "8443"
                 protocol: TCP
+      # External Traefik, which serves the public homelab hostnames
+      # (*.winetree94.com) that resolve to its LoadBalancer IP inside the LAN.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
       # WireGuard VPN and Tailscale ranges.
       - toCIDRSet:
           - cidrGroupRef: vpn-server

@@ -12,3 +12,4 @@ resources:
   - browseros.ingress-route.yaml
   - browseros.cilium-network-policy.yaml
   - browseros.traefik.cilium-network-policy.yaml
+  - browseros.traefik-external.cilium-network-policy.yaml
