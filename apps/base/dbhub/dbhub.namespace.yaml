@@ -10,8 +10,10 @@
 #   4. Add one [[sources]] entry and BOTH [[tools]] entries (execute_sql and
 #      search_objects; set readonly = true where writes are not wanted) to
 #      dbhub.toml. Declaring any [[tools]] disables the implicit defaults.
-#   5. Commit. Clients and the token stay unchanged; the new tools appear as
-#      execute_sql_<id> and search_objects_<id>.
+#   5. Commit. Clients and the token stay unchanged. With a single source the
+#      tools are named execute_sql and search_objects; from the second source
+#      on, every source's tools are suffixed: execute_sql_<id>,
+#      search_objects_<id>.
 apiVersion: v1
 kind: Namespace
 metadata:
