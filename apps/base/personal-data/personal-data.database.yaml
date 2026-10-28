@@ -27,7 +27,7 @@ spec:
 # Roles:
 # - personal:  owner of the personal database. Mathesar connects as this role
 #              (configured in the Mathesar web UI, not in a manifest).
-# - mcp_agent: login role for postgres-mcp. It is a member of personal and its
+# - mcp_agent: login role for DBHub. It is a member of personal and its
 #              session role defaults to personal, so objects an agent creates
 #              are owned by personal and stay editable in Mathesar. Revoke MCP
 #              access by disabling this role alone.
@@ -72,7 +72,7 @@ spec:
           - personal
         passwordSecret:
           name: personal-data-database-mcp-secret
-        comment: postgres-mcp agent access (session role defaults to personal)
+        comment: DBHub agent access (session role defaults to personal)
   externalClusters:
     - name: personal-data-database-recovery-source
       plugin:

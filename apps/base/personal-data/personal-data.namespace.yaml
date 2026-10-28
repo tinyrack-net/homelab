@@ -1,4 +1,4 @@
-# Standalone personal data database. Applications (Mathesar, postgres-mcp)
+# Standalone personal data database. Applications (Mathesar, DBHub)
 # are only clients: removing or replacing them leaves this database intact.
 apiVersion: v1
 kind: Namespace

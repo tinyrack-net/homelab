@@ -17,9 +17,6 @@ specs:
               k8s:io.kubernetes.pod.namespace: mathesar-system
               app.kubernetes.io/name: mathesar
           - matchLabels:
-              k8s:io.kubernetes.pod.namespace: postgres-mcp-system
-              app.kubernetes.io/name: postgres-mcp
-          - matchLabels:
               k8s:io.kubernetes.pod.namespace: dbhub-system
               app.kubernetes.io/name: dbhub
         toPorts:
