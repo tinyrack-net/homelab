@@ -67,6 +67,10 @@ spec:
   bootstrap:
     recovery:
       source: nocodb-database-recovery-source
+      database: nocodb
+      owner: nocodb
+      secret:
+        name: nocodb-database-user-secret
 ---
 # The juicefs schema holds the JuiceFS metadata of the attachment volume, so
 # the database backups cover both the NocoDB metadata and the file index.
