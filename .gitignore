@@ -4,3 +4,6 @@ Session.vim
 .idea
 .opencode
 .hermes/
+
+# Local Cloudflare CLI cache
+.cloudflare/
