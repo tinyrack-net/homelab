@@ -28,7 +28,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: mosquitto
-          image: docker.io/library/eclipse-mosquitto:2.1.2-alpine@sha256:12436df85d6b2b91e63c71184da35ec89400a98abdc688a78b1403a11ecf44b4
+          image: docker.io/library/eclipse-mosquitto:2.1.2-alpine@sha256:860aeb5d63ce509508f6dcfb2bc8a1c1dd2bc60555b562b45ce90e52d8dabb0f
           imagePullPolicy: IfNotPresent
           env:
             # mosquitto 2.1 refuses to load sensitive files (password_file, acl_file)

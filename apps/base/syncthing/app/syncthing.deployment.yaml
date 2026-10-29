@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 60
       initContainers:
         - name: prepare-permissions
-          image: syncthing/syncthing:2.1.6@sha256:92e9a8bf559062b955ab45c7a60bc33d0b97ebdb1e5e86959b40714b482f740a
+          image: syncthing/syncthing:2.1.7@sha256:2b71da7c0d0a91a6ae5285ad079226fecc0a365d08b27720e1f7037b018f7546
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -39,7 +39,7 @@ spec:
               mountPath: /data
       containers:
         - name: syncthing
-          image: syncthing/syncthing:2.1.6@sha256:92e9a8bf559062b955ab45c7a60bc33d0b97ebdb1e5e86959b40714b482f740a
+          image: syncthing/syncthing:2.1.7@sha256:2b71da7c0d0a91a6ae5285ad079226fecc0a365d08b27720e1f7037b018f7546
           imagePullPolicy: IfNotPresent
           env:
             - name: PUID

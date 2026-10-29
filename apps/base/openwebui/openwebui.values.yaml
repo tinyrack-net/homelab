@@ -2,7 +2,7 @@ fullnameOverride: open-webui
 tika:
   enabled: true
   image:
-    tag: 4.1.0-full@sha256:d7607239d4e9c2dc1fd396f41a370576a334aef28f767e5bc5511247a1e1adf7
+    tag: 4.2.0-full@sha256:4774eaac44f86cdf648ae7b5a367016eaf6f9052adec31e5cff07cff1a0c6e24
   resources:
     requests:
       cpu: 100m
@@ -31,7 +31,7 @@ strategy:
     maxSurge: 0
     maxUnavailable: 100%
 image:
-  tag: v0.12.2@sha256:ea2398210f28ef4f55d9c11426359950a7bf6681d5a8c160d476225bbd991fad
+  tag: v0.12.4@sha256:a5b9e403d19154796850679c8c5d1295301cee954be8b84ddd62af92426558f7
 startupProbe:
   httpGet:
     path: /health
@@ -91,7 +91,7 @@ extraEnvVars:
   - name: OTEL_SERVICE_NAME
     value: open-webui
   - name: OTEL_RESOURCE_ATTRIBUTES
-    value: deployment.environment.name=production,service.version=0.12.2
+    value: deployment.environment.name=production,service.version=0.12.4
   - name: OTEL_TRACES_SAMPLER
     value: parentbased_always_on
   - name: OTEL_SDK_DISABLED
