@@ -45,7 +45,7 @@ extraEnvApi:
   # always return the same client for its callback, so the registration
   # survives server restarts. Server id `nextcloud` in Open WebUI.
   - name: ALLOWED_MCP_CLIENTS
-    value: openwebui|https://ai.winetree94.com/oauth/clients/mcp:nextcloud/callback
+    value: openwebui|https://ai.winetree94.com/oauth/clients/mcp:nextcloud/callback,e2e-local
   # Browsers only reach this server through redirects; Open WebUI calls it
   # server-side. Do not leave the credentialed CORS wildcard open.
   - name: CORS_ALLOW_ORIGINS
