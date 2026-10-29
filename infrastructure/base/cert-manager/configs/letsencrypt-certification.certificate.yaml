@@ -25,4 +25,5 @@ spec:
     - "*.database.intranet.winetree94.com"
     - "*.web.garage.intranet.winetree94.com"
     - "*.browseros.intranet.winetree94.com"
+    - "*.mcp.nextcloud.intranet.winetree94.com"
     - "*.winetree94.click"
