@@ -16,14 +16,14 @@ spec:
     spec:
       initContainers:
         - name: volume-permissions
-          image: busybox:1.38.0@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
+          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command: ["sh", "-c", "chown 1000:1000 /data"]
           volumeMounts:
             - name: n8n-storage
               mountPath: /data
       containers:
         - name: n8n
-          image: n8nio/n8n:2.43.6@sha256:371dd463f02e8c35a4bc5aaf9855fc4cfec1babab97e5a02a1e31923a2ec8f5a
+          image: n8nio/n8n:2.45.5@sha256:9f6d0a5987ab5a297c4b0b38fbf1a22285dd1364551478e93f03d506908fa74c
           ports:
             - name: http
               containerPort: 5678
@@ -63,7 +63,7 @@ spec:
             - name: N8N_AGENTS_TRACING_RECORD_OUTPUTS
               value: "false"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: deployment.environment.name=production,service.version=2.42.5
+              value: deployment.environment.name=production,service.version=2.45.5
             - name: OTEL_SDK_DISABLED
               value: "false"
             - name: DB_TYPE
