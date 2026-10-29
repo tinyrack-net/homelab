@@ -4,9 +4,7 @@ resources:
   - nextcloud-mcp.namespace.yaml
   - nextcloud-mcp.secret.yaml
   - nextcloud-mcp.helm-release.yaml
-  - nextcloud-mcp.ingress-route.yaml
   - nextcloud-mcp.cilium-network-policy.yaml
-  - nextcloud-mcp.traefik.cilium-network-policy.yaml
 configMapGenerator:
   - name: nextcloud-mcp-values
     namespace: nextcloud-mcp-system

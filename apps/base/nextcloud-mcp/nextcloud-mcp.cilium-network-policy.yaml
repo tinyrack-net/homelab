@@ -10,19 +10,18 @@ spec:
       k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
       app.kubernetes.io/name: nextcloud-mcp-server
   ingress:
-    # Public route (Cloudflare Tunnel) and in-cluster clients such as
-    # Open WebUI, both through traefik-external.
+    # The MCP endpoint is unauthenticated (single-user mode), so only the
+    # Open WebUI backend may reach it.
     - fromEndpoints:
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: traefik-external-system
-            app.kubernetes.io/name: traefik
+            k8s:io.kubernetes.pod.namespace: openwebui-system
+            app.kubernetes.io/component: open-webui
       toPorts:
         - ports:
             - port: "8000"
               protocol: TCP
   egress:
-    # Nextcloud (cloud.winetree94.com) and Issuary (auth.winetree94.com)
-    # through their public hostnames, which resolve to the internal
+    # Nextcloud through cloud.winetree94.com, which resolves to the internal
     # traefik-external LoadBalancer.
     - toEndpoints:
         - matchLabels:
