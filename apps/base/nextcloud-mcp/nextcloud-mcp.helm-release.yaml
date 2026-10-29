@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud-mcp-helm-release
+  namespace: nextcloud-mcp-system
+spec:
+  releaseName: nextcloud-mcp
+  interval: 5m
+  timeout: 10m
+  chart:
+    spec:
+      chart: nextcloud-mcp-server
+      version: "0.105.13"
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud-mcp-repository
+        namespace: flux-system
+  # The chart always renders its appVersion as the image tag, so pin the
+  # platform digest here.
+  postRenderers:
+    - kustomize:
+        images:
+          - name: ghcr.io/cbcoutinho/nextcloud-mcp-server
+            newTag: 0.202.1
+            digest: sha256:653b682f7069bd7adb87d26f7d7aadecc9a3bf0721bdb2f56c4ce5f4feabf9fc
+  valuesFrom:
+    - kind: ConfigMap
+      name: nextcloud-mcp-values
+      valuesKey: values.yaml

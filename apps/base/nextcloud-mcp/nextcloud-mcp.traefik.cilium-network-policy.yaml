@@ -1,0 +1,35 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-nextcloud-mcp
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: nextcloud-mcp
+  annotations:
+    networking.tinyrack.net/hosts: nextcloud-mcp.winetree94.com
+spec:
+  description: Allow the nextcloud-mcp.winetree94.com route and its Nextcloud/Issuary calls
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    # The MCP server reaches cloud.winetree94.com and auth.winetree94.com
+    # through this Traefik.
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
+            app.kubernetes.io/name: nextcloud-mcp-server
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: nextcloud-mcp-system
+            serviceName: nextcloud-mcp-nextcloud-mcp-server
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP

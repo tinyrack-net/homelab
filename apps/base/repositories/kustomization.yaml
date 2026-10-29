@@ -4,4 +4,5 @@ resources:
   - openwebui.yaml
   - immich.yaml
   - nextcloud.yaml
+  - nextcloud-mcp.yaml
   - collabora.yaml

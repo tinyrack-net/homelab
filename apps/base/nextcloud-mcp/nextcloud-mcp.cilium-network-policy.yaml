@@ -1,0 +1,34 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-nextcloud-mcp
+  namespace: nextcloud-mcp-system
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
+      app.kubernetes.io/name: nextcloud-mcp-server
+  ingress:
+    # Public route (Cloudflare Tunnel) and in-cluster clients such as
+    # Open WebUI, both through traefik-external.
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-external-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    # Nextcloud (cloud.winetree94.com) and Issuary (auth.winetree94.com)
+    # through their public hostnames, which resolve to the internal
+    # traefik-external LoadBalancer.
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-external-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
