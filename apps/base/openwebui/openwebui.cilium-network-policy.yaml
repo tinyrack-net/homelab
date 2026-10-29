@@ -74,6 +74,13 @@ specs:
           - ports:
               - port: "8000"
                 protocol: TCP # model API
+      # Vivident Outline MCP (outline.k8s.intranet.moelive.tech) via the Vivident intranet Traefik.
+      - toCIDRSet:
+          - cidrGroupRef: vivident-traefik
+        toPorts:
+          - ports:
+              - port: "443"
+                protocol: TCP
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
