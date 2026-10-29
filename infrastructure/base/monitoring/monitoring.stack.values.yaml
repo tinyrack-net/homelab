@@ -286,7 +286,7 @@ grafana:
   imageRenderer:
     enabled: true
     image:
-      tag: v5.12.3
+      tag: v5.12.10
       pullPolicy: IfNotPresent
     env:
       HTTP_HOST: 0.0.0.0
