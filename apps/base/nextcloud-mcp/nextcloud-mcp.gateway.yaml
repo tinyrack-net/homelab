@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud-mcp-gateway
+  namespace: nextcloud-mcp-system
+  labels:
+    app.kubernetes.io/name: nextcloud-mcp-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nextcloud-mcp-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nextcloud-mcp-gateway
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: nginx
+          image: ghcr.io/nginx/nginx-unprivileged:1.30.6-alpine@sha256:969ccb55136a85056874e579908584bc0a39217a72ebf819a4ef4f44a62c9dda
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 30
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: api-keys
+              mountPath: /etc/nginx/secret
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: nextcloud-mcp-gateway-config
+        - name: api-keys
+          secret:
+            secretName: nextcloud-mcp-gateway-secrets
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-mcp-gateway
+  namespace: nextcloud-mcp-system
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: nextcloud-mcp-gateway
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

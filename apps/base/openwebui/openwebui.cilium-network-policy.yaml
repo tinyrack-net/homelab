@@ -67,15 +67,6 @@ specs:
           - ports:
               - port: "8443"
                 protocol: TCP
-      # nextcloud-mcp-server (single-user, in-cluster only).
-      - toEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
-              app.kubernetes.io/name: nextcloud-mcp-server
-        toPorts:
-          - ports:
-              - port: "8000"
-                protocol: TCP
       # Model/service endpoint on the Windows desktop.
       - toCIDRSet:
           - cidrGroupRef: desktop

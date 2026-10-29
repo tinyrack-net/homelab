@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-nextcloud-mcp
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: nextcloud-mcp
+  annotations:
+    networking.tinyrack.net/hosts: me.mcp.nextcloud.intranet.winetree94.com
+spec:
+  description: Allow the me.mcp.nextcloud.intranet.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: nextcloud-mcp-system
+            serviceName: nextcloud-mcp-gateway
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

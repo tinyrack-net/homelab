@@ -3,31 +3,56 @@ kind: CiliumNetworkPolicy
 metadata:
   name: app-nextcloud-mcp
   namespace: nextcloud-mcp-system
-spec:
-  endpointSelector:
-    matchLabels:
-      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-      k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
-      app.kubernetes.io/name: nextcloud-mcp-server
-  ingress:
-    # The MCP endpoint is unauthenticated (single-user mode), so only the
-    # Open WebUI backend may reach it.
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: openwebui-system
-            app.kubernetes.io/component: open-webui
-      toPorts:
-        - ports:
-            - port: "8000"
-              protocol: TCP
-  egress:
-    # Nextcloud through cloud.winetree94.com, which resolves to the internal
-    # traefik-external LoadBalancer.
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: traefik-external-system
-            app.kubernetes.io/name: traefik
-      toPorts:
-        - ports:
-            - port: "8443"
-              protocol: TCP
+specs:
+  # nextcloud-mcp-server has no authentication in single-user mode, so only
+  # the API key gateway may reach it.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
+        app.kubernetes.io/name: nextcloud-mcp-server
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
+              app.kubernetes.io/name: nextcloud-mcp-gateway
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+    egress:
+      # Nextcloud through cloud.winetree94.com, which resolves to the internal
+      # traefik-external LoadBalancer.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+  # Bearer API key gateway, reached through internal Traefik
+  # (me.mcp.nextcloud.intranet.winetree94.com).
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
+        app.kubernetes.io/name: nextcloud-mcp-gateway
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
+              app.kubernetes.io/name: nextcloud-mcp-server
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP

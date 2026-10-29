@@ -5,6 +5,10 @@ resources:
   - nextcloud-mcp.secret.yaml
   - nextcloud-mcp.helm-release.yaml
   - nextcloud-mcp.cilium-network-policy.yaml
+  - nextcloud-mcp.gateway.secret.yaml
+  - nextcloud-mcp.gateway.yaml
+  - nextcloud-mcp.ingress-route.yaml
+  - nextcloud-mcp.traefik.cilium-network-policy.yaml
 configMapGenerator:
   - name: nextcloud-mcp-values
     namespace: nextcloud-mcp-system
@@ -14,3 +18,7 @@ configMapGenerator:
       disableNameSuffixHash: true
       labels:
         reconcile.fluxcd.io/watch: Enabled
+  - name: nextcloud-mcp-gateway-config
+    namespace: nextcloud-mcp-system
+    files:
+      - nginx.conf=nextcloud-mcp.gateway.nginx.conf

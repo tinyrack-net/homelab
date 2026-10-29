@@ -1,12 +1,12 @@
-# nextcloud-mcp-server in single-user BasicAuth mode for Open WebUI.
+# nextcloud-mcp-server in single-user BasicAuth mode.
 #
 # Every request runs as one Nextcloud account (me@winetree94.com) with a
-# dedicated app password, and the MCP endpoint itself has NO authentication.
-# Keep it in-cluster only: there is no IngressRoute or public hostname, and the
-# Cilium policy admits only the Open WebUI pods. Open WebUI connects to
-# http://nextcloud-mcp-nextcloud-mcp-server.nextcloud-mcp-system.svc.cluster.local:8000/mcp
-# and the connection must stay Private there, since anyone allowed to use it
-# acts as this account.
+# dedicated app password, and the server itself has NO authentication. Clients
+# reach it only through nextcloud-mcp-gateway (nginx), which requires
+# "Authorization: Bearer <api key>" at
+# https://me.mcp.nextcloud.intranet.winetree94.com/mcp (internal Traefik: LAN,
+# WireGuard, Tailscale and Open WebUI). The Cilium policy admits only the
+# gateway to this server.
 nextcloud:
   # The public hostname resolves to the internal traefik-external LoadBalancer.
   host: https://cloud.winetree94.com
