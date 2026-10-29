@@ -19,6 +19,10 @@ spec:
             k8s:io.kubernetes.pod.namespace: nextcloud-system
             app.kubernetes.io/name: nextcloud
             app.kubernetes.io/component: app
+        # nextcloud-mcp-server calls the Nextcloud APIs through this route.
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: nextcloud-mcp-system
+            app.kubernetes.io/name: nextcloud-mcp-server
       toPorts:
         - ports:
             - port: "8443"
