@@ -157,6 +157,34 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+  # nextcloud-mcp-server (Login Flow v2) as an OAuth proxy for MCP clients such
+  # as Open WebUI. It requests the RFC 8707 resource below, so its access
+  # tokens are also accepted by Nextcloud user_oidc bearer validation.
+  # The app scopes mirror the server's @require_scopes set; the server only
+  # requests the ones its registered tools need.
+  - id: nextcloud-mcp
+    name: Nextcloud MCP
+    client_id: nextcloud-mcp
+    client_secret: ${ISSUARY_NEXTCLOUD_MCP_CLIENT_SECRET}
+    redirect_uris:
+      - https://nextcloud-mcp.winetree94.com/oauth/callback
+    response_types:
+      - code
+    grant_types:
+      - authorization_code
+      - refresh_token
+    scope: >-
+      openid profile email offline_access
+      calendar.read calendar.write collectives.read collectives.write
+      contacts.read contacts.write cookbook.read cookbook.write
+      deck.read deck.write files.read files.write
+      mail.read mail.send mail.write news.read notes.read notes.write
+      sar.read sar.write semantic.read sharing.write
+      shopping_list.read shopping_list.write tables.read tables.write
+      talk.read talk.write todo.read todo.write
+    resources:
+      - https://nextcloud-mcp.winetree94.com/mcp
+    skip_consent: true
   - id: outline
     name: Outline
     client_id: outline
@@ -209,6 +237,14 @@ clients:
       - refresh_token
     scope: openid profile email offline_access
     skip_consent: true
+# RFC 8707 protected resources. The MCP resource also carries the Nextcloud
+# user_oidc client_id so Nextcloud accepts the same token as a bearer.
+resources:
+  - identifier: https://nextcloud-mcp.winetree94.com/mcp
+    audiences:
+      - https://nextcloud-mcp.winetree94.com/mcp
+      - nextcloud
+
 users: []
 
 identity_providers: []
