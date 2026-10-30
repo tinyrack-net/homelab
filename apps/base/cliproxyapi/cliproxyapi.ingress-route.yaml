@@ -29,7 +29,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`llm.intranet.winetree94.com`)
+    - match: Host(`cliproxyapi.intranet.winetree94.com`) || Host(`llm.intranet.winetree94.com`)
       kind: Rule
       services:
         - name: cliproxyapi-service

@@ -130,9 +130,9 @@ metadata:
   labels:
     networking.tinyrack.net/owner: cliproxyapi
   annotations:
-    networking.tinyrack.net/hosts: llm.intranet.winetree94.com
+    networking.tinyrack.net/hosts: cliproxyapi.intranet.winetree94.com, llm.intranet.winetree94.com
 spec:
-  description: Allow the llm.intranet.winetree94.com route
+  description: Allow the cliproxyapi internal routes
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
