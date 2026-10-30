@@ -24,6 +24,23 @@ specs:
           - ports:
               - port: "8080"
                 protocol: TCP
+    egress:
+      # Allow reaching Traefik (internal/external load balancers) on LAN
+      - toCIDRSet:
+          - cidrGroupRef: lan
+        toPorts:
+          - ports:
+              - port: "443"
+                protocol: TCP
+              - port: "80"
+                protocol: TCP
+      # Allow reaching Vivident intranet for vivident outline & browseros
+      - toCIDRSet:
+          - cidrGroupRef: vivident-intranet
+        toPorts:
+          - ports:
+              - port: "443"
+                protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
