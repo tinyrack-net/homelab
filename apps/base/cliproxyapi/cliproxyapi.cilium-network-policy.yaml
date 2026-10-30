@@ -17,6 +17,9 @@ specs:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-system
               app.kubernetes.io/name: traefik
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bifrost-system
+              app: bifrost
         toPorts:
           - ports:
               - port: "8317"

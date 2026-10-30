@@ -51,6 +51,22 @@ specs:
           - ports:
               - port: "443"
                 protocol: TCP
+      # Egress to CLIProxyAPI
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cliproxyapi-system
+              app: cliproxyapi
+        toPorts:
+          - ports:
+              - port: "8317"
+                protocol: TCP
+      # Egress to homelab LAN (e.g. Qwen server on port 8080)
+      - toCIDRSet:
+          - cidrGroupRef: lan
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
