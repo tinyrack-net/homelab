@@ -25,16 +25,26 @@ specs:
               - port: "8080"
                 protocol: TCP
     egress:
-      # Allow reaching Traefik (internal/external load balancers) on LAN
+      # Outbound to internal & external Traefik pods directly
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+      # Egress to LAN LoadBalancer IPs
       - toCIDRSet:
-          - cidrGroupRef: lan
+          - cidrGroupRef: traefik-external
         toPorts:
           - ports:
               - port: "443"
                 protocol: TCP
-              - port: "80"
-                protocol: TCP
-      # Allow reaching Vivident intranet for vivident outline & browseros
+      # Egress to Vivident intranet
       - toCIDRSet:
           - cidrGroupRef: vivident-intranet
         toPorts:
@@ -52,11 +62,20 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: mcp.winetree94.com
 spec:
-  description: Allow the mcp.winetree94.com route to reach bifrost-service
+  description: Allow the mcp.winetree94.com route to reach bifrost-service and bifrost to reach external traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: bifrost-system
+            app: bifrost
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
   egress:
     - toServices:
         - k8sService:
@@ -77,11 +96,20 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: mcp.intranet.winetree94.com
 spec:
-  description: Allow the mcp.intranet.winetree94.com route to reach bifrost-service
+  description: Allow the mcp.intranet.winetree94.com route to reach bifrost-service and bifrost to reach internal traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: bifrost-system
+            app: bifrost
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
   egress:
     - toServices:
         - k8sService:
