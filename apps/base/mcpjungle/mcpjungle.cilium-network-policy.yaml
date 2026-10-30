@@ -82,6 +82,31 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: route-mcpjungle
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: mcpjungle
+  annotations:
+    networking.tinyrack.net/hosts: mcp.winetree94.com
+spec:
+  description: Allow the mcp.winetree94.com route
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: mcpjungle-system
+            serviceName: mcpjungle-service
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-mcpjungle
   namespace: traefik-system
   labels:
     networking.tinyrack.net/owner: mcpjungle

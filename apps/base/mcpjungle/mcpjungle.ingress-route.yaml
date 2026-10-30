@@ -1,6 +1,26 @@
+# Public: only the Streamable HTTP MCP gateway endpoints (global and per tool
+# group). /init, /api/v0 (admin API), /metrics and legacy SSE stay internal.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mcpjungle-external
+  namespace: mcpjungle-system
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+    - cloudflare
+  routes:
+    - match: Host(`mcp.winetree94.com`) && (Path(`/mcp`) || PathRegexp(`^/v0/groups/[^/]+/mcp$`))
+      kind: Rule
+      services:
+        - name: mcpjungle-service
+          port: 8080
+  tls:
+    secretName: letsencrypt-cert
+---
 # Internal: every endpoint (admin API, metrics, SSE) for LAN and VPN clients.
-# Public mcp.winetree94.com is added after init-server, exposing only the
-# MCP gateway endpoints.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
