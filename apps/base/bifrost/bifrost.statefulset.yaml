@@ -48,12 +48,11 @@ spec:
             - |
               mkdir -p /tools/bin /tools/lib/node_modules
               cp /usr/local/bin/node /tools/bin/
-              cp -a /usr/local/lib/node_modules/npm /tools/lib/node_modules/
+              cp -r /usr/local/lib/node_modules/npm /tools/lib/node_modules/
               ln -sf ../lib/node_modules/npm/bin/npm-cli.js /tools/bin/npm
               ln -sf ../lib/node_modules/npm/bin/npx-cli.js /tools/bin/npx
               cp /usr/lib/libstdc++.so.6 /tools/lib/
               cp /usr/lib/libgcc_s.so.1 /tools/lib/
-              chmod -R 755 /tools
           volumeMounts:
             - name: tools
               mountPath: /tools
@@ -66,7 +65,6 @@ spec:
             - |
               cp /usr/local/bin/uv /tools/bin/
               cp /usr/local/bin/uvx /tools/bin/
-              chmod -R 755 /tools/bin
           volumeMounts:
             - name: tools
               mountPath: /tools
