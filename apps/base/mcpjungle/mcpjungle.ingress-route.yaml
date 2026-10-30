@@ -1,0 +1,21 @@
+# Internal: every endpoint (admin API, metrics, SSE) for LAN and VPN clients.
+# Public mcp.winetree94.com is added after init-server, exposing only the
+# MCP gateway endpoints.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mcpjungle-internal
+  namespace: mcpjungle-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`mcp.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: mcpjungle-service
+          port: 8080
+  tls:
+    secretName: letsencrypt-cert

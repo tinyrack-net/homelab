@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcpjungle-service
+  namespace: mcpjungle-system
+  labels:
+    app.kubernetes.io/name: mcpjungle
+spec:
+  selector:
+    app: mcpjungle
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

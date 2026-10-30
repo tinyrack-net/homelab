@@ -1,0 +1,14 @@
+# HOME for the gateway and its stdio children: npm/uv caches and any
+# working directories stdio servers need. Cache only; not backed up.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mcpjungle-home
+  namespace: mcpjungle-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: longhorn-strict-local

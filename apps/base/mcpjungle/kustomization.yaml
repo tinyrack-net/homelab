@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - mcpjungle.namespace.yaml
+  - mcpjungle.database.user.secret.yaml
+  - mcpjungle.database.superuser.secret.yaml
+  - mcpjungle.database.yaml
+  - mcpjungle.pvc.yaml
+  - mcpjungle.deployment.yaml
+  - mcpjungle.service.yaml
+  - mcpjungle.servicemonitor.yaml
+  - mcpjungle.ingress-route.yaml
+  - mcpjungle.cilium-network-policy.yaml
