@@ -1,5 +1,5 @@
 # Public: only the Streamable HTTP MCP gateway endpoints (global and per tool
-# group). /init, /api/v0 (admin API), /metrics and legacy SSE stay internal.
+# group). Protected by mcpjungle-gateway (nginx checking Bearer token).
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -15,12 +15,13 @@ spec:
     - match: Host(`mcp.winetree94.com`) && (Path(`/mcp`) || PathRegexp(`^/v0/groups/[^/]+/mcp$`))
       kind: Rule
       services:
-        - name: mcpjungle-service
+        - name: mcpjungle-gateway
           port: 8080
   tls:
     secretName: letsencrypt-cert
 ---
-# Internal: every endpoint (admin API, metrics, SSE) for LAN and VPN clients.
+# Internal: full Web UI (development mode), admin API, metrics, and SSE
+# on mcp.intranet.winetree94.com for LAN/VPN clients.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:

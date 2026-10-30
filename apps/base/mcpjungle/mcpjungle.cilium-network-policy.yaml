@@ -4,24 +4,24 @@ metadata:
   name: app-mcpjungle
   namespace: mcpjungle-system
 specs:
-  # Public internet egress (npm, PyPI, SaaS MCP servers) comes from the
-  # isolated-namespaces clusterwide policy.
   - endpointSelector:
       matchLabels:
         io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
         k8s:io.kubernetes.pod.namespace: mcpjungle-system
         app: mcpjungle
     ingress:
+      # Internal requests from Traefik (LAN/VPN) directly to mcpjungle
       - fromEndpoints:
-          - matchLabels:
-              k8s:io.kubernetes.pod.namespace: traefik-external-system
-              app.kubernetes.io/name: traefik
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-system
               app.kubernetes.io/name: traefik
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: monitoring-system
               app.kubernetes.io/name: alloy
+          # Requests from the external Bearer gateway
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: mcpjungle-system
+              app.kubernetes.io/name: mcpjungle-gateway
         toPorts:
           - ports:
               - port: "8080"
@@ -34,6 +34,30 @@ specs:
         toPorts:
           - ports:
               - port: "5432"
+                protocol: TCP
+  # Bearer gateway for public ingress
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: mcpjungle-system
+        app.kubernetes.io/name: mcpjungle-gateway
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: mcpjungle-system
+              app: mcpjungle
+        toPorts:
+          - ports:
+              - port: "8080"
                 protocol: TCP
   - endpointSelector:
       matchLabels:
@@ -68,7 +92,6 @@ specs:
                 protocol: TCP
               - port: "9187"
                 protocol: TCP
-      # Barman backups to storage.intranet.winetree94.com via internal Traefik.
       - toEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-system
@@ -88,7 +111,7 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: mcp.winetree94.com
 spec:
-  description: Allow the mcp.winetree94.com route
+  description: Allow the mcp.winetree94.com route to reach mcpjungle-gateway
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -97,7 +120,7 @@ spec:
     - toServices:
         - k8sService:
             namespace: mcpjungle-system
-            serviceName: mcpjungle-service
+            serviceName: mcpjungle-gateway
       toPorts:
         - ports:
             - port: "8080"

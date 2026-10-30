@@ -35,7 +35,7 @@ spec:
               protocol: TCP
           env:
             - name: SERVER_MODE
-              value: enterprise
+              value: development
             - name: OTEL_ENABLED
               value: "true"
             - name: OTEL_RESOURCE_ATTRIBUTES
