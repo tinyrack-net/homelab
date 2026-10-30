@@ -23,8 +23,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        # Populate config.json on the persistent data volume only if absent,
-        # allowing Bifrost's split source-of-truth to persist UI updates.
+        # Populate config.json on the persistent data volume only if absent
         - name: init-config
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command:
@@ -40,6 +39,37 @@ spec:
               readOnly: true
             - name: data
               mountPath: /app/data
+        # Official Node.js Alpine image provides node and npx
+        - name: init-tools-node
+          image: docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /tools/bin /tools/lib/node_modules
+              cp /usr/local/bin/node /tools/bin/
+              cp -a /usr/local/lib/node_modules/npm /tools/lib/node_modules/
+              ln -sf ../lib/node_modules/npm/bin/npm-cli.js /tools/bin/npm
+              ln -sf ../lib/node_modules/npm/bin/npx-cli.js /tools/bin/npx
+              cp /usr/lib/libstdc++.so.6 /tools/lib/
+              cp /usr/lib/libgcc_s.so.1 /tools/lib/
+              chmod -R 755 /tools
+          volumeMounts:
+            - name: tools
+              mountPath: /tools
+        # Official Astral uv Alpine image provides uv and uvx
+        - name: init-tools-uv
+          image: ghcr.io/astral-sh/uv:alpine@sha256:95f501aef734a5aaf167ff0640e02f215dcc7043ff48685de70328e5c55a57b0
+          command:
+            - sh
+            - -c
+            - |
+              cp /usr/local/bin/uv /tools/bin/
+              cp /usr/local/bin/uvx /tools/bin/
+              chmod -R 755 /tools/bin
+          volumeMounts:
+            - name: tools
+              mountPath: /tools
       containers:
         - name: bifrost
           image: docker.io/maximhq/bifrost:latest@sha256:a1c90607dcfd13c1fb2f9476ceb3bb24407a50ade7fdf3e61a59fb42b09e5c57
@@ -55,6 +85,17 @@ spec:
               value: "8080"
             - name: APP_DIR
               value: "/app/data"
+            - name: PATH
+              value: "/tools/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            - name: LD_LIBRARY_PATH
+              value: "/tools/lib"
+            # Caches and execution dir on persistent volume
+            - name: HOME
+              value: "/app/data/home"
+            - name: UV_CACHE_DIR
+              value: "/app/data/home/.cache/uv"
+            - name: npm_config_cache
+              value: "/app/data/home/.npm"
             - name: BIFROST_ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
@@ -70,6 +111,9 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /app/data
+            - name: tools
+              mountPath: /tools
+              readOnly: true
           startupProbe:
             httpGet:
               path: /health
@@ -112,3 +156,5 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: bifrost-data
+        - name: tools
+          emptyDir: {}
