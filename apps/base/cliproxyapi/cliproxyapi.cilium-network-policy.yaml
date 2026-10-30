@@ -12,9 +12,6 @@ specs:
     ingress:
       - fromEndpoints:
           - matchLabels:
-              k8s:io.kubernetes.pod.namespace: traefik-external-system
-              app.kubernetes.io/name: traefik
-          - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-system
               app.kubernetes.io/name: traefik
           - matchLabels:
@@ -104,38 +101,13 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: route-cliproxyapi
-  namespace: traefik-external-system
-  labels:
-    networking.tinyrack.net/owner: cliproxyapi
-  annotations:
-    networking.tinyrack.net/hosts: llm.winetree94.com
-spec:
-  description: Allow the llm.winetree94.com route
-  endpointSelector:
-    matchLabels:
-      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
-      app.kubernetes.io/name: traefik
-  egress:
-    - toServices:
-        - k8sService:
-            namespace: cliproxyapi-system
-            serviceName: cliproxyapi-service
-      toPorts:
-        - ports:
-            - port: "8317"
-              protocol: TCP
----
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
-  name: route-cliproxyapi
   namespace: traefik-system
   labels:
     networking.tinyrack.net/owner: cliproxyapi
   annotations:
-    networking.tinyrack.net/hosts: cliproxyapi.intranet.winetree94.com, llm.intranet.winetree94.com
+    networking.tinyrack.net/hosts: cliproxyapi.intranet.winetree94.com
 spec:
-  description: Allow the cliproxyapi internal routes
+  description: Allow the cliproxyapi internal route
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
