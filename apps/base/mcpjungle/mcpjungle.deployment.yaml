@@ -48,6 +48,10 @@ spec:
               value: "120"
             - name: HOME
               value: /home/mcpjungle
+            # OTel process detection needs $USER: uid 1000 has no passwd entry
+            # and the binary is built without cgo.
+            - name: USER
+              value: mcpjungle
             - name: POSTGRES_HOST
               value: mcpjungle-database-cluster-rw
             - name: POSTGRES_PORT
