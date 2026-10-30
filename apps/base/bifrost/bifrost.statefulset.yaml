@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bifrost
+  namespace: bifrost-system
+spec:
+  serviceName: bifrost-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bifrost
+  template:
+    metadata:
+      labels:
+        app: bifrost
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # Populate config.json on the persistent data volume only if absent,
+        # allowing Bifrost's split source-of-truth to persist UI updates.
+        - name: init-config
+          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -f /app/data/config.json ]; then
+                cp /bootstrap/config.json /app/data/config.json
+              fi
+          volumeMounts:
+            - name: bootstrap-config
+              mountPath: /bootstrap
+              readOnly: true
+            - name: data
+              mountPath: /app/data
+      containers:
+        - name: bifrost
+          image: docker.io/maximhq/bifrost:latest@sha256:a1c90607dcfd13c1fb2f9476ceb3bb24407a50ade7fdf3e61a59fb42b09e5c57
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: BIFROST_HOST
+              value: "0.0.0.0"
+            - name: BIFROST_PORT
+              value: "8080"
+            - name: APP_DIR
+              value: "/app/data"
+            - name: BIFROST_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bifrost-secrets
+                  key: encryption-key
+            - name: BIFROST_ADMIN_USERNAME
+              value: "admin"
+            - name: BIFROST_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bifrost-secrets
+                  key: admin-password
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 2
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: bootstrap-config
+          configMap:
+            name: bifrost-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: bifrost-data

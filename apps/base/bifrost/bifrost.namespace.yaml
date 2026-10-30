@@ -1,6 +1,6 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: mcpjungle-system
+  name: bifrost-system
   labels:
     networking.tinyrack.net/isolation: enabled

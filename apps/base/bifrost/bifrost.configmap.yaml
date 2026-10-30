@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bifrost-config
+  namespace: bifrost-system
+data:
+  config.json: |
+    {
+      "$schema": "https://www.getbifrost.ai/schema",
+      "auth_config": {
+        "admin_username": "admin",
+        "admin_password": "env.BIFROST_ADMIN_PASSWORD",
+        "is_enabled": true
+      },
+      "client": {
+        "allowed_origins": ["*"],
+        "enable_logging": true,
+        "enforce_auth_on_inference": true
+      },
+      "config_store": {
+        "type": "sqlite",
+        "enabled": true,
+        "config": {
+          "path": "/app/data/config.db"
+        }
+      },
+      "logs_store": {
+        "type": "sqlite",
+        "enabled": true,
+        "config": {
+          "path": "/app/data/logs.db"
+        }
+      },
+      "plugins": [
+        {
+          "name": "governance",
+          "enabled": true,
+          "config": {
+            "is_enterprise": false,
+            "is_vk_mandatory": false
+          }
+        }
+      ]
+    }

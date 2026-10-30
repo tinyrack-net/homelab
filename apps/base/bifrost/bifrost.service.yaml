@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mcpjungle-service
-  namespace: mcpjungle-system
+  name: bifrost-service
+  namespace: bifrost-system
   labels:
-    app.kubernetes.io/name: mcpjungle
+    app.kubernetes.io/name: bifrost
 spec:
   selector:
-    app: mcpjungle
+    app: bifrost
   ports:
     - name: http
       port: 8080

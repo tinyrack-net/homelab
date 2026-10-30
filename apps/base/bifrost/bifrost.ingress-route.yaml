@@ -1,10 +1,11 @@
-# Public: only the Streamable HTTP MCP gateway endpoints (global and per tool
-# group). Protected by mcpjungle-gateway (nginx checking Bearer token).
+# Public: external AI & MCP Gateway endpoints.
+# /mcp, /mcp/<slug>, /v1/* (OpenAI-compatible inference) and /health.
+# Admin UI, /api/*, metrics, and settings are blocked from public internet.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: mcpjungle-external
-  namespace: mcpjungle-system
+  name: bifrost-external
+  namespace: bifrost-system
   annotations:
     kubernetes.io/ingress.class: traefik-external
 spec:
@@ -12,21 +13,20 @@ spec:
     - websecure
     - cloudflare
   routes:
-    - match: Host(`mcp.winetree94.com`) && (Path(`/mcp`) || PathRegexp(`^/v0/groups/[^/]+/mcp$`))
+    - match: Host(`mcp.winetree94.com`) && (PathPrefix(`/mcp`) || PathPrefix(`/v1`) || Path(`/health`))
       kind: Rule
       services:
-        - name: mcpjungle-gateway
+        - name: bifrost-service
           port: 8080
   tls:
     secretName: letsencrypt-cert
 ---
-# Internal: full Web UI (development mode), admin API, metrics, and SSE
-# on mcp.intranet.winetree94.com for LAN/VPN clients.
+# Internal: complete administrative Web UI & all APIs for LAN/VPN clients.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: mcpjungle-internal
-  namespace: mcpjungle-system
+  name: bifrost-internal
+  namespace: bifrost-system
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
@@ -36,7 +36,7 @@ spec:
     - match: Host(`mcp.intranet.winetree94.com`)
       kind: Rule
       services:
-        - name: mcpjungle-service
+        - name: bifrost-service
           port: 8080
   tls:
     secretName: letsencrypt-cert
