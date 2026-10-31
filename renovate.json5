@@ -65,17 +65,17 @@
     },
     {
       customType: 'regex',
-      description: 'BrowserOS neo release packaged as the browseros-neo image',
+      description: 'BrowserOS neo image published by browseros-neo-docker',
       managerFilePatterns: ['/apps/base/browseros/.+\\.deployment\\.yaml$/'],
       matchStrings: [
-        'image: (?<depName>ghcr\\.io/tinyrack-net/browseros-neo):(?<currentValue>\\d+\\.\\d+\\.\\d+\\.\\d+)',
+        'image: (?<depName>ghcr\\.io/tinyrack-net/browseros-neo-docker):(?<currentValue>[\\d.]*\\d)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?',
       ],
-      datasourceTemplate: 'github-releases',
-      depNameTemplate: 'browseros-ai/BrowserOS',
-      extractVersionTemplate: '^browserclaw/v(?<version>.*)$',
-      versioningTemplate:
-        'regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\.(?<build>\\d+)$',
-      autoReplaceStringTemplate: 'image: {{{depName}}}:{{{newValue}}}',
+      // Only the tags that browseros-neo-docker actually publishes are offered.
+      // Upstream also cuts browserclaw releases without an amd64 .deb (Windows
+      // only), and the image build skips those, so GitHub releases is wrong here.
+      datasourceTemplate: 'docker',
+      versioningTemplate: 'regex:^(?<major>\\d+)(?:\\.(?<minor>\\d+))?(?:\\.(?<patch>\\d+))?(?:\\.(?<build>\\d+))?$',
+      autoReplaceStringTemplate: 'image: {{{depName}}}:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}',
     },
     {
       customType: 'regex',
