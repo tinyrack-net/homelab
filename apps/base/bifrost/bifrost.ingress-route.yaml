@@ -13,7 +13,7 @@ spec:
     - websecure
     - cloudflare
   routes:
-    - match: (Host(`llm.winetree94.com`) || Host(`mcp.winetree94.com`)) && (Path(`/v1`) || PathPrefix(`/v1/`) || Path(`/mcp`) || PathPrefix(`/mcp/`) || Path(`/health`))
+    - match: Host(`llm.winetree94.com`) && (Path(`/v1`) || PathPrefix(`/v1/`) || Path(`/mcp`) || PathPrefix(`/mcp/`) || Path(`/health`))
       kind: Rule
       services:
         - name: bifrost-service
@@ -33,7 +33,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`llm.intranet.winetree94.com`) || Host(`mcp.intranet.winetree94.com`)
+    - match: Host(`llm.intranet.winetree94.com`)
       kind: Rule
       services:
         - name: bifrost-service

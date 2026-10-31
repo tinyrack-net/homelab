@@ -76,9 +76,9 @@ metadata:
   labels:
     networking.tinyrack.net/owner: bifrost
   annotations:
-    networking.tinyrack.net/hosts: llm.winetree94.com, mcp.winetree94.com
+    networking.tinyrack.net/hosts: llm.winetree94.com
 spec:
-  description: Allow the llm.winetree94.com and mcp.winetree94.com routes to reach bifrost-service and bifrost to reach external traefik
+  description: Allow the llm.winetree94.com route to reach bifrost-service and bifrost to reach external traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -110,9 +110,9 @@ metadata:
   labels:
     networking.tinyrack.net/owner: bifrost
   annotations:
-    networking.tinyrack.net/hosts: llm.intranet.winetree94.com, mcp.intranet.winetree94.com
+    networking.tinyrack.net/hosts: llm.intranet.winetree94.com
 spec:
-  description: Allow the llm.intranet.winetree94.com and mcp.intranet.winetree94.com routes to reach bifrost-service and bifrost to reach internal traefik
+  description: Allow the llm.intranet.winetree94.com route to reach bifrost-service and bifrost to reach internal traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
