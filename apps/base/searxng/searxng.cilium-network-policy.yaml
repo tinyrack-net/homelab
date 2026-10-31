@@ -12,7 +12,7 @@ specs:
     ingress:
       - fromEndpoints:
           - matchLabels:
-              k8s:io.kubernetes.pod.namespace: traefik-external-system
+              k8s:io.kubernetes.pod.namespace: traefik-system
               app.kubernetes.io/name: traefik
         toPorts:
           - ports:

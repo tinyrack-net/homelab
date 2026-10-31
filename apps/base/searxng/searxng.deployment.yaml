@@ -36,7 +36,7 @@ spec:
                   name: searxng-secret
                   key: secret_key
             - name: SEARXNG_BASE_URL
-              value: "https://search.winetree94.com/"
+              value: "https://search.intranet.winetree94.com/"
             - name: SEARXNG_VALKEY_URL
               valueFrom:
                 secretKeyRef:

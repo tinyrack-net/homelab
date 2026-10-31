@@ -2,13 +2,13 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: route-searxng
-  namespace: traefik-external-system
+  namespace: traefik-system
   labels:
     networking.tinyrack.net/owner: searxng
   annotations:
-    networking.tinyrack.net/hosts: search.winetree94.com
+    networking.tinyrack.net/hosts: search.intranet.winetree94.com
 spec:
-  description: Allow the search.winetree94.com route
+  description: Allow the search.intranet.winetree94.com route
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
