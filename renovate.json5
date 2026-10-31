@@ -35,7 +35,7 @@
     {
       customType: 'regex',
       description: 'Redis operands managed by the OT Redis Operator',
-      managerFilePatterns: ['/apps/base/searxng/.+\\.redis\\.yaml$/'],
+      managerFilePatterns: ['/apps/base/.+\\.redis\\.yaml$/'],
       matchStrings: [
         'image: (?<depName>quay\\.io/opstree/redis):(?<currentValue>[^\\s@]+)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?',
       ],
