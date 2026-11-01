@@ -130,32 +130,38 @@ delegates the primary Pod network to Cilium.
 
 ## Version sweep
 
-Renovate is **not running**. `renovate.json5` is kept in the repository, but
-there is no Dependency Dashboard issue, no Renovate pull request, and no
-`.github/workflows` directory for a scheduled run, so nothing refreshes the
-pinned versions automatically. Component versions are updated by a manual
-sweep.
+Renovate **is running** via `.github/workflows/renovate.yml` and keeps a
+`Dependency Dashboard` issue open. The workflow only supplies the trigger: the
+schedule itself lives in `renovate.json5` (`before 6am on saturday`, Asia/Seoul),
+so that file is the single owner of *when* runs happen. Do not add a second
+schedule in the workflow.
+
+The workflow needs a `RENOVATE_TOKEN` repository secret (classic PAT with `repo`
+and `workflow` scopes). Without it the job fails immediately with
+`'token' MUST be passed using its input`.
 
 Confirm the state before assuming an automatic update:
 
 ```bash
-gh issue list --repo tinyrack-net/homelab --search renovate
+gh workflow list --repo tinyrack-net/homelab
+gh run list --repo tinyrack-net/homelab --workflow renovate.yml --limit 5
+gh issue list --repo tinyrack-net/homelab --search "Dependency Dashboard"
 gh pr list --repo tinyrack-net/homelab --search renovate
-ls .github/workflows 2>/dev/null
 ```
 
-Reviving Renovate, or replacing it with another updater, needs its own decision
-and is out of scope for the sweep. Leave `renovate.json5` untouched.
+Renovate does not cover everything, so a manual sweep is still needed for the
+items below. Refresh one layer at a time, commit per layer, and verify before
+moving on.
 
 ### Sweep checklist
-
-Refresh one layer at a time, commit per layer, and verify before moving on.
 
 1. **Flux controllers** — `clusters/production/flux-system/gotk-components.yaml`
    is generated, so compare its `# Flux Version:` header and image tags with the
    latest upstream release by exporting that release:
    `flux install --version=<v> --components=source-controller,kustomize-controller,helm-controller,notification-controller,image-reflector-controller,image-automation-controller --export`,
-   then check `kubectl kustomize ./clusters/production/flux-system`.
+   then check `kubectl kustomize ./clusters/production/flux-system`. The local
+   `flux` CLI drifts behind the deployed version, so check its version first —
+   the manifest must be regenerated with a CLI of the target version.
 2. **K3s** — take the version from the K3s release channel
    (`curl -s https://update.k3s.io/v1-release/channels`) or the upstream GitHub
    releases, and update both
@@ -166,7 +172,8 @@ Refresh one layer at a time, commit per layer, and verify before moving on.
    `spec.chart.spec.version` in the owning `*.helm-release.yaml`. Render the base
    with `helm template` and `kubectl kustomize ./infrastructure/base/<name>`
    before committing, because a new chart minor can rename values keys and
-   silently drop configuration.
+   silently drop configuration. Most HelmReleases inline their values, so dedent
+   the `values:` block by 4 spaces into a scratch file to render it.
 4. **Remote release manifests** — `infrastructure/base/cloudnative-pg` and
    `infrastructure/base/system-upgrade-controller` pull manifests from upstream
    release URLs. Check their releases and diff the rendered output.
@@ -175,6 +182,28 @@ Refresh one layer at a time, commit per layer, and verify before moving on.
 6. **Node components** — K3s ships its own coredns, metrics-server,
    local-path-provisioner, and kubectl. They move with the node and are not
    pinned in this repository.
+7. **Node OS packages** — `apt list --upgradable` on the node, then
+   `apt-get -y -o Dpkg::Options::=--force-confold upgrade`. Check
+   `/var/run/reboot-required` afterwards; a reboot restarts every workload and
+   detaches/reattaches every Longhorn volume, so schedule it as its own step,
+   never in the middle of a sweep. Take an etcd snapshot first:
+   `k3s etcd-snapshot save --name pre-reboot-<date>`.
+
+### What Renovate covers
+
+`renovate.json5` has `flux` and `kubernetes` managers plus regex
+`customManagers` for the cases the built-in managers miss:
+
+| Manager | Files |
+|---|---|
+| CloudNativePG operands | `apps/base/**/*.database.yaml` (`imageName:`) |
+| OT Redis operands | `apps/base/**/*.redis.yaml` (`quay.io/opstree/redis:`) |
+| K3s Plan version | `infrastructure/base/k3s-upgrade/k3s-server-plan.yaml` |
+| CloudNativePG + Barman manifests | `infrastructure/base/cloudnative-pg/kustomization.yaml` |
+| BrowserOS neo image | `apps/base/browseros/*.deployment.yaml` |
+
+`rancher/system-upgrade-controller` is deliberately disabled: its CRD and RBAC
+are vendored by hand and must be refreshed manually.
 
 ### Image digests
 
@@ -186,9 +215,15 @@ docker buildx imagetools inspect <registry>/<path>:<tag> --format '{{json .Manif
   | jq -r 'if .manifests then (.manifests[] | select(.platform.os == "linux" and .platform.architecture == "amd64") | .digest) else .digest end'
 ```
 
-Most images pin the platform digest the command above prints.
-`eceasy/cli-proxy-api` and `library/postgres` pin the **index** digest instead,
-so check the existing pin and match its convention.
+The repository mixes both conventions, so **match the convention already used in
+the file** rather than picking one:
+
+| Convention | Files |
+|---|---|
+| **amd64** platform digest | `eceasy/cli-proxy-api`, `nginx-unprivileged`, `nextcloud-mcp-server` (postRenderer) |
+| **index** (multi-arch) digest | everything else, including `n8nio/n8n`, `n8nio/runners`, `searxng/searxng`, `cloudflared`, `open-webui`, `immich`, `nextcloud`, the CloudNativePG operands and `quay.io/opstree/redis` |
+
+Getting this backwards pins the wrong image without any error from Kubernetes.
 
 ### Pitfalls found by hand
 
@@ -207,11 +242,38 @@ so check the existing pin and match its convention.
   `k3s ctr -n k8s.io images tag mirror.gcr.io/<path>:<tag> docker.io/<path>:<tag>`.
 - `kubectl get backup -A` resolves to MariaDB backups. Name the resource
   explicitly: `kubectl get backups.postgresql.cnpg.io -A`.
+- A CNPG `Backup` can sit in `started` forever if the controller could not write
+  its status back during an API-server stall, and that blocks every later
+  `ScheduledBackup` run with "The system is already taking a backup". Confirm no
+  `barman-cloud-backup`/`pg_basebackup` process is running in the instance pod
+  (`kubectl exec ... -c postgres -- ps aux`), then delete just that `Backup` CR —
+  its completed siblings and the S3 objects are untouched. The scheduled backup
+  then runs the next missed slot.
+- A failed CNPG backup whose log ends in
+  `Read timeout on endpoint URL: "https://storage..."` followed by
+  `ValueError: I/O operation on closed file` is a transient object-store timeout,
+  not corruption. Re-run it with a one-off `Backup` CR before treating it as a
+  data problem.
 - The Traefik LoadBalancer IPs are not reachable from the workstation. Verify an
   ingress with `kubectl -n <namespace> port-forward service/<service> <local>:<port>`.
+  Note `port-forward` to a Service rotates pods on each invoke, so a `000` there
+  usually means the local forward was not ready yet, not that the route is broken.
+  Public HTTPS is the fastest real check:
+  `curl -o /dev/null -w '%{http_code}' https://<host>`.
 - Snapshot stateful volumes before a sweep that touches storage or the node: a
   Longhorn `Snapshot` per volume, a Longhorn `SystemBackup`, and a manual CNPG
   `Backup` in every namespace.
+- **This node can restart k3s under I/O pressure.** The root disk is rotational
+  (`/sys/block/sda/queue/rotational` is `1`) and etcd has logged
+  `slow fdatasync` spikes up to 6s. When a lease renewal exceeds its deadline k3s
+  exits with status 1 instead of retrying, so every controller pod restarts with
+  exit code 255 and in-flight API writes are lost. Symptom to recognise:
+  `kubectl` returning `connection refused` or `context deadline exceeded`
+  mid-reconcile while everything looked healthy a minute earlier. It is not caused
+  by the version being deployed. Check severity with
+  `ssh homelab 'systemctl show k3s -p NRestarts'` and
+  `journalctl -u k3s | grep -c 'apply request took too long'`; recover by waiting
+  for `/readyz` to return `ok`, then re-run the interrupted reconcile.
 
 ## CNI migration
 
