@@ -86,6 +86,13 @@ nextcloud:
         'default_phone_region' => 'KR',
       );
 
+  # PHP runtime tuning for large uploads
+  phpConfigs:
+    timeout.ini: |-
+      max_execution_time = 3600
+      max_input_time = 3600
+      default_socket_timeout = 3600
+
   # Nextcloud defaults its temp directory to /tmp on the container root
   # filesystem. Pin it to a bounded emptyDir so archive/upload staging cannot
   # fill the node disk.
@@ -93,9 +100,15 @@ nextcloud:
     - name: tmp
       emptyDir:
         sizeLimit: 20Gi
+    - name: apache-config
+      configMap:
+        name: nextcloud-apache-config
   extraVolumeMounts:
     - name: tmp
       mountPath: /tmp
+    - name: apache-config
+      mountPath: /etc/apache2/conf-enabled/timeout.conf
+      subPath: timeout.conf
 
   # /metrics endpoint access list (pod + service CIDRs).
   openmetrics:

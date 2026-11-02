@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-apache-config
+  namespace: nextcloud-system
+data:
+  timeout.conf: |
+    # Increase Apache timeout to 1 hour for large WebDAV chunk assembly and uploads
+    Timeout 3600
+
+    <IfModule reqtimeout_module>
+      RequestReadTimeout header=20-40,minrate=500 body=0
+    </IfModule>

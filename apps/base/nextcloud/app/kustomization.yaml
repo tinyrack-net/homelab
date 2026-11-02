@@ -6,6 +6,7 @@ resources:
   - nextcloud.ingress-route.yaml
   - nextcloud.cilium-network-policy.yaml
   - nextcloud.traefik.cilium-network-policy.yaml
+  - nextcloud.apache.configmap.yaml
 configMapGenerator:
   - name: nextcloud-values
     namespace: nextcloud-system
