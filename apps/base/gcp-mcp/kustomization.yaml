@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - gcp-mcp.namespace.yaml
+  - gcp-mcp-personal.secret.yaml
+  - gcp-mcp-vivident.secret.yaml
+  - gcp-mcp-personal.deployment.yaml
+  - gcp-mcp-vivident.deployment.yaml
+  - gcp-mcp.service.yaml
+  - gcp-mcp.cilium-network-policy.yaml

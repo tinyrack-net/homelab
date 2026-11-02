@@ -1,0 +1,152 @@
+# gcloud MCP for Vivident (Bifrost: gcp_vivident).
+# Service account bifrost-gcp-mcp@vivident-434105.iam.gserviceaccount.com.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcp-mcp-vivident
+  namespace: gcp-mcp-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gcp-mcp
+      gcp-mcp.tinyrack.net/account: vivident
+  template:
+    metadata:
+      labels:
+        app: gcp-mcp
+        gcp-mcp.tinyrack.net/account: vivident
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # node, its runtime libraries and the pinned npm packages, copied into
+        # the gcloud CLI image (which ships no node).
+        - name: init-tools
+          image: docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              mkdir -p /tools/bin /tools/lib /tools/app
+              cp /usr/local/bin/node /tools/bin/
+              cp /usr/lib/libstdc++.so.6 /usr/lib/libgcc_s.so.1 /tools/lib/
+              cd /tools/app
+              npm install --no-audit --no-fund --omit=dev \
+                supergateway@4.2.1 @google-cloud/gcloud-mcp@0.5.3
+          env:
+            - name: HOME
+              value: /tmp/home
+            - name: npm_config_cache
+              value: /tmp/home/.npm
+          volumeMounts:
+            - name: tools
+              mountPath: /tools
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        # supergateway exposes the stdio gcloud MCP over Streamable HTTP at
+        # /mcp and requires the shared API key (Bearer or X-API-Key).
+        - name: gcp-mcp
+          image: gcr.io/google.com/cloudsdktool/google-cloud-cli:589.0.0-alpine@sha256:cfbfeb8b32f93d1dd8ab1471c5ed059494f0f0371880e382176931fa05aff831
+          imagePullPolicy: IfNotPresent
+          command:
+            - node
+            - /tools/app/node_modules/supergateway/dist/index.js
+            - --stdio
+            - node /tools/app/node_modules/@google-cloud/gcloud-mcp/dist/bundle.js
+            - --outputTransport
+            - streamableHttp
+            - --port
+            - "8000"
+            - --healthEndpoint
+            - /healthz
+            - --apiKeyFile
+            - /secrets/api-key
+            - --logLevel
+            - info
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: PATH
+              value: /tools/bin:/google-cloud-sdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            - name: LD_LIBRARY_PATH
+              value: /tools/lib
+            - name: HOME
+              value: /tmp/home
+            - name: CLOUDSDK_CONFIG
+              value: /tmp/home/gcloud
+            - name: CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE
+              value: /secrets/key.json
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/key.json
+            - name: CLOUDSDK_CORE_PROJECT
+              value: vivident-434105
+            - name: CLOUDSDK_CORE_DISABLE_PROMPTS
+              value: "1"
+            - name: CLOUDSDK_CORE_DISABLE_USAGE_REPORTING
+              value: "true"
+          volumeMounts:
+            - name: tools
+              mountPath: /tools
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            - name: secrets
+              mountPath: /secrets
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: tools
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: secrets
+          secret:
+            secretName: gcp-mcp-vivident-secrets
+            defaultMode: 0440

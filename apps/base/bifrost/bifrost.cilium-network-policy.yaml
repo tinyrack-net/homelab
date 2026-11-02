@@ -60,6 +60,15 @@ specs:
           - ports:
               - port: "8317"
                 protocol: TCP
+      # Egress to the gcloud MCP gateways (gcp_personal, gcp_vivident)
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: gcp-mcp-system
+              app: gcp-mcp
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
       # Egress to homelab LAN (e.g. Qwen server on port 8080)
       - toCIDRSet:
           - cidrGroupRef: lan

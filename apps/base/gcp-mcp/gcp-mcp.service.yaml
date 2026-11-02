@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gcp-mcp-personal
+  namespace: gcp-mcp-system
+spec:
+  selector:
+    app: gcp-mcp
+    gcp-mcp.tinyrack.net/account: personal
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gcp-mcp-vivident
+  namespace: gcp-mcp-system
+spec:
+  selector:
+    app: gcp-mcp
+    gcp-mcp.tinyrack.net/account: vivident
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
