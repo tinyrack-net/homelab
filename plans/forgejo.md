@@ -296,3 +296,22 @@ USER = notify@winetree94.com
 - `ALTER ROLE forgejo PASSWORD …`로 비밀번호를 sealed secret 값으로 되돌렸다.
 - bifrost도 같은 구성이라 `recovery.secret: bifrost-database-user-secret`을 추가했다(`b0a3ea2`). 실행 중인 클러스터의 비밀번호는 아직 user secret 값과 같아 DB 조치는 필요 없었다.
 - issuary·openwebui·n8n·davinci-resolve는 recovery 대상이 CNPG 기본값(`app` DB/역할)이고 앱은 별도 역할(`<앱>`)과 user secret을 쓴다. 이 경우 owner 비밀번호 재설정이 앱 계정에 영향을 주지 않으므로 그대로 둔다.
+
+## 포트폴리오 꾸미기 (2026-11-03)
+
+수정 위치는 다음과 같다.
+
+| 항목 | 위치 |
+|---|---|
+| 테마(보라색 primary) | `apps/base/forgejo/app/custom/theme-winetree94-{light,dark,auto}.css` |
+| 로고·파비콘 | `custom/logo.svg` (`favicon.svg`로도 마운트) |
+| `<head>` 추가 CSS·메타 | `custom/header.tmpl` |
+| 상단 링크(Blog, Resume) | `custom/extra_links.tmpl` |
+| 푸터 링크 | `custom/extra_links_footer.tmpl` |
+| 사이트 이름·슬로건·메타·랜딩·탐색 메뉴·푸터 버전 | `values.yaml`의 `gitea.config` |
+| 프로필 README | Forgejo 저장소 `me/.profile` (`README.md`) |
+| 이름·소개·웹사이트·위치·아바타 | Forgejo 웹 설정 (아바타는 GitHub 프로필 사진) |
+
+- `./custom`을 수정하면 `values.yaml`의 `gitea.podAnnotations.forgejo.tinyrack.net/custom-revision` 값을 올린다. subPath 마운트는 ConfigMap 변경을 따라가지 않으므로 파드를 재시작해야 반영된다.
+- Flux source-controller는 기본적으로 `*.png`, `*.jpg` 등을 제외한다. 이미지는 SVG로 둔다. 비트맵이 꼭 필요하면 저장소 루트에 `.sourceignore` 예외를 추가한다.
+- 정적 자산은 `max-age=21600`으로 캐시되므로 바꾼 직후에는 강력 새로고침으로 확인한다.
