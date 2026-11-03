@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rclone
+  namespace: rclone-system
+spec:
+  selector:
+    app: rclone
+  ports:
+    - name: gui
+      port: 5522
+      targetPort: gui
+      protocol: TCP
+    - name: api
+      port: 5572
+      targetPort: api
+      protocol: TCP
+---
+# Bifrost: rclone
+apiVersion: v1
+kind: Service
+metadata:
+  name: rclone-mcp
+  namespace: rclone-system
+spec:
+  selector:
+    app: rclone
+  ports:
+    - name: http
+      port: 8000
+      targetPort: mcp
+      protocol: TCP

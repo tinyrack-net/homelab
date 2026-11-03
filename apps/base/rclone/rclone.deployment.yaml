@@ -1,23 +1,31 @@
-# rclone RC API (rclone rcd, loopback only) + rclone-mcp (Bifrost: rclone),
-# served over Streamable HTTP at /mcp with a Bearer token (RCLONE_MCP_TOKEN).
+# One rclone process (`rclone gui`) serves the embedded web GUI and the RC API;
+# rclone-mcp (Bifrost: rclone) is a sidecar client of the same RC API, so the
+# web UI and the agents share remotes, jobs and config.
+#
+#   :5522        web GUI (static)          -> rclone.intranet.winetree94.com/
+#   :5572/api/   RC API, htpasswd auth     -> rclone.intranet.winetree94.com/api/
+#                  admin: web GUI login, mcp: rclone-mcp
+#   :8000/mcp    rclone-mcp, Bearer token  -> Bifrost only
+#
 # Toolsets: default + dangerous (purge, config_dump, core_command, ...).
-# Token source: Bitwarden 344e14cc-213f-410a-9273-b4f700a68590.
+# Secrets: Bitwarden 344e14cc-213f-410a-9273-b4f700a68590
+#   (RCLONE_MCP_TOKEN, RCLONE_RC_PASS = mcp login, RCLONE_WEB_ADMIN_PASS = admin login).
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rclone-mcp
-  namespace: rclone-mcp-system
+  name: rclone
+  namespace: rclone-system
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: rclone-mcp
+      app: rclone
   template:
     metadata:
       labels:
-        app: rclone-mcp
+        app: rclone
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -28,9 +36,9 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        # A writable copy of rclone.conf, so config_* tools can save changes
-        # (they last until the pod restarts; the ConfigMap stays the source).
-        # Also installs the pinned rclone-mcp npm package.
+        # A writable copy of rclone.conf, so the GUI and config_* tools can save
+        # changes (they last until the pod restarts; the ConfigMap stays the
+        # source). Also installs the pinned rclone-mcp npm package.
         - name: init
           image: docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
           command:
@@ -67,23 +75,50 @@ spec:
           image: docker.io/rclone/rclone:1.75.2@sha256:2687085f718d3c628f7fdfb77c52a1d344332aed543110bb88088f2c70d43eb5
           imagePullPolicy: IfNotPresent
           args:
-            - rcd
-            - --rc-addr=127.0.0.1:5572
-            - --rc-user=mcp
+            - gui
+            - --no-open-browser
+            - --addr=0.0.0.0:5522
+            - --api-addr=0.0.0.0:5572
+            - --rc-baseurl=/api
+            - --rc-htpasswd=/secrets/htpasswd
             - --config=/config/rclone.conf
             - --cache-dir=/tmp/rclone-cache
-          # RCLONE_RC_PASS and RCLONE_CONFIG_<REMOTE>_* are read from the env.
-          envFrom:
-            - secretRef:
-                name: rclone-mcp-secrets
+          ports:
+            - name: gui
+              containerPort: 5522
+              protocol: TCP
+            - name: api
+              containerPort: 5572
+              protocol: TCP
+          # RCLONE_CONFIG_<REMOTE>_* are read from the env.
           env:
             - name: HOME
               value: /tmp/home
+          envFrom:
+            - secretRef:
+                name: rclone-secrets
           volumeMounts:
             - name: config
               mountPath: /config
             - name: tmp
               mountPath: /tmp
+            - name: secrets
+              mountPath: /secrets
+              readOnly: true
+          startupProbe:
+            tcpSocket:
+              port: api
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            tcpSocket:
+              port: api
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: gui
+            periodSeconds: 10
           resources:
             requests:
               cpu: 50m
@@ -109,25 +144,25 @@ spec:
             - --port
             - "8000"
           ports:
-            - name: http
+            - name: mcp
               containerPort: 8000
               protocol: TCP
           env:
             - name: HOME
               value: /tmp/home
             - name: RCLONE_URL
-              value: http://127.0.0.1:5572
+              value: http://127.0.0.1:5572/api
             - name: RCLONE_USER
               value: mcp
             - name: RCLONE_PASS
               valueFrom:
                 secretKeyRef:
-                  name: rclone-mcp-secrets
+                  name: rclone-secrets
                   key: RCLONE_RC_PASS
             - name: RCLONE_MCP_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: rclone-mcp-secrets
+                  name: rclone-secrets
                   key: RCLONE_MCP_TOKEN
             - name: RCLONE_TOOLSETS
               value: default,dangerous
@@ -140,16 +175,16 @@ spec:
           # rclone-mcp has no health endpoint (only /mcp).
           startupProbe:
             tcpSocket:
-              port: http
+              port: mcp
             periodSeconds: 5
             failureThreshold: 30
           livenessProbe:
             tcpSocket:
-              port: http
+              port: mcp
             periodSeconds: 15
           readinessProbe:
             tcpSocket:
-              port: http
+              port: mcp
             periodSeconds: 10
           resources:
             requests:
@@ -167,10 +202,17 @@ spec:
       volumes:
         - name: config-src
           configMap:
-            name: rclone-mcp-config
+            name: rclone-config
         - name: config
           emptyDir: {}
         - name: tools
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+        - name: secrets
+          secret:
+            secretName: rclone-secrets
+            items:
+              - key: htpasswd
+                path: htpasswd
+            defaultMode: 0440

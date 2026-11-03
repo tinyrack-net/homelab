@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: rclone-mcp-production
+  name: rclone-production
   namespace: flux-system
 spec:
   interval: 30m0s
-  path: ./apps/base/rclone-mcp
+  path: ./apps/base/rclone
   prune: true
   retryInterval: 2m0s
   sourceRef:

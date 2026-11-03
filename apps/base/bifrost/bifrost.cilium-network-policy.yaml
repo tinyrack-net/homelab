@@ -90,8 +90,8 @@ specs:
       # Egress to the rclone MCP server (rclone)
       - toEndpoints:
           - matchLabels:
-              k8s:io.kubernetes.pod.namespace: rclone-mcp-system
-              app: rclone-mcp
+              k8s:io.kubernetes.pod.namespace: rclone-system
+              app: rclone
         toPorts:
           - ports:
               - port: "8000"

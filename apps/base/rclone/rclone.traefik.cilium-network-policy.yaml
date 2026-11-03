@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-rclone
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: rclone
+  annotations:
+    networking.tinyrack.net/hosts: rclone.intranet.winetree94.com,storage.intranet.winetree94.com
+spec:
+  description: Allow the rclone.intranet.winetree94.com route and rclone's Garage S3 access
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    # homelab_garage remote -> storage.intranet.winetree94.com
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: rclone-system
+            app: rclone
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: rclone-system
+            serviceName: rclone
+      toPorts:
+        - ports:
+            - port: "5522"
+              protocol: TCP
+            - port: "5572"
+              protocol: TCP

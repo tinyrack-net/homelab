@@ -1,0 +1,26 @@
+# Web GUI on the internal Traefik (LAN/VPN only). The GUI calls the RC API on
+# the same origin under /api/; log in with url https://rclone.intranet.winetree94.com/api/
+# and the admin account (Bitwarden RCLONE_WEB_ADMIN_PASS).
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rclone-ingress-route
+  namespace: rclone-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`rclone.intranet.winetree94.com`) && PathPrefix(`/api/`)
+      kind: Rule
+      services:
+        - name: rclone
+          port: 5572
+    - match: Host(`rclone.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: rclone
+          port: 5522
+  tls:
+    secretName: letsencrypt-cert
