@@ -278,3 +278,12 @@ USER = notify@winetree94.com
 - 차트의 env-to-ini는 app.ini에 키를 **추가/수정만** 하고 삭제하지 않는다. values에서 키를 지웠다면 PVC의 `/data/gitea/conf/app.ini`에서도 직접 지워야 한다. Helm도 Secret `stringData`에서 빠진 키(`forgejo-inline-config`의 `data.*`)를 지우지 못하므로 함께 정리한다.
 - OIDC 인증 소스(`issuary`)와 관리자 계정은 차트 init 컨테이너가 매 기동 시 동기화한다.
 - 남은 확인: 사용자가 Issuary로 처음 로그인했을 때 `ACCOUNT_LINKING=login` 연결 화면이 정상 동작하는지(사람만 할 수 있는 단계).
+
+### 로컬 로그인 비활성화 (2026-11-03)
+
+`me` 계정이 Issuary와 연결된 것을 확인한 뒤 `[service] ENABLE_INTERNAL_SIGNIN=false`, `ENABLE_BASIC_AUTHENTICATION=false`를 적용했다.
+
+- 웹 로그인은 "Sign in with issuary"만 남는다(`POST /user/login`은 403).
+- Git·API는 비밀번호 Basic 인증을 거부한다. PAT 또는 `git-credential-oauth` 토큰만 쓴다.
+- 로컬 비밀번호(Bitwarden `ef50cbda-…`)는 차트 init 컨테이너가 계속 동기화하지만 로그인에는 쓸 수 없다.
+- **비상 접근**(Issuary 장애 시): `kubectl -n forgejo-system exec deploy/forgejo -c forgejo -- forgejo admin user generate-access-token --username me --token-name emergency --scopes all`로 토큰을 발급해 API를 쓴다. 웹 UI가 필요하면 values에서 `ENABLE_INTERNAL_SIGNIN`을 일시적으로 `true`로 되돌린다.
