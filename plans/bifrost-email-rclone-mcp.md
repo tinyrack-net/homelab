@@ -194,7 +194,7 @@ apps/base/bifrost/bifrost.cilium-network-policy.yaml (+ egress to both namespace
 
 ### 계획과 달라진 점 / 운영 메모
 
-- **Garage 키 `GK45d4…`에는 버킷 생성 권한이 없다**(`not allowed to create buckets`). `homelab_garage`에서 버킷을 만들려면 Garage에서 `garage key allow --create-bucket <key>`를 실행해야 한다. 기존 버킷 안의 객체는 읽고 쓸 수 있다.
+- Garage 키 `GK45d4…`(이름 `dev`)에는 원래 버킷 생성 권한이 없었다. 2026-11-03에 `garage key allow --create-bucket`으로 권한을 줬다(OMV의 `garage-garaged-1` 컨테이너). 그 뒤 Bifrost `rclone`으로 버킷 생성→업로드→`purge`가 되는 것을 확인했다.
 - **Hetzner는 버킷 생성·삭제가 eventual consistency다.** `mkdir` 직후 PutObject를 하면 `NoSuchBucket`이 나고, `purge` 직후 목록에는 버킷이 잠시 남아 있다. 10–20초 뒤에는 정상이다.
 - rclone-mcp에는 health endpoint가 없다(`/mcp` 이외는 404). 그래서 tcpSocket probe를 쓴다.
 - `rclone rcd`는 `RCLONE_RC_PASS`를 환경변수에서 읽는다. 그래서 args에 비밀번호를 넣지 않는다.
