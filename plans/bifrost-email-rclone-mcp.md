@@ -202,3 +202,41 @@ apps/base/bifrost/bifrost.cilium-network-policy.yaml (+ egress to both namespace
 - email-mcp 계정 이름에 `@`이 들어가도 동작한다(himalaya 이름과 같다).
 - Bifrost `GET /api/mcp/clients`는 기본 `limit=25`로 페이지를 나눈다. 전체를 보려면 `?limit=100`을 붙인다.
 - `email-management` 스킬을 Bifrost `email` 우선, Himalaya는 대체 수단으로 갱신했다(2026-11-03).
+
+---
+
+## rclone-system 이전과 Web GUI 추가 (2026-11-03)
+
+위 계획의 `rclone-mcp-system`과 `apps/base/rclone-mcp`는 **`rclone-system`과 `apps/base/rclone`으로 바꿨다.** 이전 경로는 Flux prune으로 삭제됐다.
+
+```
+rclone-system / deploy rclone (pod 하나)
+  ├─ rclone gui        :5522  Web GUI(rclone 내장, rclone-web 1.1.11)
+  │                    :5572  RC API (--rc-baseurl=/api, --rc-htpasswd: admin, mcp)
+  └─ rclone-mcp        :8000  /mcp (Bearer) → RCLONE_URL=http://127.0.0.1:5572/api, user mcp
+Service rclone(5522, 5572), Service rclone-mcp(8000)
+IngressRoute rclone.intranet.winetree94.com
+  ├─ /api/ → :5572
+  └─ /     → :5522        (둘 다 Traefik basicAuth `rclone-basic-auth`, admin만)
+```
+
+| 항목 | 내용 |
+|---|---|
+| 접속 | `https://rclone.intranet.winetree94.com/login?url=https://rclone.intranet.winetree94.com/api/` (내부 Traefik, LAN/VPN 전용) |
+| 로그인 | `admin` / Bitwarden `344e14cc-…` 필드 `RCLONE_WEB_ADMIN_PASS`. 브라우저 Basic 인증 창과 GUI 로그인 폼에 같은 값을 넣는다 |
+| 비밀 | `rclone-secrets`: S3 키, `RCLONE_MCP_TOKEN`, `RCLONE_RC_PASS`(mcp 로그인), `htpasswd`(admin+mcp). `rclone-basic-auth`: `users`(admin). Traefik basicAuth는 키가 하나뿐인 Secret만 받는다 |
+| Bifrost | `rclone` 클라이언트를 새로 만들었다. `connection_string`은 수정할 수 없어서 삭제 후 재등록했다. 주소는 `http://rclone-mcp.rclone-system.svc.cluster.local:8000/mcp`. `dev`·`personal` Virtual MCP에 다시 연결했다 |
+| 설정 | `rclone.conf`는 `configMapGenerator`로 관리한다. GUI·MCP에서 remote를 바꾸면 pod 안의 사본(emptyDir)에만 저장되고, 재시작하면 ConfigMap 내용으로 돌아간다 |
+
+### 결정과 이유
+
+- **프로세스 하나**: 공식 문서(rclone.org/gui)의 `rclone gui`가 GUI와 RC API를 함께 띄운다. rclone-mcp가 같은 RC API를 쓰므로 GUI와 MCP의 remote·작업(Transfers)·serve 목록이 같다.
+- **Traefik basicAuth**: rclone RC는 401에 `WWW-Authenticate: Basic`을 붙인다. GUI의 연결 확인 fetch가 이 응답을 받으면 브라우저 로그인 창이 떠서 "Connecting..."에서 멈춘다. 그래서 호스트 전체를 Traefik basicAuth로 막아 브라우저가 먼저 admin 자격 증명을 기억하게 했다. GUI 정적 파일도 인증 뒤에 둔다.
+- **업로드**: GUI 업로드는 `operations/uploadfile`(multipart)이라 Ingress 경유로 동작한다. 3MB 바이너리 업로드도 확인했다.
+
+### 제약
+
+- **GUI의 Download 버튼은 동작하지 않는다.** 이 버튼은 `serve/start`로 pod 안 임의 포트(`:0`)에 HTTP serve를 열고, 브라우저가 `https://rclone.intranet…:<port>`로 직접 받는다. 그 포트는 Ingress로 노출되지 않는다. `rclone gui`는 `--rc-serve` 경로(`/[remote:path]/file`)도 처리하지 않는다(`rclone rcd`에서는 동작). 다운로드는 다음 중 하나로 한다.
+  - Bifrost `rclone.operations_publiclink(fs, remote, expire="1h")`로 presigned URL을 받는다.
+  - 로컬 `rclone copy`를 쓴다.
+- BrowserOS로 GUI를 자동 조작할 때는 BrowserOS 오버레이가 버튼을 가리는 경우가 있다. Connect는 비밀번호 칸에서 Enter로 제출한다.
