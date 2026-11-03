@@ -1,0 +1,13 @@
+# State (scheduled-send queue) and the local mail mirror cache.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: email-mcp-data
+  namespace: email-mcp-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: longhorn-strict-local

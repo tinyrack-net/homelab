@@ -1,0 +1,108 @@
+# Multi-account IMAP/SMTP MCP server (Bifrost: email), served over
+# Streamable HTTP at /mcp with a Bearer token (EMAIL_MCP_HTTP_TOKEN).
+# Token source: Bitwarden 344e14cc-213f-410a-9273-b4f700a68590.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-mcp
+  namespace: email-mcp-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: email-mcp
+  template:
+    metadata:
+      labels:
+        app: email-mcp
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: email-mcp
+          image: ghcr.io/codefuturist/email-mcp:0.6.0@sha256:67f5ec017897ee321d010f877cd4b4486d7febbb61143930ccf380e27d79196b
+          imagePullPolicy: IfNotPresent
+          args:
+            - http
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8000"
+            - --path
+            - /mcp
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: email-mcp-secrets
+          env:
+            - name: HOME
+              value: /data/home
+            - name: XDG_CONFIG_HOME
+              value: /config
+            - name: XDG_STATE_HOME
+              value: /data/state
+            - name: XDG_CACHE_HOME
+              value: /data/cache
+            - name: XDG_DATA_HOME
+              value: /data/share
+            - name: EMAIL_MCP_HTTP_ALLOWED_HOSTS
+              value: email-mcp.email-mcp-system.svc.cluster.local,email-mcp.email-mcp-system.svc,email-mcp.email-mcp-system,email-mcp
+          volumeMounts:
+            - name: config
+              mountPath: /config/email-mcp
+              readOnly: true
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: config
+          configMap:
+            name: email-mcp-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: email-mcp-data
+        - name: tmp
+          emptyDir: {}

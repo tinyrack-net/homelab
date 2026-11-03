@@ -78,6 +78,15 @@ specs:
           - ports:
               - port: "8000"
                 protocol: TCP
+      # Egress to the email MCP server (email)
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: email-mcp-system
+              app: email-mcp
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
       # Egress to homelab LAN (e.g. Qwen server on port 8080)
       - toCIDRSet:
           - cidrGroupRef: lan

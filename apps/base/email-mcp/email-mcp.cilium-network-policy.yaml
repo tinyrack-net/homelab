@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-email-mcp
+  namespace: email-mcp-system
+spec:
+  # Only Bifrost talks to the server. Egress to the public IMAP/SMTP hosts
+  # (mail.winetree94.com, Gmail) is covered by the isolated-namespaces policy.
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: email-mcp-system
+      app: email-mcp
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: bifrost-system
+            app: bifrost
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP

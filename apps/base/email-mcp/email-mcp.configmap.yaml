@@ -1,0 +1,250 @@
+# email-mcp config (Bifrost: email). Generated from the local himalaya config;
+# account names match the himalaya account names. Passwords resolve from the
+# MAIL_*_PASSWORD env vars of email-mcp-secrets (Bitwarden item ids are the
+# ones referenced by the himalaya password commands).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: email-mcp-config
+  namespace: email-mcp-system
+data:
+  config.toml: |
+    # Generated from ~/.config/himalaya/config.toml by gen_email_config.py.
+    # Passwords are resolved from env vars (env:VAR) filled by a SealedSecret.
+
+    [settings]
+    rate_limit = 10
+    read_only = false
+
+    [settings.verification]
+    enabled = false
+
+    [settings.attachments]
+    auto_download = false
+
+    [settings.watcher]
+    enabled = false
+
+    [settings.hooks]
+    on_new_email = "none"
+
+    [[accounts]]
+    name = "stalwart-me@winetree94.com"
+    email = "me@winetree94.com"
+    full_name = "Stalwart Personal"
+    password = "env:MAIL_STALWART_ME_WINETREE94_COM_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-admin@winetree94.com"
+    email = "admin@winetree94.com"
+    full_name = "Stalwart Admin"
+    password = "env:MAIL_STALWART_ADMIN_WINETREE94_COM_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-bot@winetree94.com"
+    email = "bot@winetree94.com"
+    full_name = "Stalwart Bot"
+    password = "env:MAIL_STALWART_BOT_WINETREE94_COM_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-notify@winetree94.com"
+    email = "notify@winetree94.com"
+    full_name = "Stalwart Notify"
+    password = "env:MAIL_STALWART_NOTIFY_WINETREE94_COM_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-noreply@winetree94.com"
+    email = "noreply@winetree94.com"
+    full_name = "Stalwart Noreply (winetree94.com)"
+    password = "env:MAIL_STALWART_NOREPLY_WINETREE94_COM_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-admin@tinyrack.net"
+    email = "admin@tinyrack.net"
+    full_name = "Stalwart Admin (tinyrack.net)"
+    password = "env:MAIL_STALWART_ADMIN_TINYRACK_NET_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-contact@tinyrack.net"
+    email = "contact@tinyrack.net"
+    full_name = "Stalwart Contact"
+    password = "env:MAIL_STALWART_CONTACT_TINYRACK_NET_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-news@tinyrack.net"
+    email = "news@tinyrack.net"
+    full_name = "Stalwart News"
+    password = "env:MAIL_STALWART_NEWS_TINYRACK_NET_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-noreply@tinyrack.net"
+    email = "noreply@tinyrack.net"
+    full_name = "Stalwart Noreply (tinyrack.net)"
+    password = "env:MAIL_STALWART_NOREPLY_TINYRACK_NET_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-support@tinyrack.net"
+    email = "support@tinyrack.net"
+    full_name = "Stalwart Support"
+    password = "env:MAIL_STALWART_SUPPORT_TINYRACK_NET_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "stalwart-tester@tinyrack.net"
+    email = "tester@tinyrack.net"
+    full_name = "Stalwart Tester"
+    password = "env:MAIL_STALWART_TESTER_TINYRACK_NET_PASSWORD"
+
+    [accounts.imap]
+    host = "mail.winetree94.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "mail.winetree94.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "gmail-personal"
+    email = "winetree94@gmail.com"
+    full_name = "Gmail Personal"
+    password = "env:MAIL_GMAIL_PERSONAL_PASSWORD"
+
+    [accounts.imap]
+    host = "imap.gmail.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "smtp.gmail.com"
+    port = 465
+    tls = true
+    starttls = false
+
+    [[accounts]]
+    name = "gmail-vivident"
+    email = "hansolpark@vivident.xyz"
+    full_name = "Gmail Work"
+    password = "env:MAIL_GMAIL_VIVIDENT_PASSWORD"
+
+    [accounts.imap]
+    host = "imap.gmail.com"
+    port = 993
+    tls = true
+
+    [accounts.smtp]
+    host = "smtp.gmail.com"
+    port = 465
+    tls = true
+    starttls = false
