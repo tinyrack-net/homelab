@@ -1,6 +1,12 @@
 # Web GUI on the internal Traefik (LAN/VPN only). The GUI calls the RC API on
-# the same origin under /api/; log in with url https://rclone.intranet.winetree94.com/api/
-# and the admin account (Bitwarden RCLONE_WEB_ADMIN_PASS).
+# the same origin under /api/.
+#
+# Traefik basicAuth guards the whole host, so the browser asks for the admin
+# login once and then sends it on every request, including the GUI's fetches
+# to /api/ (rclone checks the same admin entry in its own htpasswd). Bookmark
+#   https://rclone.intranet.winetree94.com/login?url=https://rclone.intranet.winetree94.com/api/
+# so the GUI learns the RC URL and logs in by itself.
+# Login: admin / Bitwarden 344e14cc-213f-410a-9273-b4f700a68590 RCLONE_WEB_ADMIN_PASS.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -15,27 +21,27 @@ spec:
     - match: Host(`rclone.intranet.winetree94.com`) && PathPrefix(`/api/`)
       kind: Rule
       middlewares:
-        - name: rclone-no-basic-prompt
+        - name: rclone-basic-auth
       services:
         - name: rclone
           port: 5572
     - match: Host(`rclone.intranet.winetree94.com`)
       kind: Rule
+      middlewares:
+        - name: rclone-basic-auth
       services:
         - name: rclone
           port: 5522
   tls:
     secretName: letsencrypt-cert
 ---
-# The RC API answers 401 with `WWW-Authenticate: Basic`, which makes browsers
-# pop their own login dialog over the GUI's fetch and leaves the GUI stuck on
-# "Connecting...". The GUI sends Authorization itself, so drop the challenge.
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: rclone-no-basic-prompt
+  name: rclone-basic-auth
   namespace: rclone-system
 spec:
-  headers:
-    customResponseHeaders:
-      WWW-Authenticate: ""
+  basicAuth:
+    # rclone-secrets key `users`: the admin entry only (mcp stays rclone-internal).
+    secret: rclone-secrets
+    realm: rclone
