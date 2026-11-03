@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - rclone-mcp.namespace.yaml
+  - rclone-mcp.secret.yaml
+  - rclone-mcp.configmap.yaml
+  - rclone-mcp.deployment.yaml
+  - rclone-mcp.service.yaml
+  - rclone-mcp.cilium-network-policy.yaml

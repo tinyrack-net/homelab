@@ -87,6 +87,15 @@ specs:
           - ports:
               - port: "8000"
                 protocol: TCP
+      # Egress to the rclone MCP server (rclone)
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: rclone-mcp-system
+              app: rclone-mcp
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
       # Egress to homelab LAN (e.g. Qwen server on port 8080)
       - toCIDRSet:
           - cidrGroupRef: lan

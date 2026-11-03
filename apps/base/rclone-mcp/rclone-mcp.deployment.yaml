@@ -1,0 +1,176 @@
+# rclone RC API (rclone rcd, loopback only) + rclone-mcp (Bifrost: rclone),
+# served over Streamable HTTP at /mcp with a Bearer token (RCLONE_MCP_TOKEN).
+# Toolsets: default + dangerous (purge, config_dump, core_command, ...).
+# Token source: Bitwarden 344e14cc-213f-410a-9273-b4f700a68590.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rclone-mcp
+  namespace: rclone-mcp-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: rclone-mcp
+  template:
+    metadata:
+      labels:
+        app: rclone-mcp
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # A writable copy of rclone.conf, so config_* tools can save changes
+        # (they last until the pod restarts; the ConfigMap stays the source).
+        # Also installs the pinned rclone-mcp npm package.
+        - name: init
+          image: docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              cp /config-src/rclone.conf /config/rclone.conf
+              mkdir -p /tools/app
+              cd /tools/app
+              npm install --no-audit --no-fund --omit=dev rclone-mcp@2.0.0
+          env:
+            - name: HOME
+              value: /tmp/home
+            - name: npm_config_cache
+              value: /tmp/home/.npm
+          volumeMounts:
+            - name: config-src
+              mountPath: /config-src
+              readOnly: true
+            - name: config
+              mountPath: /config
+            - name: tools
+              mountPath: /tools
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - name: rclone
+          image: docker.io/rclone/rclone:1.75.2@sha256:2687085f718d3c628f7fdfb77c52a1d344332aed543110bb88088f2c70d43eb5
+          imagePullPolicy: IfNotPresent
+          args:
+            - rcd
+            - --rc-addr=127.0.0.1:5572
+            - --rc-user=mcp
+            - --config=/config/rclone.conf
+            - --cache-dir=/tmp/rclone-cache
+          # RCLONE_RC_PASS and RCLONE_CONFIG_<REMOTE>_* are read from the env.
+          envFrom:
+            - secretRef:
+                name: rclone-mcp-secrets
+          env:
+            - name: HOME
+              value: /tmp/home
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+        - name: rclone-mcp
+          image: docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+          imagePullPolicy: IfNotPresent
+          command:
+            - node
+            - /tools/app/node_modules/rclone-mcp/dist/index.js
+            - http
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8000"
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: HOME
+              value: /tmp/home
+            - name: RCLONE_URL
+              value: http://127.0.0.1:5572
+            - name: RCLONE_USER
+              value: mcp
+            - name: RCLONE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rclone-mcp-secrets
+                  key: RCLONE_RC_PASS
+            - name: RCLONE_MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: rclone-mcp-secrets
+                  key: RCLONE_MCP_TOKEN
+            - name: RCLONE_TOOLSETS
+              value: default,dangerous
+          volumeMounts:
+            - name: tools
+              mountPath: /tools
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          # rclone-mcp has no health endpoint (only /mcp).
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 20m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: config-src
+          configMap:
+            name: rclone-mcp-config
+        - name: config
+          emptyDir: {}
+        - name: tools
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}

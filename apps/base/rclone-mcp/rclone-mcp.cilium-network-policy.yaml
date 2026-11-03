@@ -1,0 +1,57 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-rclone-mcp
+  namespace: rclone-mcp-system
+spec:
+  # Only Bifrost talks to the server. Hetzner and AWS S3 and the npm registry
+  # are public and covered by the isolated-namespaces policy.
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: rclone-mcp-system
+      app: rclone-mcp
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: bifrost-system
+            app: bifrost
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    # homelab_garage goes through internal Traefik (Garage S3).
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-rclone-mcp
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: rclone-mcp
+  annotations:
+    networking.tinyrack.net/hosts: storage.intranet.winetree94.com
+spec:
+  description: Allow rclone-mcp (homelab_garage remote) to reach Garage S3
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: rclone-mcp-system
+            app: rclone-mcp
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
