@@ -294,4 +294,5 @@ USER = notify@winetree94.com
 
 - `recovery.secret: forgejo-database-user-secret`을 복원했다(`dc3787c`).
 - `ALTER ROLE forgejo PASSWORD …`로 비밀번호를 sealed secret 값으로 되돌렸다.
-- bifrost는 앱이 `*-database-user-secret`을 쓰면서 recovery에 `secret`이 없어 같은 위험이 있는지 별도로 확인할 것.
+- bifrost도 같은 구성이라 `recovery.secret: bifrost-database-user-secret`을 추가했다(`b0a3ea2`). 실행 중인 클러스터의 비밀번호는 아직 user secret 값과 같아 DB 조치는 필요 없었다.
+- issuary·openwebui·n8n·davinci-resolve는 recovery 대상이 CNPG 기본값(`app` DB/역할)이고 앱은 별도 역할(`<앱>`)과 user secret을 쓴다. 이 경우 owner 비밀번호 재설정이 앱 계정에 영향을 주지 않으므로 그대로 둔다.
