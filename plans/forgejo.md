@@ -1,4 +1,4 @@
-# Plan: Forgejo 배포 (git.winetree94.com)
+# Plan: Forgejo 배포 (git.winetree94.com) — 실행 완료 (2026-11-03)
 
 ## Context
 
@@ -255,3 +255,26 @@ USER = notify@winetree94.com
 - 클러스터 내부에서 `auth.winetree94.com`이 `10.132.246.2`로 해석되는지 확인한다. outline은 이 경로로 동작 중이다.
 - `letsencrypt-cert`가 커버하는 호스트를 확인한다.
 - forgejo-helm 차트 최신 버전과 Forgejo 17 호환성, rootless 이미지의 UID/fsGroup을 확인한다.
+
+---
+
+## 실행 결과 (2026-11-03)
+
+| 항목 | 결과 |
+|---|---|
+| 차트 / 이미지 | forgejo-helm `17.3.2`, `forgejo:17.0.1-rootless` (digest 고정). 17.0.0의 push 불가 버그(#14866)는 17.0.1에서 수정됨 |
+| Garage | 버킷 `tinyrack-homelab-forgejo-storage`, 전용 키 `forgejo` |
+| Bitwarden | `ef50cbda-817a-4985-9518-b4f7009538fa`(관리자 `me`), `31997b29-000d-4eeb-a9af-b4f700954132`(인프라 시크릿 원본), `9829213e-c3ea-4a48-b3d0-b4bf00700c3a` 필드 `app password (forgejo)`(SMTP) |
+| Issuary | 클라이언트 `forgejo`, `ISSUARY_FORGEJO_CLIENT_SECRET` 병합 |
+| OPNsense | Unbound host override `git.winetree94.com → 10.132.246.2` |
+| Cloudflare | Tunnel ingress(catch-all 앞), proxied CNAME `git` |
+| CNPG | 첫 base backup 완료 후 `bootstrap.recovery` 로 전환, readme 갱신 |
+| 검증 | 익명 clone, HTTPS push(PAT), LFS(Garage), generic 패키지, OCI push/pull, SMTP 수신, UI에 SSH URL 미노출, 외부(Cloudflare)·내부 경로 200 |
+
+### 계획과 달라진 점 / 운영 메모
+
+- `[lfs]`에 `STORAGE_TYPE`을 직접 쓰면 `[storage]` 상속이 끊겨 MinIO endpoint가 비고 서버가 죽는다. `[lfs]`는 비워 두고 상속받는다(기본 prefix `lfs/`).
+- `[oauth2] ENABLE`은 deprecated → `ENABLED`.
+- 차트의 env-to-ini는 app.ini에 키를 **추가/수정만** 하고 삭제하지 않는다. values에서 키를 지웠다면 PVC의 `/data/gitea/conf/app.ini`에서도 직접 지워야 한다. Helm도 Secret `stringData`에서 빠진 키(`forgejo-inline-config`의 `data.*`)를 지우지 못하므로 함께 정리한다.
+- OIDC 인증 소스(`issuary`)와 관리자 계정은 차트 init 컨테이너가 매 기동 시 동기화한다.
+- 남은 확인: 사용자가 Issuary로 처음 로그인했을 때 `ACCOUNT_LINKING=login` 연결 화면이 정상 동작하는지(사람만 할 수 있는 단계).

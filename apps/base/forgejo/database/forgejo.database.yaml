@@ -56,17 +56,21 @@ spec:
           storage: 10Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
-  # TODO: switch to bootstrap.recovery (see bifrost) once the first base
-  # backup has landed in Garage S3.
+  externalClusters:
+    - name: forgejo-database-recovery-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: forgejo-database-backup-store
+          serverName: forgejo-database-cluster
   bootstrap:
-    initdb:
+    # Recreate the cluster from the Barman S3 base backup on a full rebuild.
+    # The `forgejo` database (UTF8, C collation), its owner and the owner
+    # password (forgejo-database-user-secret) are restored with the backup.
+    recovery:
+      source: forgejo-database-recovery-source
       database: forgejo
       owner: forgejo
-      encoding: UTF8
-      localeCollate: C
-      localeCType: C
-      secret:
-        name: forgejo-database-user-secret
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
