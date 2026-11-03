@@ -287,3 +287,11 @@ USER = notify@winetree94.com
 - Git·API는 비밀번호 Basic 인증을 거부한다. PAT 또는 `git-credential-oauth` 토큰만 쓴다.
 - 로컬 비밀번호(Bitwarden `ef50cbda-…`)는 차트 init 컨테이너가 계속 동기화하지만 로그인에는 쓸 수 없다.
 - **비상 접근**(Issuary 장애 시): `kubectl -n forgejo-system exec deploy/forgejo -c forgejo -- forgejo admin user generate-access-token --username me --token-name emergency --scopes all`로 토큰을 발급해 API를 쓴다. 웹 UI가 필요하면 values에서 `ENABLE_INTERNAL_SIGNIN`을 일시적으로 `true`로 되돌린다.
+
+### 사고 기록: DB 비밀번호 초기화 (2026-11-03)
+
+`bootstrap.recovery`로 바꿀 때 `secret`을 빼자 CNPG가 `forgejo-database-cluster-app`을 새로 만들고 `forgejo` 역할 비밀번호를 그 값으로 바꿨다. 그 결과 다음 롤아웃에서 Forgejo가 DB에 접속하지 못했다(`password authentication failed`). 이미 실행 중이던 파드는 기존 연결을 유지해 바로 드러나지 않았다.
+
+- `recovery.secret: forgejo-database-user-secret`을 복원했다(`dc3787c`).
+- `ALTER ROLE forgejo PASSWORD …`로 비밀번호를 sealed secret 값으로 되돌렸다.
+- bifrost는 앱이 `*-database-user-secret`을 쓰면서 recovery에 `secret`이 없어 같은 위험이 있는지 별도로 확인할 것.
