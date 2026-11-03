@@ -42,6 +42,6 @@ metadata:
   namespace: rclone-system
 spec:
   basicAuth:
-    # rclone-secrets key `users`: the admin entry only (mcp stays rclone-internal).
-    secret: rclone-secrets
+    # Admin entry only (the mcp login stays rclone-internal).
+    secret: rclone-basic-auth
     realm: rclone

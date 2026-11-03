@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - rclone.namespace.yaml
   - rclone.secret.yaml
+  - rclone.basic-auth.secret.yaml
   - rclone.deployment.yaml
   - rclone.service.yaml
   - rclone.ingress-route.yaml
