@@ -62,10 +62,14 @@ spec:
   bootstrap:
     # Recreate the cluster from the Barman S3 base backup on a full rebuild.
     # The UTF8 `bifrost` database and its owner are restored with the backup.
+    # Keep `secret`: without it CNPG may generate bifrost-database-cluster-app
+    # and reset the owner password, locking Bifrost out of the database.
     recovery:
       source: bifrost-database-recovery-source
       database: bifrost
       owner: bifrost
+      secret:
+        name: bifrost-database-user-secret
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
