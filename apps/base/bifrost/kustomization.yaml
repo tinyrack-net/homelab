@@ -3,6 +3,9 @@ kind: Kustomization
 resources:
   - bifrost.namespace.yaml
   - bifrost.secrets.yaml
+  - bifrost.database.user.secret.yaml
+  - bifrost.database.superuser.secret.yaml
+  - bifrost.database.yaml
   - bifrost.pvc.yaml
   - bifrost.configmap.yaml
   - bifrost.statefulset.yaml

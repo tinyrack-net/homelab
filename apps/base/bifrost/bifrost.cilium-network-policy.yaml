@@ -25,6 +25,15 @@ specs:
               - port: "8080"
                 protocol: TCP
     egress:
+      # Config and logs stores
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bifrost-system
+              cnpg.io/cluster: bifrost-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
       # Outbound to internal & external Traefik pods directly
       - toEndpoints:
           - matchLabels:
@@ -76,6 +85,68 @@ specs:
           - ports:
               - port: "8080"
                 protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: bifrost-system
+        cnpg.io/cluster: bifrost-database-cluster
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bifrost-system
+              app: bifrost
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+              - port: "9187"
+                protocol: TCP
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bifrost-system
+              cnpg.io/cluster: bifrost-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bifrost-system
+              cnpg.io/cluster: bifrost-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+              - port: "8000"
+                protocol: TCP
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: cnpg-system
+        toPorts:
+          - ports:
+              - port: "8000"
+                protocol: TCP
+              - port: "9187"
+                protocol: TCP
+      # Barman object storage backups go through internal Traefik (Garage S3).
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -119,9 +190,9 @@ metadata:
   labels:
     networking.tinyrack.net/owner: bifrost
   annotations:
-    networking.tinyrack.net/hosts: llm.intranet.winetree94.com
+    networking.tinyrack.net/hosts: llm.intranet.winetree94.com,storage.intranet.winetree94.com
 spec:
-  description: Allow the llm.intranet.winetree94.com route to reach bifrost-service and bifrost to reach internal traefik
+  description: Allow the llm.intranet.winetree94.com route to reach bifrost-service, bifrost to reach internal traefik, and bifrost database backups to reach Garage S3
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -131,6 +202,9 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: bifrost-system
             app: bifrost
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: bifrost-system
+            cnpg.io/cluster: bifrost-database-cluster
       toPorts:
         - ports:
             - port: "8443"
