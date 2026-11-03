@@ -243,7 +243,7 @@ IngressRoute rclone.intranet.winetree94.com
 
 ---
 
-## 계획: rclone Web GUI 제거 (2026-11-03, 미실행)
+## rclone Web GUI 제거 (2026-11-03, 실행 완료)
 
 Web GUI는 쓰지 않기로 했다. `rclone gui`를 다시 **`rclone rcd`(loopback 전용)**로 되돌리고, 외부에 노출하던 것을 모두 걷어낸다. **namespace `rclone-system`, 경로 `apps/base/rclone`, Bifrost `rclone` 서버는 그대로 둔다.**
 
@@ -296,3 +296,17 @@ DNS: `rclone.intranet.winetree94.com`은 별도 레코드 없이 `*.intranet` �
 
 - 실패하면 `git revert`로 GUI 구성(커밋 `b645868`)으로 돌아간다. 그 경우 `RCLONE_WEB_ADMIN_PASS`는 Bitwarden에 아직 있어야 하므로, **필드 삭제는 검증이 끝난 뒤 마지막에 한다.**
 - 바뀌는 것은 MCP가 rclone에 붙는 주소(`/api` 제거)와 인증 방식(htpasswd → `--rc-user/--rc-pass`)이다. 둘 다 GUI 추가 전에 쓰던 값이라 위험이 낮다.
+
+### 실행 결과 (2026-11-03)
+
+| 항목 | 결과 |
+|---|---|
+| 커밋 | `9a45471` feat(rclone): drop the web GUI and keep rcd on loopback |
+| pod | `rclone` 2/2 Running. `rclone rcd`가 `http://127.0.0.1:5572/`에서 동작하고, rclone-mcp는 같은 주소로 붙는다(도구 68개) |
+| 남은 리소스 | `rclone-system`: Service `rclone-mcp`, SealedSecret `rclone-secrets`(키 10개, `htpasswd` 없음), ConfigMap `rclone-config-*`, CNP `app-rclone`. `traefik-system/route-rclone`의 hosts는 `storage.intranet.winetree94.com`만 남았다. Service `rclone`, IngressRoute, Middleware, `rclone-basic-auth`는 prune됐다 |
+| 외부 | `https://rclone.intranet.winetree94.com/`과 `/api/` 모두 404. OPNsense `config.xml`에 rclone 항목 없음 |
+| Bifrost | `rclone` 클라이언트 그대로. remote 4개, Garage·Hetzner `lsd`, Garage 버킷 생성→업로드→`purge` 성공 |
+| Cilium | `rclone-system` drop 없음 |
+| Bitwarden | `344e14cc-…`에서 `RCLONE_WEB_ADMIN_PASS` 필드 삭제. 남은 필드는 `EMAIL_MCP_HTTP_TOKEN`, `RCLONE_MCP_TOKEN`, `RCLONE_RC_PASS` |
+
+S3를 브라우저로 다뤄야 하면 사람이 직접 쓰는 도구로 해결한다. 로컬 `rclone`, Garage는 `garage-webui`(OMV), Hetzner·AWS는 각 콘솔을 쓴다. 클러스터에는 UI를 두지 않는다.
