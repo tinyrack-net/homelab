@@ -12,12 +12,12 @@ resources:
 configMapGenerator:
   # Branding and portfolio customization, mounted under GITEA_CUSTOM
   # (/data/gitea) by values.yaml. Edit the files in ./custom.
+  # Flux's source-controller drops *.png/*.jpg by default, so keep
+  # images as SVG.
   - name: forgejo-custom
     namespace: forgejo-system
     files:
       - custom/logo.svg
-      - custom/favicon.png
-      - custom/apple-touch-icon.png
       - custom/theme-winetree94-light.css
       - custom/theme-winetree94-dark.css
       - custom/theme-winetree94-auto.css

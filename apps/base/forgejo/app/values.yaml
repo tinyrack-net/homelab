@@ -51,7 +51,7 @@ test:
 
 # Branding and portfolio customization from the forgejo-custom ConfigMap
 # (./custom). Files are projected read-only into GITEA_CUSTOM=/data/gitea:
-#   public/assets/img/*         logo, favicons
+#   public/assets/img/*         logo, favicon (SVG only)
 #   public/assets/css/theme-*   winetree94 violet themes
 #   templates/custom/*.tmpl     <head> additions, navbar and footer links
 extraVolumes:
@@ -66,14 +66,6 @@ extraContainerVolumeMounts:
   - name: forgejo-custom
     mountPath: /data/gitea/public/assets/img/favicon.svg
     subPath: logo.svg
-    readOnly: true
-  - name: forgejo-custom
-    mountPath: /data/gitea/public/assets/img/favicon.png
-    subPath: favicon.png
-    readOnly: true
-  - name: forgejo-custom
-    mountPath: /data/gitea/public/assets/img/apple-touch-icon.png
-    subPath: apple-touch-icon.png
     readOnly: true
   - name: forgejo-custom
     mountPath: /data/gitea/public/assets/css/theme-winetree94-light.css
@@ -104,7 +96,7 @@ gitea:
   # subPath mounts do not follow ConfigMap updates; bump this after editing
   # ./custom so the pod restarts with the new files.
   podAnnotations:
-    forgejo.tinyrack.net/custom-revision: "1"
+    forgejo.tinyrack.net/custom-revision: "2"
 
   admin:
     existingSecret: forgejo-admin-secret
