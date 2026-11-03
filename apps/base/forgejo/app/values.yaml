@@ -49,7 +49,63 @@ persistence:
 test:
   enabled: false
 
+# Branding and portfolio customization from the forgejo-custom ConfigMap
+# (./custom). Files are projected read-only into GITEA_CUSTOM=/data/gitea:
+#   public/assets/img/*         logo, favicons
+#   public/assets/css/theme-*   winetree94 violet themes
+#   templates/custom/*.tmpl     <head> additions, navbar and footer links
+extraVolumes:
+  - name: forgejo-custom
+    configMap:
+      name: forgejo-custom
+extraContainerVolumeMounts:
+  - name: forgejo-custom
+    mountPath: /data/gitea/public/assets/img/logo.svg
+    subPath: logo.svg
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/public/assets/img/favicon.svg
+    subPath: logo.svg
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/public/assets/img/favicon.png
+    subPath: favicon.png
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/public/assets/img/apple-touch-icon.png
+    subPath: apple-touch-icon.png
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/public/assets/css/theme-winetree94-light.css
+    subPath: theme-winetree94-light.css
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/public/assets/css/theme-winetree94-dark.css
+    subPath: theme-winetree94-dark.css
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/public/assets/css/theme-winetree94-auto.css
+    subPath: theme-winetree94-auto.css
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/templates/custom/header.tmpl
+    subPath: header.tmpl
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/templates/custom/extra_links.tmpl
+    subPath: extra_links.tmpl
+    readOnly: true
+  - name: forgejo-custom
+    mountPath: /data/gitea/templates/custom/extra_links_footer.tmpl
+    subPath: extra_links_footer.tmpl
+    readOnly: true
+
 gitea:
+  # subPath mounts do not follow ConfigMap updates; bump this after editing
+  # ./custom so the pod restarts with the new files.
+  podAnnotations:
+    forgejo.tinyrack.net/custom-revision: "1"
+
   admin:
     existingSecret: forgejo-admin-secret
     email: me@winetree94.com
@@ -109,7 +165,9 @@ gitea:
           key: FORGEJO__STORAGE__MINIO_SECRET_ACCESS_KEY
 
   config:
-    APP_NAME: Forgejo
+    APP_NAME: winetree94
+    APP_SLOGAN: code & homelab
+    APP_DISPLAY_NAME_FORMAT: "{APP_NAME} · {APP_SLOGAN}"
     RUN_MODE: prod
 
     server:
@@ -124,7 +182,8 @@ gitea:
       SSH_DOMAIN: git.winetree94.com
       LFS_START_SERVER: true
       OFFLINE_MODE: true
-      LANDING_PAGE: explore
+      # Single-user portfolio: the profile page is the front page.
+      LANDING_PAGE: /me
 
     database:
       DB_TYPE: postgres
@@ -179,7 +238,24 @@ gitea:
       ENABLE_PUSH_CREATE_ORG: true
 
     ui:
-      DEFAULT_THEME: forgejo-auto
+      DEFAULT_THEME: winetree94-auto
+      THEMES: winetree94-auto,winetree94-light,winetree94-dark,forgejo-auto,forgejo-light,forgejo-dark
+      SHOW_USER_EMAIL: false
+      EXPLORE_PAGING_DEFAULT_SORT: recentupdate
+
+    ui.meta:
+      AUTHOR: hansol park (winetree94)
+      DESCRIPTION: Projects and homelab infrastructure by winetree94, a front-end developer in Seoul.
+      KEYWORDS: winetree94,portfolio,front-end,typescript,homelab,kubernetes
+
+    service.explore:
+      # Single-user instance: there is nobody else to list.
+      DISABLE_USERS_PAGE: true
+      DISABLE_ORGANIZATIONS_PAGE: true
+
+    other:
+      SHOW_FOOTER_VERSION: false
+      SHOW_FOOTER_TEMPLATE_LOAD_TIME: false
 
     i18n:
       LANGS: ko-KR,en-US

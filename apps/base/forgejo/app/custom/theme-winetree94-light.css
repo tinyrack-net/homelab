@@ -1,0 +1,30 @@
+/* winetree94 theme: Forgejo's built-in theme with a violet primary palette.
+   Selectable as "winetree94-*" and set as DEFAULT_THEME in values.yaml. */
+@import "theme-forgejo-light.css";
+
+:root {
+  --color-primary: #6d28d9;
+  --color-primary-contrast: #ffffff;
+  --color-primary-dark-1: #6d28d9;
+  --color-primary-dark-2: #5b21b6;
+  --color-primary-dark-3: #5b21b6;
+  --color-primary-dark-4: #4c1d95;
+  --color-primary-light-1: #7c3aed;
+  --color-primary-light-2: #8b5cf6;
+  --color-primary-light-3: #a78bfa;
+  --color-primary-light-4: #c4b5fd;
+  --color-primary-light-5: #ddd6fe;
+  --color-primary-light-6: #ede9fe;
+  --color-primary-light-7: #f5f3ff;
+  --color-primary-alpha-10: #6d28d919;
+  --color-primary-alpha-20: #6d28d933;
+  --color-primary-alpha-30: #6d28d94b;
+  --color-primary-alpha-40: #6d28d966;
+  --color-primary-alpha-50: #6d28d980;
+  --color-primary-alpha-60: #6d28d999;
+  --color-primary-alpha-70: #6d28d9b3;
+  --color-primary-alpha-80: #6d28d9cc;
+  --color-primary-alpha-90: #6d28d9e1;
+  --color-primary-hover: var(--color-primary-dark-2);
+  --color-primary-active: var(--color-primary-dark-4);
+}

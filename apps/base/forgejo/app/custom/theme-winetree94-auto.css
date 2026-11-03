@@ -1,0 +1,4 @@
+/* winetree94 theme: Forgejo's built-in theme with a violet primary palette.
+   Selectable as "winetree94-*" and set as DEFAULT_THEME in values.yaml. */
+@import "theme-winetree94-light.css";
+@import "theme-winetree94-dark.css" (prefers-color-scheme: dark);

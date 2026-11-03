@@ -10,6 +10,25 @@ resources:
   - forgejo.cilium-network-policy.yaml
   - forgejo.traefik.cilium-network-policy.yaml
 configMapGenerator:
+  # Branding and portfolio customization, mounted under GITEA_CUSTOM
+  # (/data/gitea) by values.yaml. Edit the files in ./custom.
+  - name: forgejo-custom
+    namespace: forgejo-system
+    files:
+      - custom/logo.svg
+      - custom/favicon.png
+      - custom/apple-touch-icon.png
+      - custom/theme-winetree94-light.css
+      - custom/theme-winetree94-dark.css
+      - custom/theme-winetree94-auto.css
+      - custom/header.tmpl
+      - custom/extra_links.tmpl
+      - custom/extra_links_footer.tmpl
+    options:
+      # Referenced by a fixed name from values.yaml. Templates and assets are
+      # loaded at startup, so bump gitea.podAnnotations
+      # forgejo.tinyrack.net/custom-revision after editing ./custom.
+      disableNameSuffixHash: true
   - name: forgejo-values
     namespace: forgejo-system
     files:
