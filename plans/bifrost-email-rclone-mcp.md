@@ -240,3 +240,59 @@ IngressRoute rclone.intranet.winetree94.com
   - Bifrost `rclone.operations_publiclink(fs, remote, expire="1h")`로 presigned URL을 받는다.
   - 로컬 `rclone copy`를 쓴다.
 - BrowserOS로 GUI를 자동 조작할 때는 BrowserOS 오버레이가 버튼을 가리는 경우가 있다. Connect는 비밀번호 칸에서 Enter로 제출한다.
+
+---
+
+## 계획: rclone Web GUI 제거 (2026-11-03, 미실행)
+
+Web GUI는 쓰지 않기로 했다. `rclone gui`를 다시 **`rclone rcd`(loopback 전용)**로 되돌리고, 외부에 노출하던 것을 모두 걷어낸다. **namespace `rclone-system`, 경로 `apps/base/rclone`, Bifrost `rclone` 서버는 그대로 둔다.**
+
+### 바뀌는 것
+
+| 대상 | 현재 | 변경 후 |
+|---|---|---|
+| `rclone` 컨테이너 | `gui --addr=:5522 --api-addr=:5572 --rc-baseurl=/api --rc-htpasswd` | `rcd --rc-addr=127.0.0.1:5572 --rc-user=mcp`. 비밀번호는 env `RCLONE_RC_PASS`에서 읽는다(GUI 추가 전 방식) |
+| probe | gui `:5522` httpGet + api tcpSocket | rclone 컨테이너 probe 제거(loopback이라 kubelet이 닿지 않는다). rclone-mcp의 tcpSocket probe만 남긴다 |
+| `rclone-mcp` env | `RCLONE_URL=http://127.0.0.1:5572/api` | `http://127.0.0.1:5572` |
+| Service `rclone`(5522, 5572) | 있음 | **삭제**. `rclone-mcp`(8000)만 남긴다 |
+| IngressRoute, Middleware `rclone-basic-auth` | 있음 | **삭제** (`rclone.ingress-route.yaml`) |
+| SealedSecret `rclone-basic-auth` | 있음 | **삭제** (`rclone.basic-auth.secret.yaml`) |
+| SealedSecret `rclone-secrets` | `htpasswd` 키 포함 | `htpasswd` 키를 빼고 다시 봉인한다. 나머지 키(S3, `RCLONE_MCP_TOKEN`, `RCLONE_RC_PASS`)는 그대로 둔다 |
+| secrets 볼륨 마운트 | `/secrets/htpasswd` | 삭제 |
+| CNP `app-rclone` | ingress: bifrost `:8000` + traefik `:5522/:5572` | ingress: bifrost `:8000`만 남긴다. egress(traefik `:8443`, Garage)는 그대로 둔다 |
+| CNP `traefik-system/route-rclone` | hosts `rclone.intranet…,storage.intranet…`. ingress(Garage) + egress(rclone svc) | hosts는 `storage.intranet.winetree94.com`만 남긴다. egress(→ rclone svc) 규칙은 삭제하고, ingress(rclone pod → `:8443`)는 남긴다 |
+| Bitwarden `344e14cc-…` | 필드 `RCLONE_WEB_ADMIN_PASS` 있음 | 필드 삭제 |
+| 이 문서 | "rclone-system 이전과 Web GUI 추가" 절 | 그대로 둔다(이력). 아래에 결과를 추가한다 |
+
+바뀌지 않는 것:
+- Bifrost `rclone` 클라이언트 주소는 그대로다(`rclone-mcp.rclone-system.svc…:8000/mcp`). 재등록이 필요 없다.
+- `rclone.conf`(configMapGenerator), init 컨테이너, `RCLONE_TOOLSETS=default,dangerous`, 리소스 설정도 그대로다.
+
+DNS: `rclone.intranet.winetree94.com`은 별도 레코드 없이 `*.intranet` 와일드카드로 내부 Traefik에 붙어 있었다. 따라서 IngressRoute만 지우면 404가 된다. 지울 DNS 레코드는 없다(실행 시 OPNsense override가 없는지 한 번 확인한다).
+
+### 실행 단계
+
+1. **secret 재봉인**: `rclone-secrets`에서 `htpasswd`를 빼고 `kubeseal`로 다시 만든다. 값은 Bitwarden과 로그인 셸 env에서 파이프로만 넘긴다.
+2. **매니페스트 수정**
+   - `rclone.deployment.yaml`: args, probe, `RCLONE_URL`, secrets 볼륨을 고친다. 상단 주석도 고친다.
+   - `rclone.service.yaml`: Service `rclone`을 삭제한다.
+   - `rclone.ingress-route.yaml`, `rclone.basic-auth.secret.yaml`: 삭제하고 `kustomization.yaml`에서 뺀다.
+   - CNP 두 개를 위 표대로 고친다.
+3. **검증(로컬)**
+   - `kubectl kustomize ./apps/base/rclone`을 실행한다. 렌더링 결과에 `5522`, `htpasswd`, `basic-auth`가 남아 있지 않은지 `grep`으로 확인한다.
+   - `kubectl kustomize ./apps/overlays/production`도 실행한다.
+4. **커밋·배포**: `feat(rclone): drop the web GUI and keep rcd on loopback`. push 후 `flux reconcile`한다. 지운 리소스(Service, IngressRoute, Middleware, SealedSecret)는 prune된다.
+5. **검증(클러스터)**
+   - pod `2/2 Running`, 로그에 `Serving remote control on http://127.0.0.1:5572/`가 보이는지 확인한다.
+   - `rclone-system`에 남은 리소스가 Service `rclone-mcp`와 SealedSecret `rclone-secrets`뿐인지 본다. `traefik-system/route-rclone`의 hosts도 확인한다.
+   - `https://rclone.intranet.winetree94.com/`이 404를 반환하는지 확인한다.
+   - Bifrost `rclone`으로 `config_listremotes`, `homelab_garage:`/`hetzner_fsn:` `lsd`를 실행한다. Garage에서 테스트 버킷 생성 → 업로드 → `purge`까지 해 본다.
+   - `hubble observe --verdict DROPPED -n rclone-system`에 drop이 없는지 본다.
+6. **정리**
+   - Bitwarden에서 `RCLONE_WEB_ADMIN_PASS` 필드를 지운다.
+   - 이 문서에 실행 결과를 기록한다.
+
+### 위험·되돌리기
+
+- 실패하면 `git revert`로 GUI 구성(커밋 `b645868`)으로 돌아간다. 그 경우 `RCLONE_WEB_ADMIN_PASS`는 Bitwarden에 아직 있어야 하므로, **필드 삭제는 검증이 끝난 뒤 마지막에 한다.**
+- 바뀌는 것은 MCP가 rclone에 붙는 주소(`/api` 제거)와 인증 방식(htpasswd → `--rc-user/--rc-pass`)이다. 둘 다 GUI 추가 전에 쓰던 값이라 위험이 낮다.
