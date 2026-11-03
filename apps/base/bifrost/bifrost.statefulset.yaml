@@ -23,16 +23,15 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        # Populate config.json on the persistent data volume only if absent
+        # Sync config.json from the ConfigMap on every start. Runtime UI/API
+        # edits live in the PostgreSQL config store (split source-of-truth mode).
         - name: init-config
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command:
             - sh
             - -c
             - |
-              if [ ! -f /app/data/config.json ]; then
-                cp /bootstrap/config.json /app/data/config.json
-              fi
+              cp /bootstrap/config.json /app/data/config.json
           volumeMounts:
             - name: bootstrap-config
               mountPath: /bootstrap
@@ -99,6 +98,11 @@ spec:
                 secretKeyRef:
                   name: bifrost-secrets
                   key: encryption-key
+            - name: BIFROST_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bifrost-database-user-secret
+                  key: password
             - name: BIFROST_ADMIN_USERNAME
               value: "admin"
             - name: BIFROST_ADMIN_PASSWORD

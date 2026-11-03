@@ -18,17 +18,31 @@ data:
         "enforce_auth_on_inference": true
       },
       "config_store": {
-        "type": "sqlite",
+        "type": "postgres",
         "enabled": true,
         "config": {
-          "path": "/app/data/config.db"
+          "host": "bifrost-database-cluster-rw.bifrost-system.svc.cluster.local",
+          "port": "5432",
+          "user": "bifrost",
+          "password": "env.BIFROST_POSTGRES_PASSWORD",
+          "db_name": "bifrost",
+          "ssl_mode": "require",
+          "max_idle_conns": 5,
+          "max_open_conns": 20
         }
       },
       "logs_store": {
-        "type": "sqlite",
+        "type": "postgres",
         "enabled": true,
         "config": {
-          "path": "/app/data/logs.db"
+          "host": "bifrost-database-cluster-rw.bifrost-system.svc.cluster.local",
+          "port": "5432",
+          "user": "bifrost",
+          "password": "env.BIFROST_POSTGRES_PASSWORD",
+          "db_name": "bifrost",
+          "ssl_mode": "require",
+          "max_idle_conns": 5,
+          "max_open_conns": 20
         }
       },
       "plugins": [
