@@ -1,0 +1,38 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: forgejo-database
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/forgejo/database
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: cloudnative-pg
+    - name: sealed-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: forgejo-deployment
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: ./apps/base/forgejo/app
+  prune: true
+  timeout: 15m
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: load-repositories
+    - name: forgejo-database
+    - name: longhorn
+    - name: reflector

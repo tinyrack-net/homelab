@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: forgejo-system
+spec:
+  interval: 5m
+  timeout: 15m
+  releaseName: forgejo
+  targetNamespace: forgejo-system
+  storageNamespace: forgejo-system
+  chartRef:
+    kind: OCIRepository
+    name: forgejo-repository
+    namespace: flux-system
+  install:
+    remediation:
+      retries: 0
+  upgrade:
+    remediation:
+      retries: 0
+  valuesFrom:
+    - kind: ConfigMap
+      name: forgejo-values
+      valuesKey: values.yaml

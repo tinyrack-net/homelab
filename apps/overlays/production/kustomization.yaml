@@ -27,3 +27,4 @@ resources:
   - dbhub.yaml
   - bifrost.yaml
   - gcp-mcp.yaml
+  - forgejo.yaml

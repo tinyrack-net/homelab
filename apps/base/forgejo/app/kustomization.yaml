@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - forgejo.admin.secret.yaml
+  - forgejo.oauth.secret.yaml
+  - forgejo.env.secret.yaml
+  - forgejo.pvc.yaml
+  - forgejo.helm-release.yaml
+  - forgejo.ingress-route.yaml
+  - forgejo.cilium-network-policy.yaml
+  - forgejo.traefik.cilium-network-policy.yaml
+configMapGenerator:
+  - name: forgejo-values
+    namespace: forgejo-system
+    files:
+      - values.yaml
+    options:
+      disableNameSuffixHash: true
+      labels:
+        reconcile.fluxcd.io/watch: Enabled

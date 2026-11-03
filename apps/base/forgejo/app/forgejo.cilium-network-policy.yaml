@@ -1,0 +1,70 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-forgejo
+  namespace: forgejo-system
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: forgejo-system
+      app.kubernetes.io/name: forgejo
+  ingress:
+    # Public route through traefik-external; internal Traefik for diagnostics.
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-external-system
+            app.kubernetes.io/name: traefik
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+  egress:
+    # PostgreSQL (CloudNativePG).
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: forgejo-system
+            cnpg.io/cluster: forgejo-database-cluster
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # Garage S3 (LFS, attachments, packages) through internal Traefik.
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+    # OIDC discovery, token and userinfo calls to Issuary through the public
+    # hostname, which resolves to the internal traefik-external LB.
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-external-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+    # Notification mail through the public SMTP submission endpoint, and
+    # HTTPS for repository migrations and pull mirrors from public forges.
+    # CiliumCIDRGroup cannot be referenced from `except`, so these stay literal.
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8 # RFC1918 private
+            - 100.64.0.0/10 # RFC6598 CGNAT (Tailscale)
+            - 169.254.0.0/16 # Link-local
+            - 172.16.0.0/12 # RFC1918 private
+            - 192.168.0.0/16 # RFC1918 private
+      toPorts:
+        - ports:
+            - port: "587"
+              protocol: TCP # SMTP submission
+            - port: "443"
+              protocol: TCP # HTTPS migrations / mirrors

@@ -6,3 +6,4 @@ resources:
   - nextcloud.yaml
   - nextcloud-mcp.yaml
   - collabora.yaml
+  - forgejo.yaml
