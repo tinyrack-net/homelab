@@ -4,9 +4,8 @@ metadata:
   name: app-rclone
   namespace: rclone-system
 spec:
-  # Bifrost reaches rclone-mcp; internal Traefik reaches the GUI and RC API.
-  # Hetzner and AWS S3 and the npm registry are public and covered by the
-  # isolated-namespaces policy.
+  # Only Bifrost talks to rclone-mcp. Hetzner and AWS S3 and the npm registry
+  # are public and covered by the isolated-namespaces policy.
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -20,16 +19,6 @@ spec:
       toPorts:
         - ports:
             - port: "8000"
-              protocol: TCP
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: traefik-system
-            app.kubernetes.io/name: traefik
-      toPorts:
-        - ports:
-            - port: "5522"
-              protocol: TCP
-            - port: "5572"
               protocol: TCP
   egress:
     # homelab_garage goes through internal Traefik (Garage S3).

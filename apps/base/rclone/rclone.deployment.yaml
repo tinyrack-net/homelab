@@ -1,15 +1,11 @@
-# One rclone process (`rclone gui`) serves the embedded web GUI and the RC API;
-# rclone-mcp (Bifrost: rclone) is a sidecar client of the same RC API, so the
-# web UI and the agents share remotes, jobs and config.
+# rclone RC API (rclone rcd, loopback only) + rclone-mcp (Bifrost: rclone).
 #
-#   :5522        web GUI (static)          -> rclone.intranet.winetree94.com/
-#   :5572/api/   RC API, htpasswd auth     -> rclone.intranet.winetree94.com/api/
-#                  admin: web GUI login, mcp: rclone-mcp
-#   :8000/mcp    rclone-mcp, Bearer token  -> Bifrost only
+#   127.0.0.1:5572  RC API, user mcp / RCLONE_RC_PASS (pod-internal)
+#   :8000/mcp       rclone-mcp, Bearer token (RCLONE_MCP_TOKEN) -> Bifrost only
 #
 # Toolsets: default + dangerous (purge, config_dump, core_command, ...).
 # Secrets: Bitwarden 344e14cc-213f-410a-9273-b4f700a68590
-#   (RCLONE_MCP_TOKEN, RCLONE_RC_PASS = mcp login, RCLONE_WEB_ADMIN_PASS = admin login).
+#   (RCLONE_MCP_TOKEN, RCLONE_RC_PASS).
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -36,7 +32,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        # A writable copy of rclone.conf, so the GUI and config_* tools can save
+        # A writable copy of rclone.conf, so config_* tools can save
         # changes (they last until the pod restarts; the ConfigMap stays the
         # source). Also installs the pinned rclone-mcp npm package.
         - name: init
@@ -75,22 +71,13 @@ spec:
           image: docker.io/rclone/rclone:1.75.2@sha256:2687085f718d3c628f7fdfb77c52a1d344332aed543110bb88088f2c70d43eb5
           imagePullPolicy: IfNotPresent
           args:
-            - gui
-            - --no-open-browser
-            - --addr=0.0.0.0:5522
-            - --api-addr=0.0.0.0:5572
-            - --rc-baseurl=/api
-            - --rc-htpasswd=/secrets/htpasswd
+            - rcd
+            - --rc-addr=127.0.0.1:5572
+            - --rc-user=mcp
             - --config=/config/rclone.conf
             - --cache-dir=/tmp/rclone-cache
-          ports:
-            - name: gui
-              containerPort: 5522
-              protocol: TCP
-            - name: api
-              containerPort: 5572
-              protocol: TCP
-          # RCLONE_CONFIG_<REMOTE>_* are read from the env.
+          # RCLONE_RC_PASS and RCLONE_CONFIG_<REMOTE>_* are read from the env.
+          # No probes: the RC API listens on loopback only, out of kubelet's reach.
           env:
             - name: HOME
               value: /tmp/home
@@ -102,23 +89,6 @@ spec:
               mountPath: /config
             - name: tmp
               mountPath: /tmp
-            - name: secrets
-              mountPath: /secrets
-              readOnly: true
-          startupProbe:
-            tcpSocket:
-              port: api
-            periodSeconds: 5
-            failureThreshold: 30
-          livenessProbe:
-            tcpSocket:
-              port: api
-            periodSeconds: 15
-          readinessProbe:
-            httpGet:
-              path: /
-              port: gui
-            periodSeconds: 10
           resources:
             requests:
               cpu: 50m
@@ -151,7 +121,7 @@ spec:
             - name: HOME
               value: /tmp/home
             - name: RCLONE_URL
-              value: http://127.0.0.1:5572/api
+              value: http://127.0.0.1:5572
             - name: RCLONE_USER
               value: mcp
             - name: RCLONE_PASS
@@ -209,10 +179,3 @@ spec:
           emptyDir: {}
         - name: tmp
           emptyDir: {}
-        - name: secrets
-          secret:
-            secretName: rclone-secrets
-            items:
-              - key: htpasswd
-                path: htpasswd
-            defaultMode: 0440
