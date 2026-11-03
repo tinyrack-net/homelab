@@ -3,8 +3,12 @@ kind: Kustomization
 resources:
   - email-mcp.namespace.yaml
   - email-mcp.secret.yaml
-  - email-mcp.configmap.yaml
   - email-mcp.pvc.yaml
   - email-mcp.deployment.yaml
   - email-mcp.service.yaml
   - email-mcp.cilium-network-policy.yaml
+configMapGenerator:
+  - name: email-mcp-config
+    namespace: email-mcp-system
+    files:
+      - config.toml=email-mcp.config.toml
