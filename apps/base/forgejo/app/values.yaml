@@ -165,7 +165,7 @@ gitea:
 
     # Built-in OAuth2 provider, used by git-credential-oauth for HTTPS pushes.
     oauth2:
-      ENABLE: true
+      ENABLED: true
 
     repository:
       DEFAULT_BRANCH: main
@@ -208,9 +208,8 @@ gitea:
       MINIO_BUCKET_LOOKUP: path
       SERVE_DIRECT: false
 
-    lfs:
-      STORAGE_TYPE: minio
-      MINIO_BASE_PATH: lfs/
+    # No STORAGE_TYPE here: setting it breaks inheritance from [storage] and
+    # leaves the MinIO endpoint empty. [lfs] inherits and uses the lfs/ prefix.
 
     packages:
       ENABLED: true
