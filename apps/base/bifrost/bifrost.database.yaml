@@ -52,14 +52,20 @@ spec:
   enableSuperuserAccess: true
   superuserSecret:
     name: bifrost-database-superuser-secret
+  externalClusters:
+    - name: bifrost-database-recovery-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: bifrost-database-backup-store
+          serverName: bifrost-database-cluster
   bootstrap:
-    initdb:
-      # Bifrost requires a UTF8 database for both the config and logs stores.
+    # Recreate the cluster from the Barman S3 base backup on a full rebuild.
+    # The UTF8 `bifrost` database and its owner are restored with the backup.
+    recovery:
+      source: bifrost-database-recovery-source
       database: bifrost
       owner: bifrost
-      encoding: UTF8
-      secret:
-        name: bifrost-database-user-secret
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup

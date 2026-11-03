@@ -72,10 +72,12 @@ git commit -m "chore: resume applications after cluster recovery"
 git push
 ```
 
-All seven CNPG manifests use `bootstrap.recovery`; they recreate their databases
-from S3 when Flux applies the application manifests. Verify CNPG recovery before
-allowing external traffic, then check Flux, certificates, ingress, storage, and
-core application data.
+CNPG manifests that declare `bootstrap.recovery` (bifrost, davinci-resolve,
+issuary, mathesar, n8n, openwebui, personal-data) recreate their databases
+from S3 when Flux applies the application manifests; clusters still declared
+with `bootstrap.initdb` come up empty after a rebuild and need a manual
+restore. Verify CNPG recovery before allowing external traffic, then check
+Flux, certificates, ingress, storage, and core application data.
 
 ## Bootstrap
 
