@@ -198,7 +198,7 @@ apps/base/bifrost/bifrost.cilium-network-policy.yaml (+ egress to both namespace
 - **Hetzner는 버킷 생성·삭제가 eventual consistency다.** `mkdir` 직후 PutObject를 하면 `NoSuchBucket`이 나고, `purge` 직후 목록에는 버킷이 잠시 남아 있다. 10–20초 뒤에는 정상이다.
 - rclone-mcp에는 health endpoint가 없다(`/mcp` 이외는 404). 그래서 tcpSocket probe를 쓴다.
 - `rclone rcd`는 `RCLONE_RC_PASS`를 환경변수에서 읽는다. 그래서 args에 비밀번호를 넣지 않는다.
-- email-mcp 0.6.0 스키마에는 계정별 `save_to_sent`/`sent_mailbox`가 없다(main 브랜치에만 있다). 전역 `save_to_sent=false`가 기본이다. Stalwart는 서버가 보낸 메일함에 사본을 저장하지 않으므로, MCP로 보낸 메일은 Sent 폴더에 남지 않는다.
+- 보낸 메일 사본: `[settings.send] save_to_sent = true`(2026-11-03 추가). Stalwart 계정은 \Sent 폴더(`Sent Items`)에 사본이 저장된다. 배포된 0.6.0 이미지는 Gmail 계정을 자동으로 건너뛴다(git 태그 v0.6.0 소스와 다르다). Gmail에서 사본이 중복되지 않는 것도 확인했다. config는 `email-mcp.config.toml` + `configMapGenerator`로 관리하므로, 바꾸면 pod가 자동으로 재시작된다.
 - email-mcp 계정 이름에 `@`이 들어가도 동작한다(himalaya 이름과 같다).
 - Bifrost `GET /api/mcp/clients`는 기본 `limit=25`로 페이지를 나눈다. 전체를 보려면 `?limit=100`을 붙인다.
-- 남은 일: `email-management` 스킬 등 에이전트 지침에 Bifrost `email`·`rclone` 서버 사용법을 반영할지 정한다.
+- `email-management` 스킬을 Bifrost `email` 우선, Himalaya는 대체 수단으로 갱신했다(2026-11-03).

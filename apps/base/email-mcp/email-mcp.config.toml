@@ -8,8 +8,8 @@ rate_limit = 10
 read_only = false
 
 # File a copy of every sent message in the IMAP \Sent folder. Stalwart does
-# not file submissions itself. Global in 0.6.0 (no per-account override), so
-# it also applies to the Gmail accounts.
+# not file submissions itself; email-mcp skips Gmail accounts on its own
+# because Gmail already files them (verified: no duplicate).
 [settings.send]
 save_to_sent = true
 
