@@ -191,6 +191,20 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+  - id: forgejo
+    name: Forgejo
+    client_id: forgejo
+    client_secret: ${ISSUARY_FORGEJO_CLIENT_SECRET}
+    # Forgejo builds the callback from the auth source name ("issuary").
+    redirect_uris:
+      - https://git.winetree94.com/user/oauth2/issuary/callback
+    response_types:
+      - code
+    grant_types:
+      - authorization_code
+      - refresh_token
+    scope: openid profile email
+    skip_consent: true
   - id: stalwart-webui
     name: Stalwart WebUI
     client_id: stalwart-webui
