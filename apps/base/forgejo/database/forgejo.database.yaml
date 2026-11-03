@@ -65,12 +65,16 @@ spec:
           serverName: forgejo-database-cluster
   bootstrap:
     # Recreate the cluster from the Barman S3 base backup on a full rebuild.
-    # The `forgejo` database (UTF8, C collation), its owner and the owner
-    # password (forgejo-database-user-secret) are restored with the backup.
+    # The `forgejo` database (UTF8, C collation) and its owner are restored
+    # with the backup. Keep `secret`: without it CNPG generates a new
+    # forgejo-database-cluster-app secret and resets the owner password,
+    # which locks Forgejo out of the database.
     recovery:
       source: forgejo-database-recovery-source
       database: forgejo
       owner: forgejo
+      secret:
+        name: forgejo-database-user-secret
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
