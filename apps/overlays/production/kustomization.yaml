@@ -28,5 +28,4 @@ resources:
   - bifrost.yaml
   - gcp-mcp.yaml
   - email-mcp.yaml
-  - rclone.yaml
   - forgejo.yaml
