@@ -67,20 +67,6 @@ spec:
           volumeMounts:
             - name: tools
               mountPath: /tools
-        # Skills marketplace (Claude Code / Codex) serves via `git upload-pack`;
-        # Bifrost disables marketplace routes when git is not on PATH.
-        - name: init-tools-git
-          image: docker.io/alpine/git:v2.52.0@sha256:4a0e72d49596a1f5d3701aeedafdadc5c0da4062be4657c7bdc4017387f591cc
-          command:
-            - sh
-            - -c
-            - |
-              mkdir -p /tools/bin /tools/lib
-              cp /usr/bin/git /tools/bin/
-              cp /usr/lib/libpcre2-8.so.0 /tools/lib/
-          volumeMounts:
-            - name: tools
-              mountPath: /tools
       containers:
         - name: bifrost
           image: docker.io/maximhq/bifrost:v2.4.0@sha256:a1c90607dcfd13c1fb2f9476ceb3bb24407a50ade7fdf3e61a59fb42b09e5c57

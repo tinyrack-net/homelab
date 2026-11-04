@@ -15,8 +15,7 @@ data:
       "client": {
         "allowed_origins": ["*"],
         "enable_logging": true,
-        "enforce_auth_on_inference": true,
-        "skills_external_client_url": "https://llm.intranet.winetree94.com"
+        "enforce_auth_on_inference": true
       },
       "config_store": {
         "type": "postgres",
