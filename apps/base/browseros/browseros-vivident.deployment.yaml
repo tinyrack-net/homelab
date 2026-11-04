@@ -89,6 +89,20 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 3
+          # /healthz is answered by nginx itself and stays green while the
+          # in-browser MCP server is gone, which left /mcp returning 502 behind
+          # a Ready pod. Restart the container when the browser's MCP proxy
+          # (9010) or the claw-server behind it (9210) stops listening.
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - nc -z -w 2 127.0.0.1 9010 && nc -z -w 2 127.0.0.1 9210
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 4
           volumeMounts:
             - name: config
               mountPath: /config
