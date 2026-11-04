@@ -1,4 +1,4 @@
-# Plan: Bifrost에 이메일·S3 MCP 추가 (email-mcp, rclone-mcp) — 실행 완료 (2026-11-03)
+# Plan: Bifrost에 이메일·S3 MCP 추가 (email-mcp, rclone-mcp) — email-mcp 운영 중, rclone-mcp 철회 (2026-11-04)
 
 ## Context
 
@@ -313,7 +313,7 @@ S3를 브라우저로 다뤄야 하면 사람이 직접 쓰는 도구로 해결�
 
 ---
 
-## 계획: rclone·rclone-mcp 클러스터 제거 (2026-11-03, 미실행)
+## rclone·rclone-mcp 클러스터 제거 (2026-11-04, 실행 완료)
 
 클러스터의 rclone과 rclone-mcp를 쓰지 않기로 했다. Bifrost `rclone` 서버와 `rclone-system`을 모두 걷어낸다. **email-mcp와 로컬 `rclone` CLI는 그대로 둔다.**
 
@@ -361,6 +361,18 @@ S3를 브라우저로 다뤄야 하면 사람이 직접 쓰는 도구로 해결�
 - 매니페스트: `git revert` 후 reconcile하면 `9a45471` 상태로 돌아간다. SealedSecret은 같은 클러스터 키로 봉인돼 있어 그대로 복호화된다.
 - Bifrost: 클라이언트를 재등록하고 Virtual MCP 두 곳에 다시 연결한다. 등록에는 `RCLONE_MCP_TOKEN`이 필요하므로 Bitwarden 필드 삭제를 마지막에 둔다.
 
-### 실행 전 확인할 것
+### 결정
 
-- Garage 키의 버킷 생성 권한을 회수할지(로컬 rclone에서도 버킷을 못 만들게 된다).
+- Garage 키 `GK45d4…`의 `--create-bucket` 권한은 그대로 둔다(로컬 rclone이 계속 쓴다).
+
+### 실행 결과 (2026-11-04)
+
+| 항목 | 결과 |
+|---|---|
+| Bifrost | Virtual MCP `dev`(26→25)·`personal`(14→13)에서 `rclone`을 뺐다. VK 연결은 유지됐다. 클라이언트 `7f625574-…`를 삭제해 전체 클라이언트가 25개가 됐다. `listToolFiles`에서 `rclone.pyi`가 사라졌다(`email.pyi`는 남아 있다). Bifrost 로그에는 `Disconnecting MCP server 'rclone'`만 있고 오류는 없다 |
+| 커밋 | `2683b46` feat(rclone): remove rclone and rclone-mcp from the cluster |
+| 클러스터 | `rclone-production`, namespace `rclone-system`, `traefik-system/route-rclone`이 모두 NotFound(prune됨). `bifrost-production`, `email-mcp-production`은 Ready |
+| 회귀 | Bifrost `email.list_accounts()`, `gcp_personal.run_gcloud_command`가 정상이다. `bifrost-system`에 Cilium drop 없음 |
+| Bitwarden | `344e14cc-…`에서 `RCLONE_MCP_TOKEN`, `RCLONE_RC_PASS`를 삭제했다. 남은 필드는 `EMAIL_MCP_HTTP_TOKEN`. 노트도 email-mcp 전용으로 고쳤다 |
+
+이로써 이 문서의 S3 부분(rclone-mcp, Web GUI)은 모두 철회됐다. 클러스터에 남은 것은 email-mcp뿐이다. S3 작업은 로컬 `rclone`으로 한다.
