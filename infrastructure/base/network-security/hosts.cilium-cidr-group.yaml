@@ -111,17 +111,6 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumCIDRGroup
 metadata:
-  name: mbp
-  labels:
-    networking.tinyrack.net/cidr-scope: host
-spec:
-  # MacBook Pro development machine.
-  externalCIDRs:
-    - 10.132.247.35/32
----
-apiVersion: cilium.io/v2
-kind: CiliumCIDRGroup
-metadata:
   name: vivident-traefik
   labels:
     networking.tinyrack.net/cidr-scope: host
