@@ -87,6 +87,17 @@ specs:
           - ports:
               - port: "8000"
                 protocol: TCP
+      # Egress to supergateway MCP servers on the desktop and MacBook Pro
+      # (marionette_* on 18100, cua_driver_* on 18101)
+      - toCIDRSet:
+          - cidrGroupRef: desktop
+          - cidrGroupRef: mbp
+        toPorts:
+          - ports:
+              - port: "18100"
+                protocol: TCP
+              - port: "18101"
+                protocol: TCP
       # Egress to homelab LAN (e.g. Qwen server on port 8080)
       - toCIDRSet:
           - cidrGroupRef: lan
