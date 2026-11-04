@@ -310,3 +310,57 @@ DNS: `rclone.intranet.winetree94.com`은 별도 레코드 없이 `*.intranet` �
 | Bitwarden | `344e14cc-…`에서 `RCLONE_WEB_ADMIN_PASS` 필드 삭제. 남은 필드는 `EMAIL_MCP_HTTP_TOKEN`, `RCLONE_MCP_TOKEN`, `RCLONE_RC_PASS` |
 
 S3를 브라우저로 다뤄야 하면 사람이 직접 쓰는 도구로 해결한다. 로컬 `rclone`, Garage는 `garage-webui`(OMV), Hetzner·AWS는 각 콘솔을 쓴다. 클러스터에는 UI를 두지 않는다.
+
+---
+
+## 계획: rclone·rclone-mcp 클러스터 제거 (2026-11-03, 미실행)
+
+클러스터의 rclone과 rclone-mcp를 쓰지 않기로 했다. Bifrost `rclone` 서버와 `rclone-system`을 모두 걷어낸다. **email-mcp와 로컬 `rclone` CLI는 그대로 둔다.**
+
+### 제거 대상
+
+| 위치 | 대상 | 방법 |
+|---|---|---|
+| Bifrost (config store, GitOps 밖) | Virtual MCP `dev`(id 2)·`personal`(id 4)의 `rclone` 연결 | 관리자 API `PUT /api/mcp/virtual-mcps/{id}`에서 `tools`에서 뺀다 |
+| | MCP 클라이언트 `rclone`(현재 id `7f625574-…`) | `DELETE /api/mcp/client/{id}` |
+| 저장소 | `apps/base/rclone/` 전체(8개 파일) | `git rm -r` |
+| | `apps/overlays/production/rclone.yaml` | `git rm` |
+| | `apps/overlays/production/kustomization.yaml`의 `- rclone.yaml` | 줄 삭제 |
+| | `apps/base/bifrost/bifrost.cilium-network-policy.yaml`의 rclone egress 블록 | 블록 삭제 |
+| 클러스터 | Kustomization `rclone-production`, namespace `rclone-system`(Deployment, Service, SealedSecret, ConfigMap, CNP), `traefik-system/route-rclone` | overlay에서 빠지면 `apps` Kustomization이 prune한다. `rclone-production`이 사라지면서 그 하위 리소스도 prune된다 |
+| Bitwarden `344e14cc-…` | 필드 `RCLONE_MCP_TOKEN`, `RCLONE_RC_PASS` | 필드 삭제. 항목 이름 `bifrost-mcp (homelab secrets)`과 `EMAIL_MCP_HTTP_TOKEN`은 그대로 둔다 |
+
+남기는 것:
+- **S3 키 원본**(로컬 `secrets.zsh`)과 로컬 `rclone.conf`. 로컬 rclone이 계속 쓴다.
+- **Garage 키 `GK45d4…`의 `--create-bucket` 권한.** 로컬 rclone도 같은 키를 쓴다. 회수하려면 `garage key deny --create-bucket GK45d4…`를 실행한다(선택, 아래 확인 사항).
+- **에이전트 지침·스킬.** Bifrost `rclone`을 언급하는 곳이 없어 고칠 것이 없다(`~/.agents` 검색 결과 0건).
+
+### 실행 단계
+
+1. **Bifrost 정리(먼저)**: 클러스터 서버를 지우기 전에 연결을 끊는다. 그래야 Bifrost에 unhealthy 클라이언트와 재연결 오류가 남지 않는다.
+   - Virtual MCP `dev`·`personal`에서 `rclone`을 뺀다. 응답의 `virtual_key_ids`가 그대로인지 확인한다.
+   - 클라이언트 `rclone`을 삭제한다.
+   - `GET /api/mcp/clients?limit=100`에 `rclone`이 없는지 본다. 새 세션의 `listToolFiles`에서 `rclone.pyi`가 사라졌는지도 본다.
+2. **매니페스트 제거**: 위 표의 저장소 항목을 처리한다.
+3. **검증(로컬)**
+   - `kubectl kustomize ./apps/overlays/production`과 `kubectl kustomize ./apps/base/bifrost`를 실행한다.
+   - `rg -n rclone apps infrastructure`에 남는 것이 `email-mcp.config.toml` 주석(계획 문서 이름)뿐인지 확인한다.
+4. **커밋·배포**: `feat(rclone): remove rclone and rclone-mcp from the cluster`. push 후 `flux reconcile kustomization apps`를 실행한다.
+5. **검증(클러스터)**
+   - `kubectl --context homelab -n flux-system get kustomization rclone-production`이 NotFound인지 본다.
+   - `kubectl --context homelab get ns rclone-system`이 NotFound(Terminating 후 삭제)인지 본다.
+   - `kubectl --context homelab -n traefik-system get cnp route-rclone`이 NotFound인지 본다.
+   - Bifrost pod 로그에 rclone 관련 연결 오류가 없는지 본다.
+   - 회귀 확인: Bifrost `email.list_accounts()`가 정상인지 본다. bifrost CNP가 바뀌었으므로 다른 MCP 하나(`gcp_personal` 등)도 호출해 본다.
+6. **정리**
+   - Bitwarden 필드 2개를 삭제한다(검증이 끝난 뒤, 되돌리기 대비로 마지막에).
+   - 이 문서에 실행 결과를 기록한다.
+
+### 되돌리기
+
+- 매니페스트: `git revert` 후 reconcile하면 `9a45471` 상태로 돌아간다. SealedSecret은 같은 클러스터 키로 봉인돼 있어 그대로 복호화된다.
+- Bifrost: 클라이언트를 재등록하고 Virtual MCP 두 곳에 다시 연결한다. 등록에는 `RCLONE_MCP_TOKEN`이 필요하므로 Bitwarden 필드 삭제를 마지막에 둔다.
+
+### 실행 전 확인할 것
+
+- Garage 키의 버킷 생성 권한을 회수할지(로컬 rclone에서도 버킷을 못 만들게 된다).
