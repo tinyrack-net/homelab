@@ -72,7 +72,7 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 1Gi
+          storage: 5Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
   enableSuperuserAccess: true
