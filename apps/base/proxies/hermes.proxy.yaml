@@ -1,0 +1,41 @@
+# Hermes Agent runs on the Windows desktop (cidr group "desktop"); its gateway
+# serves the Webapp on 9120 with Issuary OIDC sign-in (public PKCE client
+# "hermes", restricted to the owner). Internal only.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hermes-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hermes-proxy-service
+  namespace: hermes-proxy
+spec:
+  type: ExternalName
+  ports:
+    - port: 9120
+      name: http
+  externalName: 10.132.247.31
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hermes-ingress-route
+  namespace: hermes-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`hermes.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: hermes-proxy-service
+          kind: Service
+          port: 9120
+          passHostHeader: true
+          scheme: http
+  tls:
+    secretName: letsencrypt-cert

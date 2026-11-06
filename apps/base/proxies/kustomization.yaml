@@ -11,7 +11,9 @@ resources:
   - openmediavault-nanokvm.proxy.yaml
   - photos.proxy.yaml
   - slzb-ultima3.proxy.yaml
+  - hermes.proxy.yaml
   - garage.traefik.cilium-network-policy.yaml
+  - hermes.traefik.cilium-network-policy.yaml
   - macmini-nanokvm.traefik.cilium-network-policy.yaml
   - main-proxmox.traefik.cilium-network-policy.yaml
   - openmediavault.traefik.cilium-network-policy.yaml
