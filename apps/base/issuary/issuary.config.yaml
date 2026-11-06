@@ -219,6 +219,11 @@ clients:
       - refresh_token
     scope: openid profile email offline_access
     skip_consent: true
+    # A signed-in Hermes user can run commands in the agent's pod, so only
+    # the owner (me@winetree94.com) may sign in. Requires Issuary >= 0.35.0.
+    access:
+      users:
+        - d7b0968d-796f-480c-8cc2-d7577ee0e19e
   - id: stalwart-webui
     name: Stalwart WebUI
     client_id: stalwart-webui
