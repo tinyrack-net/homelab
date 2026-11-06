@@ -35,10 +35,10 @@ spec:
               archive=/tmp/cni-plugins.tgz
               wget -qO "$archive" https://github.com/containernetworking/plugins/releases/download/v1.9.1/cni-plugins-linux-amd64-v1.9.1.tgz
               echo "b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303  $archive" | sha256sum -c -
-              tar -xzf "$archive" -C /tmp ./macvlan ./static
-              rm -f /host-cni/macvlan /host-cni/static
-              cp /tmp/macvlan /tmp/static /host-cni/
-              chmod 0755 /host-cni/macvlan /host-cni/static
+              tar -xzf "$archive" -C /tmp ./macvlan ./static ./dhcp
+              rm -f /host-cni/macvlan /host-cni/static /host-cni/dhcp
+              cp /tmp/macvlan /tmp/static /tmp/dhcp /host-cni/
+              chmod 0755 /host-cni/macvlan /host-cni/static /host-cni/dhcp
           securityContext:
             privileged: true
           volumeMounts:
@@ -59,6 +59,35 @@ spec:
               mountPath: /host-cni
               mountPropagation: Bidirectional
       containers:
+        # DHCP IPAM daemon for macvlan attachments that lease addresses from
+        # the LAN DHCP server (OPNsense). The dhcp plugin forwards requests to
+        # /run/cni/dhcp.sock on the host; this daemon acquires and renews the
+        # leases inside the pod network namespaces (reached via /hostroot).
+        - name: cni-dhcp-daemon
+          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              mkdir -p /hostroot/run/cni
+              rm -f /hostroot/run/cni/dhcp.sock
+              exec /host-cni/dhcp daemon -hostprefix /hostroot
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 16Mi
+            limits:
+              memory: 128Mi
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - name: cni-bin
+              mountPath: /host-cni
+              readOnly: true
+            - name: host-root
+              mountPath: /hostroot
+              mountPropagation: HostToContainer
         - name: kube-multus
           image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.1-thick@sha256:d3a3e029a27cd9c23aa904e8c881af5f2db01245419f8e1147f08238dd85f764
           command:
