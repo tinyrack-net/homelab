@@ -13,7 +13,6 @@ resources:
   - rustdesk.yaml
   - home-assistant.yaml
   - immich.yaml
-  - syncthing.yaml
   - cliproxyapi.yaml
   - guacamole.yaml
   - vivident-tailscale-router.yaml
