@@ -14,3 +14,7 @@ configMapGenerator:
     namespace: hermes-system
     files:
       - config.yaml=hermes.managed-config.yaml
+  - name: hermes-bot-desktop-keeper
+    namespace: hermes-system
+    files:
+      - run=hermes.bot-desktop-keeper.sh

@@ -25,12 +25,13 @@ dashboard:
       scopes: openid profile email offline_access
 
 # The agent's own desktop (Xvnc + Xfce in this pod), viewed and taken over
-# from the Webapp / Hermes Desktop Screen pane. Screens are off by default and
-# do not survive a pod restart, so start one whenever the agent first needs a
-# display (computer_use or a headed browser). An idle screen still stops after
-# idle_stop_minutes and comes back on the next use.
+# from the Webapp / Hermes Desktop Screen pane. It is kept running at all
+# times: the bot-desktop s6 service (hermes.bot-desktop-keeper.sh) starts it at
+# boot and restarts it if it dies, and the idle stop is disabled. auto_start
+# still covers the gap if the agent needs a display before the keeper runs.
 bot_desktop:
   auto_start: true
+  idle_stop_minutes: 0
 
 # LLM access goes through Bifrost with the "hermes" virtual key.
 providers:

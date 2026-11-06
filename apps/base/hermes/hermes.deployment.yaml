@@ -83,6 +83,11 @@ spec:
               mountPath: /etc/hermes/config.yaml
               subPath: config.yaml
               readOnly: true
+            # s6-overlay legacy service that keeps the Bot Desktop running.
+            - name: bot-desktop-keeper
+              mountPath: /etc/services.d/bot-desktop/run
+              subPath: run
+              readOnly: true
             - name: shm
               mountPath: /dev/shm
       volumes:
@@ -93,6 +98,10 @@ spec:
           configMap:
             name: hermes-managed-config
             defaultMode: 0444
+        - name: bot-desktop-keeper
+          configMap:
+            name: hermes-bot-desktop-keeper
+            defaultMode: 0755
         - name: shm
           emptyDir:
             medium: Memory
