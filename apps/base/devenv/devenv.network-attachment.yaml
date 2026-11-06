@@ -1,0 +1,25 @@
+# Dedicated LAN IPs for devenv environments (class "lan"). Addresses come
+# from the OPNsense DHCP server; the pod name is sent as client identifier
+# and host name, and devenv derives a stable MAC from the environment, so an
+# environment keeps its lease across restarts.
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: lan-dhcp
+  namespace: devenv
+spec:
+  config: |-
+    {
+      "cniVersion": "1.0.0",
+      "type": "macvlan",
+      "master": "enp6s18",
+      "mode": "bridge",
+      "capabilities": {"mac": true},
+      "ipam": {
+        "type": "dhcp",
+        "provide": [
+          {"option": "dhcp-client-identifier", "fromArg": "K8S_POD_NAME"},
+          {"option": "host-name", "fromArg": "K8S_POD_NAME"}
+        ]
+      }
+    }

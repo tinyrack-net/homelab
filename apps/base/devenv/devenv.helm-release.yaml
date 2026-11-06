@@ -53,3 +53,20 @@ spec:
           maxCPU: "8"
           maxMemory: 16Gi
           maxDisk: 200Gi
+    extraClasses:
+      # Dedicated LAN IP from OPNsense DHCP; every port is reachable from the
+      # LAN. The secondary interface bypasses Cilium policies.
+      lan:
+        storage:
+          mode: persistent
+          storageClassName: longhorn
+          defaultSize: 20Gi
+        network:
+          mode: multus
+          multus:
+            networkAttachment: devenv/lan-dhcp
+            stableMAC: true
+        limits:
+          maxCPU: "8"
+          maxMemory: 16Gi
+          maxDisk: 200Gi
