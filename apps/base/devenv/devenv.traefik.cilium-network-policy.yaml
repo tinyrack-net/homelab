@@ -8,11 +8,22 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: devenv.intranet.winetree94.com
 spec:
-  description: Allow the devenv.intranet.winetree94.com route
+  description: Allow the devenv.intranet.winetree94.com route and environments' access to the intranet applications
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
       app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: devenv
+            devenv.tinyrack.net/component: workspace
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
   egress:
     - toServices:
         - k8sService:
@@ -21,4 +32,29 @@ spec:
       toPorts:
         - ports:
             - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-devenv
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: devenv
+spec:
+  description: Allow development environments to reach the public homelab routes
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: devenv
+            devenv.tinyrack.net/component: workspace
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+            - port: "8000"
               protocol: TCP

@@ -70,7 +70,25 @@ spec:
   egress:
     # Development work reaches LAN hosts, VPN clients and Tailscale, like a
     # workstation. DNS and the public internet come from the
-    # isolated-namespaces clusterwide policy.
+    # isolated-namespaces clusterwide policy. The Kubernetes node itself and
+    # in-cluster pods stay blocked.
     - toCIDRSet:
         - cidrGroupRef: lan
+        - cidrGroupRef: vpn-server
+        - cidrGroupRef: vpn-control
         - cidrGroupRef: tailscale
+    # Intranet and public homelab services through Traefik, the same way LAN
+    # clients reach them (their LoadBalancer IPs resolve to the pods).
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-external-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
