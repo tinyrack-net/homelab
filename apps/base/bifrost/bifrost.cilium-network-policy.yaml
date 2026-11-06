@@ -87,6 +87,15 @@ specs:
           - ports:
               - port: "8000"
                 protocol: TCP
+      # Egress to the devenv MCP endpoint (devenv)
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: devenv-system
+              app.kubernetes.io/name: devenv
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
       # Egress to homelab LAN (e.g. Qwen server on port 8080)
       - toCIDRSet:
           - cidrGroupRef: lan
