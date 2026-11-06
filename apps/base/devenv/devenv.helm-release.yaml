@@ -1,0 +1,44 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: devenv
+  namespace: devenv-system
+spec:
+  interval: 5m
+  timeout: 5m
+  releaseName: devenv
+  targetNamespace: devenv-system
+  storageNamespace: devenv-system
+  chartRef:
+    kind: OCIRepository
+    name: devenv-repository
+    namespace: flux-system
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 0
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 0
+  values:
+    environments:
+      namespace: devenv
+      createNamespace: false
+      quota:
+        requests.cpu: "16"
+        requests.memory: 48Gi
+        requests.storage: 500Gi
+    secureCookies: true
+    defaultClass:
+      spec:
+        storage:
+          mode: persistent
+          storageClassName: longhorn
+          defaultSize: 20Gi
+        network:
+          mode: gateway
+        limits:
+          maxCPU: "8"
+          maxMemory: 16Gi
+          maxDisk: 200Gi

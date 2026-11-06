@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devenv-system
+  labels:
+    networking.tinyrack.net/isolation: enabled
+---
+# Environments live here. The chart is told not to create it so the
+# isolation label stays under GitOps control.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devenv
+  labels:
+    networking.tinyrack.net/isolation: enabled
