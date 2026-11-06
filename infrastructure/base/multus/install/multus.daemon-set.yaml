@@ -62,16 +62,20 @@ spec:
         # DHCP IPAM daemon for macvlan attachments that lease addresses from
         # the LAN DHCP server (OPNsense). The dhcp plugin forwards requests to
         # /run/cni/dhcp.sock on the host; this daemon acquires and renews the
-        # leases inside the pod network namespaces (reached via /hostroot).
+        # leases inside the pod network namespaces. The host /run is mounted
+        # at /run (and /var/run -> /run) because the netns paths it receives
+        # are /var/run/netns/..., and on the host /var/run is an absolute
+        # symlink that a -hostprefix can not follow.
         - name: cni-dhcp-daemon
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command:
             - /bin/sh
             - -ec
             - |
-              mkdir -p /hostroot/run/cni
-              rm -f /hostroot/run/cni/dhcp.sock
-              exec /host-cni/dhcp daemon -hostprefix /hostroot
+              mkdir -p /run/cni
+              rm -f /run/cni/dhcp.sock
+              rm -rf /var/run && ln -s /run /var/run
+              exec /host-cni/dhcp daemon
           securityContext:
             privileged: true
           resources:
@@ -85,8 +89,8 @@ spec:
             - name: cni-bin
               mountPath: /host-cni
               readOnly: true
-            - name: host-root
-              mountPath: /hostroot
+            - name: host-run
+              mountPath: /run
               mountPropagation: HostToContainer
         - name: kube-multus
           image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.1-thick@sha256:d3a3e029a27cd9c23aa904e8c881af5f2db01245419f8e1147f08238dd85f764
