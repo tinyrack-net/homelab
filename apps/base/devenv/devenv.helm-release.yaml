@@ -30,6 +30,17 @@ spec:
         requests.memory: 48Gi
         requests.storage: 500Gi
     secureCookies: true
+    # SSH gateway: ssh -p 2222 <env>@devenv.intranet.winetree94.com is not
+    # possible through Traefik (HTTP only), so it gets its own LAN IP.
+    sshService:
+      type: LoadBalancer
+      port: 2222
+      publicHost: 10.132.246.6
+      externalTrafficPolicy: Local
+      labels:
+        networking.tinyrack.net/load-balancer: cilium-l2
+      annotations:
+        lbipam.cilium.io/ips: "10.132.246.6"
     defaultClass:
       spec:
         storage:
