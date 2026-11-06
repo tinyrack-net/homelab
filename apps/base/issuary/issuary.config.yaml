@@ -205,6 +205,20 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+  # Hermes Agent Webapp and Hermes Desktop remote sign-in. Hermes only
+  # supports public clients (authorization code + PKCE S256, no secret).
+  - id: hermes
+    name: Hermes Agent
+    client_id: hermes
+    redirect_uris:
+      - https://hermes.intranet.winetree94.com/auth/callback
+    response_types:
+      - code
+    grant_types:
+      - authorization_code
+      - refresh_token
+    scope: openid profile email offline_access
+    skip_consent: true
   - id: stalwart-webui
     name: Stalwart WebUI
     client_id: stalwart-webui

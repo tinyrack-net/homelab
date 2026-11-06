@@ -29,3 +29,4 @@ resources:
   - gcp-mcp.yaml
   - email-mcp.yaml
   - forgejo.yaml
+  - hermes.yaml
