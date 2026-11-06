@@ -2,6 +2,11 @@
 # from the OPNsense DHCP server; the pod name is sent as client identifier
 # and host name, and devenv derives a stable MAC from the environment, so an
 # environment keeps its lease across restarts.
+#
+# DHCP installs a second default route via the LAN gateway. sbr moves the
+# LAN routes into a separate table used only for traffic sourced from the
+# LAN address, so replies to the devenv server (web terminal, desktop, SSH
+# gateway) leave through eth0 instead of the LAN.
 apiVersion: k8s.cni.cncf.io/v1
 kind: NetworkAttachmentDefinition
 metadata:
@@ -11,15 +16,21 @@ spec:
   config: |-
     {
       "cniVersion": "1.0.0",
-      "type": "macvlan",
-      "master": "enp6s18",
-      "mode": "bridge",
-      "capabilities": {"mac": true},
-      "ipam": {
-        "type": "dhcp",
-        "provide": [
-          {"option": "dhcp-client-identifier", "fromArg": "K8S_POD_NAME"},
-          {"option": "host-name", "fromArg": "K8S_POD_NAME"}
-        ]
-      }
+      "name": "lan-dhcp",
+      "plugins": [
+        {
+          "type": "macvlan",
+          "master": "enp6s18",
+          "mode": "bridge",
+          "capabilities": {"mac": true},
+          "ipam": {
+            "type": "dhcp",
+            "provide": [
+              {"option": "dhcp-client-identifier", "fromArg": "K8S_POD_NAME"},
+              {"option": "host-name", "fromArg": "K8S_POD_NAME"}
+            ]
+          }
+        },
+        {"type": "sbr"}
+      ]
     }
