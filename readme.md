@@ -271,7 +271,8 @@ Getting this backwards pins the wrong image without any error from Kubernetes.
   `storage-minimal-available-percentage` (25%). Shrinking PVCs does not help:
   the space is in snapshots, not in volume sizes. The
   `longhorn-snapshot-cleanup` DeletingPolicy (`backup-cleanup`) removes any
-  snapshot whose exact Completed `Backup` exists in Garage, and the
+  snapshot whose exact Completed `Backup` exists in Garage, except the newest
+  backed-up one per volume (the base for the next incremental backup), and the
   `longhorn-snapshot-cleanup` RecurringJob (05:00) purges them. A snapshot only
   marked removed frees its space after a purge (Longhorn UI → volume → Purge
   snapshots, or the `snapshotPurge` volume action). Label a snapshot
