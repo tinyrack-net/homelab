@@ -9,10 +9,10 @@
 # the backup. The space is reclaimed when longhorn-snapshot-cleanup (05:00)
 # purges the removed snapshots.
 apiVersion: policies.kyverno.io/v1
-kind: NamespacedDeletingPolicy
+# Cluster-scoped: Kyverno rejects globalContext in namespaced policies.
+kind: DeletingPolicy
 metadata:
   name: longhorn-snapshot-cleanup
-  namespace: longhorn-system
 spec:
   # After the volume backups (03:30, 15:30) and system backup (04:00), before
   # the 05:00 snapshot purge.
@@ -47,6 +47,8 @@ spec:
           backup.?status.orValue({})[?'volumeName'].orValue('') == variables.volumeName &&
           backup.?status.orValue({})[?'snapshotName'].orValue('') == object.metadata.name)
   conditions:
+    - name: longhorn-system
+      expression: object.metadata.namespace == 'longhorn-system'
     - name: cleanup-enabled
       expression: variables.cleanupEnabled
     - name: not-protected
