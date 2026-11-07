@@ -205,6 +205,20 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+  # devenv console (https://devenv.intranet.winetree94.com). Confidential
+  # client with PKCE; devenv creates its users on first login.
+  - id: devenv
+    name: devenv
+    client_id: devenv
+    client_secret: ${ISSUARY_DEVENV_CLIENT_SECRET}
+    redirect_uris:
+      - https://devenv.intranet.winetree94.com/api/v1/auth/oidc/issuary/callback
+    response_types:
+      - code
+    grant_types:
+      - authorization_code
+    scope: openid profile email
+    skip_consent: true
   # Hermes Agent Webapp on the Windows desktop, served through the internal
   # Traefik proxy (apps/base/proxies/hermes.proxy.yaml). Hermes only supports
   # public clients (authorization code + PKCE S256, no secret).

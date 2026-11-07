@@ -23,6 +23,9 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: nextcloud-system
             app.kubernetes.io/name: nextcloud
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: devenv-system
+            app.kubernetes.io/name: devenv
       toPorts:
         - ports:
             - port: "8443"

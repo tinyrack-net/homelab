@@ -4,6 +4,7 @@ resources:
   - devenv.namespace.yaml
   - devenv.network-attachment.yaml
   - devenv.oci-repository.yaml
+  - devenv-oidc.secret.yaml
   - devenv.helm-release.yaml
   - devenv.ingress-route.yaml
   - devenv.cilium-network-policy.yaml

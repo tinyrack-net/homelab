@@ -31,6 +31,16 @@ spec:
         requests.storage: 500Gi
     secureCookies: true
     externalURL: https://devenv.intranet.winetree94.com
+    auth:
+      # The local admin stays as a fallback; everyday login is Issuary.
+      admins:
+        - me@winetree94.com
+      oidc:
+        - id: issuary
+          name: Issuary
+          issuer: https://auth.winetree94.com
+          clientID: devenv
+          existingSecret: devenv-oidc
     # SSH gateway: ssh -p 2222 <env>@devenv.intranet.winetree94.com is not
     # possible through Traefik (HTTP only), so it gets its own LAN IP.
     sshService:

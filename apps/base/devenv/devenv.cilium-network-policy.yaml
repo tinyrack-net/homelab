@@ -34,6 +34,16 @@ spec:
             - port: "2222"
               protocol: TCP
   egress:
+    # OIDC discovery and token calls to Issuary (auth.winetree94.com resolves
+    # to the traefik-external LoadBalancer).
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-external-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
     - toEntities:
         - kube-apiserver
       toPorts:
