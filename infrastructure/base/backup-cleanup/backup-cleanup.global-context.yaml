@@ -38,3 +38,14 @@ spec:
     version: v1beta2
     resource: systembackups
     namespace: longhorn-system
+---
+apiVersion: kyverno.io/v2
+kind: GlobalContextEntry
+metadata:
+  name: backup-cleanup-longhorn-backups
+spec:
+  kubernetesResource:
+    group: longhorn.io
+    version: v1beta2
+    resource: backups
+    namespace: longhorn-system

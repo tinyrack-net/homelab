@@ -1,0 +1,59 @@
+# Deletes in-volume Longhorn snapshots whose data is already in the backup
+# target (Garage). Each recurring backup leaves its snapshot in the volume
+# (retain 14), and those snapshots kept ~60G of old blocks on the single node
+# disk until the node fell below Longhorn's minimal-available threshold and new
+# volumes could not be scheduled.
+#
+# A snapshot is deleted only when a Completed Backup of exactly that snapshot
+# (same volume and snapshot name) exists. Deleting the snapshot does not touch
+# the backup. The space is reclaimed when longhorn-snapshot-cleanup (05:00)
+# purges the removed snapshots.
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedDeletingPolicy
+metadata:
+  name: longhorn-snapshot-cleanup
+  namespace: longhorn-system
+spec:
+  # After the volume backups (03:30, 15:30) and system backup (04:00), before
+  # the 05:00 snapshot purge.
+  schedule: "40 4,16 * * *"
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - longhorn.io
+        apiVersions:
+          - v1beta2
+        resources:
+          - snapshots
+        scope: Namespaced
+  variables:
+    - name: cleanupEnabled
+      expression: >-
+        globalContext.Get("backup-cleanup-control", "")
+          .data[?'enabled'].orValue('false') == 'true'
+    - name: protected
+      expression: >-
+        object.metadata.?labels.orValue({})
+          [?'tinyrack.net/protected'].orValue('false') == 'true'
+    - name: volumeName
+      expression: object.spec.?volume.orValue('')
+    - name: backups
+      expression: globalContext.Get("backup-cleanup-longhorn-backups", "")
+    - name: backedUp
+      expression: >-
+        variables.volumeName != '' &&
+        variables.backups.exists(backup,
+          backup.?status.orValue({})[?'state'].orValue('') == 'Completed' &&
+          backup.?status.orValue({})[?'volumeName'].orValue('') == variables.volumeName &&
+          backup.?status.orValue({})[?'snapshotName'].orValue('') == object.metadata.name)
+  conditions:
+    - name: cleanup-enabled
+      expression: variables.cleanupEnabled
+    - name: not-protected
+      expression: '!variables.protected'
+    - name: not-volume-head
+      expression: object.metadata.name != 'volume-head'
+    - name: backed-up
+      expression: variables.backedUp
+    - name: settled
+      expression: time.now() - timestamp(object.metadata.creationTimestamp) >= duration('1h')

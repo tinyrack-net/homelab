@@ -7,3 +7,4 @@ resources:
   - cnpg-backup.deleting-policy.yaml
   - longhorn-backup.deleting-policy.yaml
   - longhorn-system-backup.deleting-policy.yaml
+  - longhorn-snapshot.deleting-policy.yaml

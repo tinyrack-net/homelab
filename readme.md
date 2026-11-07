@@ -264,7 +264,18 @@ Getting this backwards pins the wrong image without any error from Kubernetes.
   `curl -o /dev/null -w '%{http_code}' https://<host>`.
 - Snapshot stateful volumes before a sweep that touches storage or the node: a
   Longhorn `Snapshot` per volume, a Longhorn `SystemBackup`, and a manual CNPG
-  `Backup` in every namespace.
+  `Backup` in every namespace. Delete those snapshots once the sweep is verified:
+  they are not backed up and keep the old blocks on the node disk.
+- Longhorn snapshots hold real disk space on the single node, and new volumes
+  stay `faulted` ("disks are unavailable") once free space drops below
+  `storage-minimal-available-percentage` (25%). Shrinking PVCs does not help:
+  the space is in snapshots, not in volume sizes. The
+  `longhorn-snapshot-cleanup` DeletingPolicy (`backup-cleanup`) removes any
+  snapshot whose exact Completed `Backup` exists in Garage, and the
+  `longhorn-snapshot-cleanup` RecurringJob (05:00) purges them. A snapshot only
+  marked removed frees its space after a purge (Longhorn UI → volume → Purge
+  snapshots, or the `snapshotPurge` volume action). Label a snapshot
+  `tinyrack.net/protected=true` to keep it.
 - **This node can restart k3s under I/O pressure.** The root disk is rotational
   (`/sys/block/sda/queue/rotational` is `1`) and etcd has logged
   `slow fdatasync` spikes up to 6s. When a lease renewal exceeds its deadline k3s
