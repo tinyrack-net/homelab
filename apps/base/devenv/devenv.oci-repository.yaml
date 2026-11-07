@@ -7,4 +7,4 @@ spec:
   interval: 1h
   url: oci://ghcr.io/tinyrack-net/charts/devenv
   ref:
-    tag: 0.9.0
+    tag: 0.9.1
