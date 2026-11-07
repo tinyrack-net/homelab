@@ -5,8 +5,10 @@
 # volumes could not be scheduled.
 #
 # A snapshot is deleted only when a Completed Backup of exactly that snapshot
-# (same volume and snapshot name) exists. Deleting the snapshot does not touch
-# the backup. The space is reclaimed when longhorn-snapshot-cleanup (05:00)
+# (same volume and snapshot name) exists and a newer Completed Backup of the
+# same volume exists too. The newest backed-up snapshot stays so the next
+# backup stays incremental (without it Longhorn reads the whole volume).
+# Deleting the snapshot does not touch the backup. The space is reclaimed when longhorn-snapshot-cleanup (05:00)
 # purges the removed snapshots.
 apiVersion: policies.kyverno.io/v1
 # Cluster-scoped: Kyverno rejects globalContext in namespaced policies.
@@ -46,6 +48,15 @@ spec:
           backup.?status.orValue({})[?'state'].orValue('') == 'Completed' &&
           backup.?status.orValue({})[?'volumeName'].orValue('') == variables.volumeName &&
           backup.?status.orValue({})[?'snapshotName'].orValue('') == object.metadata.name)
+    - name: newerBackupExists
+      expression: >-
+        variables.backups.exists(backup,
+          backup.?status.orValue({})[?'state'].orValue('') == 'Completed' &&
+          backup.?status.orValue({})[?'volumeName'].orValue('') == variables.volumeName &&
+          backup.?status.orValue({})[?'snapshotName'].orValue('') != object.metadata.name &&
+          backup.?status.orValue({})[?'snapshotCreatedAt'].orValue('') != '' &&
+          timestamp(backup.status.snapshotCreatedAt) >
+            timestamp(object.?status.orValue({})[?'creationTime'].orValue(object.metadata.creationTimestamp)))
   conditions:
     - name: longhorn-system
       expression: object.metadata.namespace == 'longhorn-system'
@@ -57,5 +68,7 @@ spec:
       expression: object.metadata.name != 'volume-head'
     - name: backed-up
       expression: variables.backedUp
+    - name: not-latest-backup
+      expression: variables.newerBackupExists
     - name: settled
       expression: time.now() - timestamp(object.metadata.creationTimestamp) >= duration('1h')
