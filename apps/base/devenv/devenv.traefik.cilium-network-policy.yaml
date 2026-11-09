@@ -62,7 +62,7 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: route-devenv-backup
+  name: route-devenv-database-backup
   namespace: traefik-system
   labels:
     networking.tinyrack.net/owner: devenv
