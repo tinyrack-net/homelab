@@ -69,7 +69,7 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: storage.intranet.winetree94.com
 spec:
-  description: Allow devenv metadata backups to reach object storage through internal Traefik
+  description: Allow the devenv database backups to reach object storage through internal Traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -78,8 +78,7 @@ spec:
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: devenv-system
-            app.kubernetes.io/name: devenv
-            app.kubernetes.io/component: backup
+            cnpg.io/cluster: devenv-database-cluster
       toPorts:
         - ports:
             - port: "8443"

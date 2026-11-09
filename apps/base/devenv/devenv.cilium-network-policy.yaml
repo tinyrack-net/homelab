@@ -34,15 +34,14 @@ spec:
             - port: "2222"
               protocol: TCP
   egress:
-    # Metadata backups to Garage (storage.intranet.winetree94.com through the
-    # internal Traefik). The backup CronJob pod shares the server labels.
+    # State database (CloudNativePG).
     - toEndpoints:
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: traefik-system
-            app.kubernetes.io/name: traefik
+            k8s:io.kubernetes.pod.namespace: devenv-system
+            cnpg.io/cluster: devenv-database-cluster
       toPorts:
         - ports:
-            - port: "8443"
+            - port: "5432"
               protocol: TCP
     # OIDC discovery and token calls to Issuary (auth.winetree94.com resolves
     # to the traefik-external LoadBalancer).
@@ -68,6 +67,67 @@ spec:
       toPorts:
         - ports:
             - port: "22"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: app-devenv-database
+  namespace: devenv-system
+spec:
+  description: devenv database - clients, CNPG operator, replication and backups to Garage
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      k8s:io.kubernetes.pod.namespace: devenv-system
+      cnpg.io/cluster: devenv-database-cluster
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: devenv-system
+            app.kubernetes.io/name: devenv
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: cnpg-system
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+            - port: "9187"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: devenv-system
+            cnpg.io/cluster: devenv-database-cluster
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: devenv-system
+            cnpg.io/cluster: devenv-database-cluster
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
+    # Base backups and WAL to Garage through the internal Traefik.
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
               protocol: TCP
 ---
 apiVersion: cilium.io/v2
