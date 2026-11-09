@@ -25,13 +25,14 @@ spec:
       maxParallel: 8
 ---
 # devenv state (users, environments, keys, tokens). Home volumes are backed
-# up by Longhorn. Switch bootstrap to recovery once the first base backup
-# exists, like the other databases.
+# up by Longhorn. A rebuilt cluster recovers from the barman backups.
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: devenv-database-cluster
   namespace: devenv-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
   instances: 1
   imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm@sha256:ff50547e391c0df0ff64726962e816effcfd85b4ea42040a70cc502e8ff45d49
@@ -58,7 +59,8 @@ spec:
           barmanObjectName: devenv-database-backup-store-pg18
           serverName: devenv-database-pg18
   bootstrap:
-    initdb:
+    recovery:
+      source: devenv-database-recovery-source
       database: devenv
       owner: devenv
 ---
