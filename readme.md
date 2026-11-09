@@ -79,6 +79,22 @@ with `bootstrap.initdb` come up empty after a rebuild and need a manual
 restore. Verify CNPG recovery before allowing external traffic, then check
 Flux, certificates, ingress, storage, and core application data.
 
+devenv keeps no database. Home volumes (`<env>-home`) come back with the
+Longhorn system backup (the classes label them for the `longhorn-backup`
+group); users, environments, SSH host keys, passwords and tokens are restored
+from the daily metadata export in `s3://tinyrack-homelab/apps/devenv/metadata`.
+Once Flux has reinstalled devenv, run the restore from the backup CronJob:
+
+```bash
+kubectl -n devenv-system create job devenv-restore --from=cronjob/devenv-backup \
+  --dry-run=client -o yaml | sed 's/- backup$/- restore/' | kubectl apply -f -
+kubectl -n devenv-system logs -f job/devenv-restore
+```
+
+Environments are recreated stopped and start once their home volume is bound,
+keeping their LAN addresses and SSH host keys. See devenv's
+`docs/disaster-recovery.md`.
+
 ## Bootstrap
 
 ### K3s, Cilium, and Sealed Secrets key
