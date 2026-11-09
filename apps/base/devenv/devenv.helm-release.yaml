@@ -70,6 +70,9 @@ spec:
           storageClassName: longhorn
           defaultSize: 20Gi
           labels:
+            # Longhorn copies recurring job labels from the PVC to the
+            # volume only with the source label.
+            recurring-job.longhorn.io/source: enabled
             recurring-job-group.longhorn.io/longhorn-backup: enabled
         network:
           mode: gateway
@@ -86,6 +89,9 @@ spec:
           storageClassName: longhorn
           defaultSize: 20Gi
           labels:
+            # Longhorn copies recurring job labels from the PVC to the
+            # volume only with the source label.
+            recurring-job.longhorn.io/source: enabled
             recurring-job-group.longhorn.io/longhorn-backup: enabled
         network:
           mode: multus
