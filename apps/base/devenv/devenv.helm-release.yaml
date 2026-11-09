@@ -52,12 +52,25 @@ spec:
         networking.tinyrack.net/load-balancer: cilium-l2
       annotations:
         lbipam.cilium.io/ips: "10.132.246.6"
+    # Daily export of users, environments and keys to Garage; home volumes
+    # are backed up by Longhorn (class storage labels below).
+    backup:
+      enabled: true
+      schedule: "45 3 * * *"
+      dest: s3://tinyrack-homelab/apps/devenv/metadata
+      keep: 14
+      s3:
+        endpoint: https://storage.intranet.winetree94.com
+        region: home
+        existingSecret: tinyrack-homelab-s3-secret
     defaultClass:
       spec:
         storage:
           mode: persistent
           storageClassName: longhorn
           defaultSize: 20Gi
+          labels:
+            recurring-job-group.longhorn.io/longhorn-backup: enabled
         network:
           mode: gateway
         limits:
@@ -72,6 +85,8 @@ spec:
           mode: persistent
           storageClassName: longhorn
           defaultSize: 20Gi
+          labels:
+            recurring-job-group.longhorn.io/longhorn-backup: enabled
         network:
           mode: multus
           multus:

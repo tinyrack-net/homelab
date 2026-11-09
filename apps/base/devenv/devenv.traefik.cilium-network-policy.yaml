@@ -58,3 +58,29 @@ spec:
               protocol: TCP
             - port: "8000"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-devenv-backup
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: devenv
+  annotations:
+    networking.tinyrack.net/hosts: storage.intranet.winetree94.com
+spec:
+  description: Allow devenv metadata backups to reach object storage through internal Traefik
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: devenv-system
+            app.kubernetes.io/name: devenv
+            app.kubernetes.io/component: backup
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

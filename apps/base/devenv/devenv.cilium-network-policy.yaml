@@ -34,6 +34,16 @@ spec:
             - port: "2222"
               protocol: TCP
   egress:
+    # Metadata backups to Garage (storage.intranet.winetree94.com through the
+    # internal Traefik). The backup CronJob pod shares the server labels.
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik-system
+            app.kubernetes.io/name: traefik
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
     # OIDC discovery and token calls to Issuary (auth.winetree94.com resolves
     # to the traefik-external LoadBalancer).
     - toEndpoints:
