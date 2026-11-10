@@ -4,6 +4,7 @@ resources:
   - traefik.cilium-network-policy.yaml
   - traefik.namespace.yaml
   - traefik.helm-release.yaml
+  - traefik.middlewares.yaml
 configMapGenerator:
   - name: traefik-values
     files:

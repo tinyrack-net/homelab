@@ -28,6 +28,8 @@ accessLog:
       defaultMode: drop
       names:
         traceparent: keep
+        # CrowdSec's bad user agent and crawler scenarios read it.
+        User-Agent: keep
     queryParameters:
       defaultMode: drop
 tracing:
@@ -45,6 +47,15 @@ ingressClass:
   isDefaultClass: false
   name: "traefik-external"
 ports:
+  # Edge and LAN traffic arrive here with the real client address. The shared
+  # protection chain runs for every route on this entrypoint; the cloudflare
+  # entrypoint is left alone because every request there comes from cloudflared.
+  websecure:
+    http:
+      middlewares:
+        - traefik-external-system-edge-ratelimit@kubernetescrd
+        - traefik-external-system-edge-inflight@kubernetescrd
+        - traefik-external-system-edge-headers@kubernetescrd
   # Public HTTP reaches this entrypoint through the edge proxy (proxy-japan).
   # Redirect every request to HTTPS so routes do not need their own web routers.
   web:
