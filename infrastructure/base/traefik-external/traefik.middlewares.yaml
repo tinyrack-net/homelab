@@ -27,6 +27,35 @@ spec:
       ipStrategy:
         depth: 0
 ---
+# CrowdSec bouncer: rejects addresses that LAPI has a decision for (community
+# blocklist and, once out of simulation, local scenarios). Stream mode keeps the
+# decision list in Traefik; if LAPI is unreachable the last list stays in use and
+# traffic is never blocked because of it (fail open).
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: edge-crowdsec
+  namespace: traefik-external-system
+spec:
+  plugin:
+    crowdsec:
+      enabled: true
+      logLevel: INFO
+      crowdsecMode: stream
+      crowdsecLapiScheme: http
+      crowdsecLapiHost: crowdsec-service.crowdsec-system.svc.cluster.local:8080
+      crowdsecLapiKeyFile: /etc/crowdsec-bouncer/api-key
+      updateIntervalSeconds: 60
+      updateMaxFailure: -1
+      streamStartupBlock: false
+      # LAN, VPN and cluster clients are never checked.
+      clientTrustedIPs:
+        - 10.0.0.0/8
+        - 100.64.0.0/10
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+      metricsUpdateIntervalSeconds: 600
+---
 # No frame or CSP headers here: Nextcloud embeds Collabora and apps set their own.
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
