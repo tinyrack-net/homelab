@@ -45,6 +45,15 @@ ingressClass:
   isDefaultClass: false
   name: "traefik-external"
 ports:
+  # Public HTTP reaches this entrypoint through the edge proxy (proxy-japan).
+  # Redirect every request to HTTPS so routes do not need their own web routers.
+  web:
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
   cloudflare:
     port: 8444
     exposedPort: 443
