@@ -2,38 +2,34 @@
 - name: Run Sealed Secrets recovery key preflight checks before verification
   ansible.builtin.import_tasks: preflight.yml
 
-- name: Read the restored Sealed Secrets recovery key
+- name: Read the restored Sealed Secrets keys
   ansible.builtin.command:
     argv:
       - /usr/local/bin/k3s
       - kubectl
       - get
       - secret
-      - "{{ restore_sealed_secrets_key_secret_name }}"
       - --namespace
       - "{{ restore_sealed_secrets_key_namespace }}"
+      - --selector=sealedsecrets.bitnami.com/sealed-secrets-key
       - --output=json
   register: restore_sealed_secrets_key_result
   changed_when: false
   no_log: true
 
-- name: Decode the restored Sealed Secrets recovery key
-  ansible.builtin.set_fact:
-    restore_sealed_secrets_key_resource: "{{ restore_sealed_secrets_key_result.stdout | from_json }}"
-  no_log: true
-
-- name: Verify the restored Sealed Secrets recovery key
+- name: Verify every Vault key is restored unchanged
+  vars:
+    restore_sealed_secrets_key_by_name: >-
+      {{ dict((restore_sealed_secrets_key_result.stdout | from_json)['items']
+         | map(attribute='metadata.name')
+         | zip((restore_sealed_secrets_key_result.stdout | from_json)['items'] | map(attribute='data'))) }}
   ansible.builtin.assert:
     that:
-      - restore_sealed_secrets_key_resource.type == "kubernetes.io/tls"
-      - >-
-        restore_sealed_secrets_key_resource.metadata.labels["sealedsecrets.bitnami.com/sealed-secrets-key"]
-        == "active"
-      - >-
-        restore_sealed_secrets_key_resource.data["tls.crt"]
-        == (lookup('ansible.builtin.file', restore_sealed_secrets_key_tls_crt_path, rstrip=false) | b64encode)
-      - >-
-        restore_sealed_secrets_key_resource.data["tls.key"]
-        == (restore_sealed_secrets_key_tls_key | b64encode)
-    fail_msg: The restored Sealed Secrets recovery key does not match the Vault values.
+      - item.name in restore_sealed_secrets_key_by_name
+      - restore_sealed_secrets_key_by_name[item.name]['tls.crt'] == (item.tls_crt | b64encode)
+      - restore_sealed_secrets_key_by_name[item.name]['tls.key'] == (item.tls_key | b64encode)
+    fail_msg: "The restored Sealed Secrets key {{ item.name }} does not match the Vault."
+  loop: "{{ restore_sealed_secrets_key_keys }}"
+  loop_control:
+    label: "{{ item.name }}"
   no_log: true

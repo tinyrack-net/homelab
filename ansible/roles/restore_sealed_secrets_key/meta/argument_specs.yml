@@ -1,12 +1,9 @@
 ---
 argument_specs:
   main:
-    short_description: Restore the Sealed Secrets controller recovery key
+    short_description: Restore every Sealed Secrets controller key
     options:
       restore_sealed_secrets_key_namespace:
-        type: str
-        required: true
-      restore_sealed_secrets_key_secret_name:
         type: str
         required: true
       restore_sealed_secrets_key_ready_timeout:
@@ -15,6 +12,17 @@ argument_specs:
       restore_sealed_secrets_key_tls_crt_path:
         type: str
         required: true
-      restore_sealed_secrets_key_tls_key:
-        type: str
+      restore_sealed_secrets_key_keys:
+        type: list
+        elements: dict
         required: true
+        options:
+          name:
+            type: str
+            required: true
+          tls_crt:
+            type: str
+            required: true
+          tls_key:
+            type: str
+            required: true

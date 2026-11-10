@@ -1,12 +1,18 @@
 ---
-- name: Require the Sealed Secrets TLS material
+- name: Require the Sealed Secrets keys from the Vault
+  vars:
+    restore_sealed_secrets_key_count: "{{ restore_sealed_secrets_key_keys | length }}"
   ansible.builtin.assert:
     that:
-      - restore_sealed_secrets_key_tls_key is defined
-      - restore_sealed_secrets_key_tls_key != "CHANGE_ME"
-      - "'BEGIN' in restore_sealed_secrets_key_tls_key"
-      - "'PRIVATE KEY' in restore_sealed_secrets_key_tls_key"
-    fail_msg: Run `make vault-edit` and add the Sealed Secrets TLS private key.
+      - restore_sealed_secrets_key_count | int > 0
+      - restore_sealed_secrets_key_keys | map(attribute='name') | unique | length
+        == restore_sealed_secrets_key_count | int
+      - restore_sealed_secrets_key_keys | map(attribute='tls_key') | select('search', 'PRIVATE KEY') | list | length
+        == restore_sealed_secrets_key_count | int
+      - restore_sealed_secrets_key_keys | map(attribute='tls_crt') | select('search', 'BEGIN CERTIFICATE')
+        | list | length == restore_sealed_secrets_key_count | int
+    fail_msg: Run `make vault-edit` and add every Sealed Secrets key to vault_sealed_secrets_keys.
+  no_log: true
 
 - name: Inspect the committed Sealed Secrets certificate
   ansible.builtin.stat:
@@ -24,44 +30,65 @@
     fail_msg: The committed tinyrack-homelab-secret-key.crt file is missing.
   run_once: true
 
-- name: Read the public key from the Sealed Secrets certificate
+- name: Read the public key of each Sealed Secrets certificate
   ansible.builtin.command:
-    argv:
-      - openssl
-      - x509
-      - -pubkey
-      - -noout
+    argv: [openssl, x509, -pubkey, -noout]
   args:
-    stdin: >-
-      {{ lookup('ansible.builtin.file', restore_sealed_secrets_key_tls_crt_path, rstrip=false) }}
+    stdin: "{{ item.tls_crt }}"
+  loop: "{{ restore_sealed_secrets_key_keys }}"
+  loop_control:
+    label: "{{ item.name }}"
   delegate_to: localhost
   become: false
   run_once: true
-  register: restore_sealed_secrets_key_certificate_public_key
+  register: restore_sealed_secrets_key_certificate_public_keys
+  changed_when: false
+  check_mode: false
+
+- name: Read the public key of each Sealed Secrets private key
+  ansible.builtin.command:
+    argv: [openssl, pkey, -pubout]
+  args:
+    stdin: "{{ item.tls_key }}"
+  loop: "{{ restore_sealed_secrets_key_keys }}"
+  loop_control:
+    label: "{{ item.name }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  register: restore_sealed_secrets_key_private_public_keys
   changed_when: false
   check_mode: false
   no_log: true
 
-- name: Read the public key from the Sealed Secrets private key
-  ansible.builtin.command:
-    argv:
-      - openssl
-      - pkey
-      - -pubout
-  args:
-    stdin: "{{ restore_sealed_secrets_key_tls_key }}"
-  delegate_to: localhost
-  become: false
-  run_once: true
-  register: restore_sealed_secrets_key_private_public_key
-  changed_when: false
-  check_mode: false
-  no_log: true
-
-- name: Verify the Sealed Secrets certificate and private key match
+- name: Verify each Sealed Secrets certificate matches its private key
   ansible.builtin.assert:
     that:
-      - restore_sealed_secrets_key_certificate_public_key.stdout == restore_sealed_secrets_key_private_public_key.stdout
-    fail_msg: The Sealed Secrets certificate and private key do not match.
+      - >-
+        restore_sealed_secrets_key_certificate_public_keys.results | map(attribute='stdout') | list
+        == restore_sealed_secrets_key_private_public_keys.results | map(attribute='stdout') | list
+    fail_msg: A Sealed Secrets certificate and private key in the Vault do not match.
   run_once: true
   no_log: true
+
+- name: Read the public key of the committed certificate
+  ansible.builtin.command:
+    argv: [openssl, x509, -pubkey, -noout]
+  args:
+    stdin: "{{ lookup('ansible.builtin.file', restore_sealed_secrets_key_tls_crt_path, rstrip=false) }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+  register: restore_sealed_secrets_key_committed_public_key
+  changed_when: false
+  check_mode: false
+
+# The controller seals with the newest key; the committed certificate must be that key.
+- name: Verify the committed certificate is the newest Vault key
+  ansible.builtin.assert:
+    that:
+      - >-
+        restore_sealed_secrets_key_committed_public_key.stdout
+        == (restore_sealed_secrets_key_certificate_public_keys.results | last).stdout
+    fail_msg: tinyrack-homelab-secret-key.crt must be the certificate of the last key in vault_sealed_secrets_keys.
+  run_once: true

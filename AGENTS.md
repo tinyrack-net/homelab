@@ -18,7 +18,7 @@
 - Committed `*.secret.yaml` and `*.secrets.yaml` files are encrypted `SealedSecret` manifests, often stored as JSON rather than YAML.
 - Do not replace them with plaintext `Secret` resources.
 - Recreate encrypted secrets with the repo certificate using the same pattern as `README.md`: `kubectl create secret generic <secret-name> --namespace <namespace> --dry-run=client --from-literal=KEY=VALUE -o yaml | kubeseal --cert ./tinyrack-homelab-secret-key.crt > ./<name>.secret.yaml`.
-- The public cert is committed at `./tinyrack-homelab-secret-key.crt`; the private key file `tinyrack-homelab-secret-key.key` is intentionally gitignored.
+- The public cert is committed at `./tinyrack-homelab-secret-key.crt` and must be the newest controller key. Private keys live only in the Ansible Vault (`vault_sealed_secrets_keys`); key renewal is disabled, see `README.md` → Sealed Secrets.
 
 ## Bootstrap / Ops
 - The README bootstrap flow is: install K3S without Traefik, restore the Sealed Secrets TLS secret, then run `flux bootstrap github --repository=homelab --branch=main --path=./clusters/production --owner=tinyrack-net`.

@@ -91,8 +91,10 @@ and SSH host keys. See devenv's `docs/disaster-recovery.md`.
 
 ### K3s, Cilium, and Sealed Secrets key
 
-Store the become password and Sealed Secrets TLS certificate/private key in the
-Ansible Vault, then let Ansible prepare everything up to the Flux boundary:
+Store the become password and every Sealed Secrets key (`vault_sealed_secrets_keys`)
+in the Ansible Vault, then let Ansible prepare everything up to the Flux boundary.
+The vault password is the Bitwarden item `ansible vault (homelab)`; `vault-pass.sh`
+reads `ANSIBLE_VAULT_PASSWORD` or the gitignored `.vault_pass`:
 
 ```bash
 cd ansible
@@ -106,7 +108,7 @@ cd ..
 ```
 
 Do not bootstrap Flux until `make verify` confirms that Cilium is healthy and
-that the recovery key in the new cluster matches the Vault values. K3s starts
+that every Sealed Secrets key in the new cluster matches the Vault values. K3s starts
 with Flannel, its network-policy controller, and kube-proxy disabled; Cilium must
 therefore be running before Flux controllers and workloads can start.
 
@@ -342,3 +344,13 @@ kubectl create secret generic some-secret \
   kubeseal --cert ./tinyrack-homelab-secret-key.crt \
   > ./some.secret.yaml
 ```
+
+Key management:
+
+- The controller runs with `keyrenewperiod: "0"` and never creates keys on its own.
+- Every active key is in the Ansible Vault as `vault_sealed_secrets_keys` (oldest
+  first). `restore_sealed_secrets_key` restores all of them before Flux, and
+  `make preflight` checks that `tinyrack-homelab-secret-key.crt` is the newest one.
+- To rotate, create a new key in the cluster, append it to `vault_sealed_secrets_keys`,
+  replace the committed certificate with its `tls.crt`, and run `make verify`. Keep old
+  keys until every SealedSecret has been resealed.

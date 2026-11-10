@@ -1,6 +1,8 @@
 ---
 restore_sealed_secrets_key_namespace: sealed-secrets
-restore_sealed_secrets_key_secret_name: sealed-secrets-key
 restore_sealed_secrets_key_ready_timeout: 300s
+# Public certificate used by `kubeseal --cert`; must belong to the newest key below.
 restore_sealed_secrets_key_tls_crt_path: "{{ playbook_dir }}/../../tinyrack-homelab-secret-key.crt"
-restore_sealed_secrets_key_tls_key: "{{ vault_sealed_secrets_tls_key }}"
+# Every key the controller may need to decrypt existing SealedSecrets, oldest first.
+# Each item: { name, tls_crt, tls_key }. The controller seals with the newest one.
+restore_sealed_secrets_key_keys: "{{ vault_sealed_secrets_keys }}"
