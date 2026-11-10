@@ -17,6 +17,7 @@ resources:
   - multus.yaml
   - traefik.yaml
   - traefik-external.yaml
+  - crowdsec.yaml
   - hubble-ui.yaml
   - cloudnative-pg.yaml
   - backup-cleanup.yaml
