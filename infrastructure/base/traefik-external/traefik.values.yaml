@@ -64,6 +64,7 @@ ports:
   websecure:
     http:
       middlewares:
+        - traefik-external-system-edge-crowdsec@kubernetescrd
         - traefik-external-system-edge-ratelimit@kubernetescrd
         - traefik-external-system-edge-inflight@kubernetescrd
         - traefik-external-system-edge-headers@kubernetescrd
