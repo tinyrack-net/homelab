@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - bifrost.namespace.yaml
   - bifrost.secrets.yaml
+  - bifrost-mcp.secrets.yaml
   - bifrost.database.user.secret.yaml
   - bifrost.database.superuser.secret.yaml
   - bifrost.database.yaml
@@ -12,3 +13,10 @@ resources:
   - bifrost.service.yaml
   - bifrost.ingress-route.yaml
   - bifrost.cilium-network-policy.yaml
+# DBHub configs of the stdio MCP clients (mcp-dbhub/*.toml), mounted at
+# /etc/bifrost-mcp/dbhub. A change gets a new name hash and rolls the pod.
+configMapGenerator:
+  - name: bifrost-mcp-dbhub
+    namespace: bifrost-system
+    files:
+      - mcp-dbhub/personal.toml

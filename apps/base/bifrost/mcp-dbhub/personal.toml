@@ -1,0 +1,16 @@
+# Bifrost stdio MCP client dbhub_personal:
+#   npx -y @bytebase/dbhub@1.6.1 --transport stdio --config /etc/bifrost-mcp/dbhub/personal.toml
+# One database per client, so the tools keep DBHub's plain names (execute_sql,
+# search_objects). ${PERSONAL_DB_PASSWORD} comes from the Bifrost container's
+# env (Secret bifrost-mcp-secrets); the client's `envs` lists the name only.
+#
+# A source without [[tools]] entries gets execute_sql (read-write, no row cap)
+# and search_objects. To set readonly or max_rows, declare both tools; declaring
+# any [[tools]] drops the defaults.
+
+[[sources]]
+id = "personal"
+description = "Personal data (personal-data cluster, database personal). The same tables are edited by hand in Mathesar at tables.intranet.winetree94.com; organise topics as schemas."
+dsn = "postgres://mcp_agent:${PERSONAL_DB_PASSWORD}@personal-data-database-cluster-rw.personal-data-system.svc.cluster.local:5432/personal?sslmode=disable"
+query_timeout = 60
+pool_max_connections = 5

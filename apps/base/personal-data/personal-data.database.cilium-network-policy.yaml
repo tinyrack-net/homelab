@@ -19,6 +19,10 @@ specs:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: dbhub-system
               app.kubernetes.io/name: dbhub
+          # Bifrost runs DBHub as the stdio MCP client dbhub_personal.
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bifrost-system
+              app: bifrost
         toPorts:
           - ports:
               - port: "5432"

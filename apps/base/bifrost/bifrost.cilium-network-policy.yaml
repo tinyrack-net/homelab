@@ -96,6 +96,15 @@ specs:
           - ports:
               - port: "8080"
                 protocol: TCP
+      # Egress to the personal data database (stdio DBHub client dbhub_personal)
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: personal-data-system
+              cnpg.io/cluster: personal-data-database-cluster
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
       # Egress to homelab LAN (e.g. Qwen server on port 8080)
       - toCIDRSet:
           - cidrGroupRef: lan

@@ -110,11 +110,22 @@ spec:
                 secretKeyRef:
                   name: bifrost-secrets
                   key: admin-password
+          # Stdio MCP clients (registered in the admin UI) inherit this env and
+          # list variable names only in their `envs`, so no credential is
+          # stored in the config store (e.g. PERSONAL_DB_PASSWORD for
+          # dbhub_personal).
+          envFrom:
+            - secretRef:
+                name: bifrost-mcp-secrets
           volumeMounts:
             - name: data
               mountPath: /app/data
             - name: tools
               mountPath: /tools
+              readOnly: true
+            # DBHub configs of the stdio MCP clients (mcp-dbhub/).
+            - name: mcp-dbhub
+              mountPath: /etc/bifrost-mcp/dbhub
               readOnly: true
           startupProbe:
             httpGet:
@@ -160,3 +171,6 @@ spec:
             claimName: bifrost-data
         - name: tools
           emptyDir: {}
+        - name: mcp-dbhub
+          configMap:
+            name: bifrost-mcp-dbhub
