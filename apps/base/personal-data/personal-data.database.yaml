@@ -27,7 +27,10 @@ spec:
 # Roles:
 # - personal:  owner of the personal database. Mathesar connects as this role
 #              (configured in the Mathesar web UI, not in a manifest).
-# - mcp_agent: login role for DBHub. It is a member of personal and its
+# - mcp_agent: login role for DBHub (Bifrost stdio MCP client dbhub_personal,
+#              apps/base/bifrost/mcp-dbhub; its password is also sealed into
+#              bifrost-system/bifrost-mcp-secrets, so rotating it means
+#              resealing both). It is a member of personal and its
 #              session role defaults to personal, so objects an agent creates
 #              are owned by personal and stay editable in Mathesar. Revoke MCP
 #              access by disabling this role alone.

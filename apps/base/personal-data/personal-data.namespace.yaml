@@ -1,4 +1,5 @@
-# Standalone personal data database. Applications (Mathesar, DBHub)
+# Standalone personal data database. Applications (Mathesar, and DBHub run
+# by Bifrost as the stdio MCP client dbhub_personal)
 # are only clients: removing or replacing them leaves this database intact.
 apiVersion: v1
 kind: Namespace

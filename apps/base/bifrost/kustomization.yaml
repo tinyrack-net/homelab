@@ -15,6 +15,20 @@ resources:
   - bifrost.cilium-network-policy.yaml
 # DBHub configs of the stdio MCP clients (mcp-dbhub/*.toml), mounted at
 # /etc/bifrost-mcp/dbhub. A change gets a new name hash and rolls the pod.
+#
+# Adding a database as a new stdio DBHub client (one database per client keeps
+# the plain tool names execute_sql / search_objects):
+#   1. Create a least-privilege login role in the target database and allow
+#      bifrost-system (app: bifrost) in that database's network policy; add the
+#      target to the egress list in bifrost.cilium-network-policy.yaml.
+#   2. Add <NAME>_DB_PASSWORD to bifrost-mcp.secrets.yaml (kubeseal
+#      --merge-into) and mcp-dbhub/<name>.toml to the generator below.
+#   3. Commit, then register the client in the Bifrost admin UI/API (outside
+#      GitOps): connection_type stdio, command npx, args
+#      -y @bytebase/dbhub@<version> --transport stdio --config
+#      /etc/bifrost-mcp/dbhub/<name>.toml, envs ["<NAME>_DB_PASSWORD"] (name
+#      only, the value comes from the container env), code mode on. Then add
+#      the client to the virtual MCPs that should see it.
 configMapGenerator:
   - name: bifrost-mcp-dbhub
     namespace: bifrost-system

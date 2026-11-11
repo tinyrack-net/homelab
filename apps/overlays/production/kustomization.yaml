@@ -23,7 +23,6 @@ resources:
   - outline.yaml
   - personal-data.yaml
   - mathesar.yaml
-  - dbhub.yaml
   - bifrost.yaml
   - gcp-mcp.yaml
   - email-mcp.yaml
