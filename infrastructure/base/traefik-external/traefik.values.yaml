@@ -97,6 +97,10 @@ service:
     networking.tinyrack.net/load-balancer: cilium-l2
   annotations:
     lbipam.cilium.io/ips: "10.132.246.2"
+    # Forgejo SSH (forgejo-system/forgejo-ssh, port 22) shares this address so that
+    # git.winetree94.com resolves to one IP for both HTTPS and SSH, on the LAN and through the edge.
+    lbipam.cilium.io/sharing-key: traefik-external
+    lbipam.cilium.io/sharing-cross-namespace: forgejo-system
   additionalServices:
     cloudflare:
       type: ClusterIP
