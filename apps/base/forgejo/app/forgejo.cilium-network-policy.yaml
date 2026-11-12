@@ -22,6 +22,24 @@ spec:
         - ports:
             - port: "3000"
               protocol: TCP
+    # Git over SSH through the forgejo-ssh LoadBalancer (10.132.246.2:22).
+    # Internet clients arrive through the edge proxy with their real address,
+    # so this has to be open to the world, like traefik-external websecure.
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "2222"
+              protocol: TCP
+    - fromCIDRSet:
+        - cidrGroupRef: lan
+        - cidrGroupRef: vpn-server
+        - cidrGroupRef: vpn-control
+        - cidrGroupRef: tailscale
+      toPorts:
+        - ports:
+            - port: "2222"
+              protocol: TCP
   egress:
     # PostgreSQL (CloudNativePG).
     - toEndpoints:
