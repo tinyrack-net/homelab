@@ -112,6 +112,9 @@ nextcloud:
     - name: apache-config
       mountPath: /etc/apache2/conf-enabled/timeout.conf
       subPath: timeout.conf
+    - name: apache-config
+      mountPath: /etc/apache2/conf-enabled/mpm.conf
+      subPath: mpm.conf
 
   # /metrics endpoint access list (pod + service CIDRs).
   openmetrics:

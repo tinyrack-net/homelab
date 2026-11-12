@@ -11,3 +11,23 @@ data:
     <IfModule reqtimeout_module>
       RequestReadTimeout header=20-40,minrate=500 body=0
     </IfModule>
+
+  # The image ships Debian's stock prefork pool (5-10 spare children), and
+  # prefork only forks one new child per second. A single page load sends
+  # ~50 parallel asset requests through Traefik (peak 46 in-flight observed),
+  # and Traefik's idle keep-alive connections each pin a child, so requests
+  # queued for whole seconds (1-5s stalls on plain CSS/JS). Keep enough idle
+  # children for a full page burst and release idle keep-alive connections
+  # sooner. Each child is ~25MB, so MaxSpareServers 50 stays within the 2Gi
+  # limit. conf-enabled is included after mods-enabled, so this overrides
+  # mods-enabled/mpm_prefork.conf.
+  mpm.conf: |
+    <IfModule mpm_prefork_module>
+      StartServers            25
+      MinSpareServers         25
+      MaxSpareServers         50
+      MaxRequestWorkers       150
+      MaxConnectionsPerChild  0
+    </IfModule>
+
+    KeepAliveTimeout 2
