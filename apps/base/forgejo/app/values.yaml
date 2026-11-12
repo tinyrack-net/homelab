@@ -257,9 +257,15 @@ gitea:
       DISABLE_USERS_PAGE: true
       DISABLE_ORGANIZATIONS_PAGE: true
 
+    # Footer keeps only the language selector, licenses and custom links.
     other:
+      SHOW_FOOTER_POWERED_BY: false
       SHOW_FOOTER_VERSION: false
       SHOW_FOOTER_TEMPLATE_LOAD_TIME: false
+
+    # Hides the Swagger page and its footer link; the API itself stays enabled.
+    api:
+      ENABLE_SWAGGER: false
 
     i18n:
       LANGS: ko-KR,en-US
