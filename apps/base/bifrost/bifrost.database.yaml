@@ -77,7 +77,7 @@ metadata:
   name: bifrost-backup
   namespace: bifrost-system
 spec:
-  schedule: "0 0 */4 * * *"
+  schedule: "0 0 12 * * *"  # daily 21:00 KST, before borgmatic (WAL keeps PITR)
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:
