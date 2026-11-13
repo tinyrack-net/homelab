@@ -26,6 +26,24 @@ nextcloud:
     usernameKey: username
     passwordKey: password
     tokenKey: nextcloud-token
+    smtpHostKey: smtp-host
+    smtpUsernameKey: smtp-username
+    smtpPasswordKey: smtp-password
+
+  # Outgoing mail (shares, calendar invitations, password resets, admin test
+  # mail) through Stalwart as notify@winetree94.com, the same submission path
+  # Outline and Forgejo use. The image's smtp.config.php renders this from the
+  # env vars at runtime, so the app password stays in nextcloud-admin-secret
+  # (Stalwart app password "nextcloud") and never lands in config.php.
+  # Port 587 with an empty `secure` makes the mailer upgrade with STARTTLS.
+  mail:
+    enabled: true
+    fromAddress: notify
+    domain: winetree94.com
+    smtp:
+      secure: ""
+      port: 587
+      authtype: LOGIN
 
   # PHP config file mounted into /var/www/html/config/. Traefik terminates TLS
   # and speaks plain HTTP to the pod, so the proxy ranges must be trusted and
