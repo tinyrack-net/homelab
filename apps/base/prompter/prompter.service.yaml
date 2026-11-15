@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prompter
+  namespace: prompter-system
+spec:
+  type: ClusterIP
+  selector:
+    app: prompter
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

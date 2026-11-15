@@ -1,0 +1,35 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-prompter
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: prompter
+  annotations:
+    networking.tinyrack.net/hosts: prompter.intranet.winetree94.com
+spec:
+  description: Allow the prompter.intranet.winetree94.com route and Outline's webhook deliveries to it
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    # Outline delivers webhooks to the public route name, which resolves to
+    # this internal Traefik from inside the cluster.
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: outline-system
+            app.kubernetes.io/name: outline
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: prompter-system
+            serviceName: prompter
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

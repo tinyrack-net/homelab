@@ -22,6 +22,15 @@ specs:
           - ports:
               - port: "3000"
                 protocol: TCP
+      # The prompter reads documents through the API in-cluster.
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: prompter-system
+              app: prompter
+        toPorts:
+          - ports:
+              - port: "3000"
+                protocol: TCP
     egress:
       # PostgreSQL (CloudNativePG).
       - toEndpoints:
@@ -46,6 +55,16 @@ specs:
       - toEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-external-system
+              app.kubernetes.io/name: traefik
+        toPorts:
+          - ports:
+              - port: "8443"
+                protocol: TCP
+      # Webhook deliveries to the prompter at prompter.intranet.winetree94.com,
+      # which resolves to the internal Traefik LB.
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: traefik-system
               app.kubernetes.io/name: traefik
         toPorts:
           - ports:

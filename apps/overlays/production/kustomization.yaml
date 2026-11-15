@@ -28,3 +28,4 @@ resources:
   - email-mcp.yaml
   - forgejo.yaml
   - devenv.yaml
+  - prompter.yaml

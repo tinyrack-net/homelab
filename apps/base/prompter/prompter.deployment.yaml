@@ -1,0 +1,83 @@
+# Voice-following teleprompter for Outline documents (tinyrack-net/prompter).
+# Stateless: no database or volume. Outline is reached in-cluster through its
+# Service; Outline calls back through the internal Traefik for webhooks.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prompter
+  namespace: prompter-system
+spec:
+  # A single replica: the document hub and SSE viewers live in memory, so
+  # webhook deliveries must reach the pod that holds the open streams.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: prompter
+  template:
+    metadata:
+      labels:
+        app: prompter
+    spec:
+      containers:
+        - name: prompter
+          image: ghcr.io/tinyrack-net/prompter:latest@sha256:4f43db1374e3c9f12378fb665a27d2a317fa156718455ce6606f9ebedfc11eb7 # {"$imagepolicy": "flux-system:prompter"}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+            - name: OUTLINE_URL
+              value: http://outline.outline-system.svc.cluster.local:3000
+            - name: OUTLINE_PUBLIC_URL
+              value: https://notes.winetree94.com
+            - name: OUTLINE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: prompter-outline
+                  key: OUTLINE_API_KEY
+            - name: OUTLINE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: prompter-outline
+                  key: OUTLINE_WEBHOOK_SECRET
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 16Mi
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault

@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - prompter.namespace.yaml
+  - prompter.secret.yaml
+  - prompter.deployment.yaml
+  - prompter.service.yaml
+  - prompter.ingress-route.yaml
+  - prompter.cilium-network-policy.yaml
+  - prompter.traefik.cilium-network-policy.yaml
