@@ -44,23 +44,23 @@ spec:
   volumeMode: Filesystem
 ---
 # App data (/data): covers, author images, fonts, KEPUB cache and the Book
-# Dock drop folder. Small, write-heavy files stay on Longhorn and are covered
-# by the recurring Longhorn backups.
+# Dock drop folder. Also on JuiceFS: the node's Longhorn disk is at its
+# scheduling limit (over-provisioning and minimal-available), and this keeps
+# all BookOrbit files in Garage with the index in the database backups.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: bookorbit-data
+  name: bookorbit-app-data
   namespace: bookorbit-system
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
-    recurring-job.longhorn.io/source: enabled
-    recurring-job-group.longhorn.io/longhorn-backup: enabled
+    storage.tinyrack.net/profile: bookorbit
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 20Gi
-  storageClassName: longhorn
+      storage: 50Gi
+  storageClassName: bookorbit-juicefs
   volumeMode: Filesystem

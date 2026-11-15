@@ -111,7 +111,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: bookorbit-data
+            claimName: bookorbit-app-data
         - name: library
           persistentVolumeClaim:
             claimName: bookorbit-library
