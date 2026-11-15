@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: issuary
-          image: ghcr.io/tinyrack-net/issuary:0.35.0@sha256:d547b4f0836cf1376c248d9dbed36fb60b8cd10423384780965de7a86bdae852 # {"$imagepolicy": "flux-system:issuary"}
+          image: ghcr.io/tinyrack-net/issuary:0.36.0@sha256:c9b41546e9dd58dc22f3a1590173249aa1b83c2caac886387a9e53c1913e0cbf # {"$imagepolicy": "flux-system:issuary"}
           imagePullPolicy: IfNotPresent
           command:
             - node
