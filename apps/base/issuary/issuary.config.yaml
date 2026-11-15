@@ -206,15 +206,16 @@ clients:
     scope: openid profile email
     skip_consent: true
   # BookOrbit (https://books.winetree94.com). The provider is configured in
-  # the BookOrbit admin UI with the slug "issuary". The iOS app's
-  # bookorbit://oauth2-callback cannot be registered because Issuary only
-  # accepts https redirect URIs, so the app signs in with a local password.
+  # the BookOrbit admin UI with the slug "issuary". The Android/iOS apps use
+  # the fixed private-use scheme bookorbit://oauth2-callback (Issuary >=
+  # 0.36.0 only returns S256 PKCE-bound codes to it).
   - id: bookorbit
     name: BookOrbit
     client_id: bookorbit
     client_secret: ${ISSUARY_BOOKORBIT_CLIENT_SECRET}
     redirect_uris:
       - https://books.winetree94.com/oauth2-callback
+      - bookorbit://oauth2-callback
     response_types:
       - code
     grant_types:
