@@ -72,7 +72,7 @@ git commit -m "chore: resume applications after cluster recovery"
 git push
 ```
 
-CNPG manifests that declare `bootstrap.recovery` (bifrost, davinci-resolve,
+CNPG manifests that declare `bootstrap.recovery` (bifrost, bookorbit, davinci-resolve,
 devenv, forgejo, issuary, mathesar, n8n, openwebui, personal-data) recreate their databases
 from S3 when Flux applies the application manifests; clusters still declared
 with `bootstrap.initdb` come up empty after a rebuild and need a manual
