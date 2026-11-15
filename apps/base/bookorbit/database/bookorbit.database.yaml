@@ -56,10 +56,18 @@ spec:
           storage: 10Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
-  # Switch to bootstrap.recovery (as mathesar does) once the first backup
-  # exists, so a recreated cluster restores instead of starting empty.
+  externalClusters:
+    - name: bookorbit-database-recovery-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: bookorbit-database-backup-store
+          serverName: bookorbit-database-cluster
+  # Initialised with initdb on 2026-11-15; a recreated cluster restores from
+  # the Barman backups instead of starting empty.
   bootstrap:
-    initdb:
+    recovery:
+      source: bookorbit-database-recovery-source
       database: bookorbit
       owner: bookorbit
       secret:
