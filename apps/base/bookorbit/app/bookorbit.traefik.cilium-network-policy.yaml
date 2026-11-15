@@ -1,0 +1,64 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-bookorbit
+  namespace: traefik-external-system
+  labels:
+    networking.tinyrack.net/owner: bookorbit
+  annotations:
+    networking.tinyrack.net/hosts: books.winetree94.com
+spec:
+  description: Allow the books.winetree94.com route and BookOrbit's OIDC calls to Issuary
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: bookorbit-system
+            app.kubernetes.io/name: bookorbit
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toServices:
+        - k8sService:
+            namespace: bookorbit-system
+            serviceName: bookorbit
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: route-bookorbit
+  namespace: traefik-system
+  labels:
+    networking.tinyrack.net/owner: bookorbit
+  annotations:
+    networking.tinyrack.net/hosts: storage.intranet.winetree94.com
+spec:
+  description: Allow BookOrbit's JuiceFS mounts and database backups to reach Garage S3
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+      app.kubernetes.io/name: traefik
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            app: juicefs-csi-node
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            app.kubernetes.io/name: juicefs-mount
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: bookorbit-system
+            cnpg.io/cluster: bookorbit-database-cluster
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

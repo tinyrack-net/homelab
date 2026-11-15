@@ -1,0 +1,109 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: bookorbit-database-backup-store
+  namespace: bookorbit-system
+spec:
+  retentionPolicy: 30d
+  configuration:
+    destinationPath: s3://tinyrack-homelab/apps/bookorbit/database-18
+    endpointURL: https://storage.intranet.winetree94.com
+    s3Credentials:
+      region:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_REGION
+      accessKeyId:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: tinyrack-homelab-s3-secret
+        key: AWS_SECRET_ACCESS_KEY
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+      maxParallel: 8
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: bookorbit-database-cluster
+  namespace: bookorbit-system
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  instances: 1
+  # The standard image ships pgvector, which BookOrbit requires.
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-trixie@sha256:39add80f5b1e573e2f6b641c66fd1a2f8dede67ca0330e870285bc1078551390
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: bookorbit-database-backup-store
+  storage:
+    pvcTemplate:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: longhorn-strict-local
+      volumeMode: Filesystem
+  # Switch to bootstrap.recovery (as mathesar does) once the first backup
+  # exists, so a recreated cluster restores instead of starting empty.
+  bootstrap:
+    initdb:
+      database: bookorbit
+      owner: bookorbit
+      secret:
+        name: bookorbit-database-user-secret
+---
+# BookOrbit runs CREATE EXTENSION IF NOT EXISTS for these on every start as
+# the non-superuser owner, so they must already exist. The juicefs schema
+# holds the JuiceFS metadata of the library volume, so the database backups
+# cover both the reading data and the file index.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: bookorbit-database
+  namespace: bookorbit-system
+spec:
+  name: bookorbit
+  owner: bookorbit
+  databaseReclaimPolicy: retain
+  cluster:
+    name: bookorbit-database-cluster
+  schemas:
+    - name: juicefs
+      owner: bookorbit
+      ensure: present
+  extensions:
+    - name: uuid-ossp
+      ensure: present
+    - name: pg_trgm
+      ensure: present
+    - name: unaccent
+      ensure: present
+    - name: vector
+      ensure: present
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: bookorbit-backup
+  namespace: bookorbit-system
+spec:
+  schedule: "0 0 12 * * *"  # daily 21:00 KST, before borgmatic (WAL keeps PITR)
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+  cluster:
+    name: bookorbit-database-cluster

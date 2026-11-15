@@ -1,0 +1,66 @@
+# BookOrbit has no object storage backend; it only reads and writes local
+# paths. The /books library is a JuiceFS volume whose data chunks live in the
+# Garage bucket tinyrack-homelab-bookorbit-storage (reached only through the
+# internal storage.intranet endpoint) and whose metadata lives in the juicefs
+# schema of the BookOrbit database. Browsers never talk to Garage directly.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: bookorbit-juicefs
+provisioner: csi.juicefs.com
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  csi.storage.k8s.io/provisioner-secret-name: bookorbit-juicefs-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: bookorbit-system
+  csi.storage.k8s.io/node-publish-secret-name: bookorbit-juicefs-secret
+  csi.storage.k8s.io/node-publish-secret-namespace: bookorbit-system
+mountOptions:
+  - cache-dir=/var/lib/jfs-cache
+  - cache-size=10240
+  - free-space-ratio=0.2
+  - buffer-size=100
+  - put-timeout=3600
+  - max-uploads=2
+  - upload-delay=10s
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bookorbit-library
+  namespace: bookorbit-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    storage.tinyrack.net/profile: bookorbit
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: bookorbit-juicefs
+  volumeMode: Filesystem
+---
+# App data (/data): covers, author images, fonts, KEPUB cache and the Book
+# Dock drop folder. Small, write-heavy files stay on Longhorn and are covered
+# by the recurring Longhorn backups.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bookorbit-data
+  namespace: bookorbit-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    recurring-job.longhorn.io/source: enabled
+    recurring-job-group.longhorn.io/longhorn-backup: enabled
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: longhorn
+  volumeMode: Filesystem

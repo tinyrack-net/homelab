@@ -205,6 +205,23 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+  # BookOrbit (https://books.winetree94.com). The provider is configured in
+  # the BookOrbit admin UI with the slug "issuary". The iOS app's
+  # bookorbit://oauth2-callback cannot be registered because Issuary only
+  # accepts https redirect URIs, so the app signs in with a local password.
+  - id: bookorbit
+    name: BookOrbit
+    client_id: bookorbit
+    client_secret: ${ISSUARY_BOOKORBIT_CLIENT_SECRET}
+    redirect_uris:
+      - https://books.winetree94.com/oauth2-callback
+    response_types:
+      - code
+    grant_types:
+      - authorization_code
+      - refresh_token
+    scope: openid profile email
+    skip_consent: true
   # devenv console (https://devenv.intranet.winetree94.com). Confidential
   # client with PKCE; devenv creates its users on first login.
   - id: devenv
