@@ -1,0 +1,130 @@
+# Kokoro-FastAPI (CPU): OpenAI-compatible text-to-speech for BookOrbit's
+# reader. Stateless, offline (the model is baked into the image) and reached
+# only from BookOrbit, so it runs without API keys. Registered in BookOrbit
+# Settings > TTS as an OpenAI-compatible provider with base URL
+# http://kokoro-tts.bookorbit-system.svc.cluster.local:8880/v1 and model
+# `kokoro`, which also enables word highlighting via /dev/captioned_speech.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kokoro-tts
+  namespace: bookorbit-system
+  labels:
+    app.kubernetes.io/name: kokoro-tts
+    app.kubernetes.io/part-of: bookorbit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kokoro-tts
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kokoro-tts
+        app.kubernetes.io/part-of: bookorbit
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000 # appuser in the image
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: kokoro-tts
+          # ~1.5 GB compressed; bump by hand together with the digest.
+          image: ghcr.io/remsky/kokoro-fastapi-cpu:v0.10.0@sha256:f54c5960c2b9387f6349080a9944f8bc7e8cdb98a4ef9238cb0b0f9ff9795f44
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8880
+              protocol: TCP
+          env:
+            # Weights ship in the image; never reach Hugging Face at runtime.
+            - name: DOWNLOAD_MODEL
+              value: "false"
+            - name: HF_HUB_OFFLINE
+              value: "1"
+            - name: HF_HUB_DISABLE_TELEMETRY
+              value: "1"
+            - name: API_LOG_LEVEL
+              value: INFO
+            # BookOrbit only uses the HTTP speech, voices and captioned routes.
+            - name: ENABLE_WEB_PLAYER
+              value: "false"
+            - name: CORS_ENABLED
+              value: "false"
+            - name: ENABLE_WEBSOCKET_TTS
+              value: "false"
+            - name: DEFAULT_VOICE
+              value: af_heart
+            # The image path (api/temp_files) is on the read-only root.
+            - name: TEMP_FILE_DIR
+              value: /tmp/kokoro
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          # Measured on the homelab node (v0.10.0): ~0.85 GiB idle after
+          # warm-up, ~1.55 GiB while synthesizing a long captioned passage,
+          # which also uses ~3.5 CPUs. Inference is synchronous, one request
+          # at a time.
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1536Mi
+            limits:
+              cpu: "4"
+              memory: 2560Mi
+          # Model load and warm-up take ~10 s on the node.
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          # Synthesis holds the single worker for tens of seconds on long
+          # passages, so be patient before restarting.
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /home/appuser/.cache
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 1Gi
+        - name: cache
+          emptyDir:
+            sizeLimit: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kokoro-tts
+  namespace: bookorbit-system
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: kokoro-tts
+  ports:
+    - name: http
+      port: 8880
+      targetPort: http
+      protocol: TCP

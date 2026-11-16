@@ -1,0 +1,37 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tts-kokoro
+  namespace: bookorbit-system
+specs:
+  # Only BookOrbit calls Kokoro. Kokoro needs no egress of its own: the model
+  # is baked into the image and Hugging Face lookups are disabled.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: bookorbit-system
+        app.kubernetes.io/name: kokoro-tts
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bookorbit-system
+              app.kubernetes.io/name: bookorbit
+        toPorts:
+          - ports:
+              - port: "8880"
+                protocol: TCP
+  # BookOrbit's own egress to Kokoro.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: bookorbit-system
+        app.kubernetes.io/name: bookorbit
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bookorbit-system
+              app.kubernetes.io/name: kokoro-tts
+        toPorts:
+          - ports:
+              - port: "8880"
+                protocol: TCP
