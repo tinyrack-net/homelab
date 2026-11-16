@@ -1,0 +1,37 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: metadata-kakao-books
+  namespace: bookorbit-system
+specs:
+  # Only BookOrbit calls the provider. Its egress to dapi.kakao.com (public
+  # HTTPS) is covered by the isolated-namespaces policy.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: bookorbit-system
+        app.kubernetes.io/name: kakao-books
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bookorbit-system
+              app.kubernetes.io/name: bookorbit
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
+  # BookOrbit's own egress to the provider.
+  - endpointSelector:
+      matchLabels:
+        io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
+        k8s:io.kubernetes.pod.namespace: bookorbit-system
+        app.kubernetes.io/name: bookorbit
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: bookorbit-system
+              app.kubernetes.io/name: kakao-books
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
