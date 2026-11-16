@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: kakao-books
-          image: ghcr.io/tinyrack-net/bookorbit-korean-provider:0.1.0@sha256:013ff44228a850ac0e27e76ee2568f77fa6c25b2cef6e5f380c2451ba0b332da # {"$imagepolicy": "flux-system:bookorbit-korean-provider"}
+          image: ghcr.io/tinyrack-net/bookorbit-korean-provider:0.1.1@sha256:fcfcc6cbf159bb412f7891f30a507de08c433e27389febf09a1fbb6644cca19d # {"$imagepolicy": "flux-system:bookorbit-korean-provider"}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
