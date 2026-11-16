@@ -275,6 +275,13 @@ clients:
       - refresh_token
     scope: openid profile email offline_access
     skip_consent: true
-users: []
+# Config-managed accounts: email is pre-verified and 2FA enrollment is not
+# required for them (registration stays disabled). The password lives in
+# issuary-secrets; the Bitwarden item holds the original.
+users:
+  - sub: ee304e2b-2ede-46c5-bea8-a25305f8df86
+    email: shared@winetree94.com
+    password: ${ISSUARY_USER_PASSWORD_SHARED}
+    role: user
 
 identity_providers: []
