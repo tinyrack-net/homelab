@@ -60,6 +60,13 @@ clients:
       - implicit
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: home-assistant
     name: Home Assistant
     client_id: home-assistant
@@ -71,6 +78,13 @@ clients:
       - authorization_code
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: 5f4d8c3b-2a1e-4b9f-8c7d-6e5a4f3b2c1d
     name: Homelab Test Client
     client_id: homelab-test-client
@@ -84,6 +98,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: openwebui
     name: OpenWebUI
     client_id: cM329FCwUpqO55pUrMWRjj4abLCeFVGIm7D7lm3B
@@ -97,6 +118,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: grafana
     name: Grafana
     client_id: grafana
@@ -110,6 +138,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: karakeep
     name: Karakeep
     client_id: msWzYbh6iiGSsEsdTx5yh9cYSsNgJsQjZ9om4RLl
@@ -123,6 +158,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: immich
     name: Immich
     client_id: immich
@@ -138,6 +180,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: nextcloud
     name: Nextcloud
     client_id: nextcloud
@@ -157,6 +206,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: outline
     name: Outline
     client_id: outline
@@ -178,6 +234,13 @@ clients:
     # refresh tokens for offline_access, so it must be allowed here.
     scope: openid profile email offline_access
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: mathesar
     name: Mathesar
     client_id: mathesar
@@ -191,6 +254,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   - id: forgejo
     name: Forgejo
     client_id: forgejo
@@ -205,6 +275,13 @@ clients:
       - refresh_token
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   # BookOrbit (https://books.winetree94.com). The provider is configured in
   # the BookOrbit admin UI with the slug "issuary". The Android/iOS apps use
   # the fixed private-use scheme bookorbit://oauth2-callback (Issuary >=
@@ -237,6 +314,13 @@ clients:
       - authorization_code
     scope: openid profile email
     skip_consent: true
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
   # Hermes Agent Webapp on the Windows desktop, served through the internal
   # Traefik proxy (apps/base/proxies/hermes.proxy.yaml). Hermes only supports
   # public clients (authorization code + PKCE S256, no secret).
@@ -278,6 +362,14 @@ clients:
 # Config-managed accounts: email is pre-verified and 2FA enrollment is not
 # required for them (registration stays disabled). The password lives in
 # issuary-secrets; the Bitwarden item holds the original.
+    # Everyone except the shared account (shared@winetree94.com), which is
+    # limited to BookOrbit. A new user must be added here to use this client.
+    access:
+      roles:
+        - admin
+      users:
+        - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
+
 users:
   - sub: ee304e2b-2ede-46c5-bea8-a25305f8df86
     email: shared@winetree94.com
