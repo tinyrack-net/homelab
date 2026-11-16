@@ -62,6 +62,14 @@ spec:
             # The image path (api/temp_files) is on the read-only root.
             - name: TEMP_FILE_DIR
               value: /tmp/kokoro
+            # PyTorch otherwise starts one thread per node core (16) and the
+            # 4-CPU limit throttles them. Matching the limit measured ~30%
+            # faster (10.4 s -> 7.1 s for a 413-char captioned passage); 6 or
+            # 8 CPUs gained nothing. Keep these equal to limits.cpu.
+            - name: OMP_NUM_THREADS
+              value: "4"
+            - name: MKL_NUM_THREADS
+              value: "4"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
