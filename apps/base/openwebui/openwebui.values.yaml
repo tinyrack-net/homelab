@@ -20,7 +20,7 @@ websocket:
     enabled: true
 terminals:
   enabled: false
-replicaCount: 2
+replicaCount: 1
 # Open WebUI migrates its schema on startup and does not support mixed-version
 # replicas. Stop every old pod before any new one starts. This keeps the
 # RollingUpdate type because server-side apply cannot clear the defaulted
