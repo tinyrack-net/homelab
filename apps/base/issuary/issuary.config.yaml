@@ -48,6 +48,11 @@ auth:
 
 terms: []
 
+# Every client must have an access block. Issuary lets every user into a
+# client that has none, so a new client without one would be open to the
+# shared account (shared@winetree94.com), which is meant for BookOrbit only.
+# Copy the block from an existing client: admins plus the listed users.
+# bookorbit is the one deliberate exception.
 clients:
   - id: guacamole
     name: Apache Guacamole
