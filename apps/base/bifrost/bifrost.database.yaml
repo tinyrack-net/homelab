@@ -20,6 +20,12 @@ spec:
         key: AWS_SECRET_ACCESS_KEY
     data:
       compression: gzip
+      # Split the base backup into 2GB archives. Garage needs ~5s/GB to finish
+      # CompleteMultipartUpload; past ~11GB that exceeded botocore's 60s read
+      # timeout, the automatic retry hit NoSuchUpload, and every backup was
+      # marked failed even though data.tar.gz had been stored.
+      additionalCommandArgs:
+        - "--max-archive-size=2GB"
     wal:
       compression: gzip
       maxParallel: 8
