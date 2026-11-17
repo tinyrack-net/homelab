@@ -287,8 +287,10 @@ Getting this backwards pins the wrong image without any error from Kubernetes.
   marked removed frees its space after a purge (Longhorn UI → volume → Purge
   snapshots, or the `snapshotPurge` volume action). Label a snapshot
   `tinyrack.net/protected=true` to keep it.
-- **This node can restart k3s under I/O pressure.** The root disk is rotational
-  (`/sys/block/sda/queue/rotational` is `1`) and etcd has logged
+- **This node can restart k3s under I/O pressure.** The node is Proxmox VM 101
+  on `proxmox-main`; its root disk is a thick LVM volume on an NVMe SSD, exposed
+  with `ssd=1` (`/sys/block/sda/queue/rotational` is `0`). Before 2026-11-17 the
+  flag was missing and the guest saw a rotational disk; etcd has logged
   `slow fdatasync` spikes up to 6s. When a lease renewal exceeds its deadline k3s
   exits with status 1 instead of retrying, so every controller pod restarts with
   exit code 255 and in-flight API writes are lost. Symptom to recognise:
@@ -298,6 +300,22 @@ Getting this backwards pins the wrong image without any error from Kubernetes.
   `ssh homelab 'systemctl show k3s -p NRestarts'` and
   `journalctl -u k3s | grep -c 'apply request took too long'`; recover by waiting
   for `/readyz` to return `ok`, then re-run the interrupted reconcile.
+- **A VM shutdown can stall in the final `systemd-shutdown` stage.** Longhorn's
+  iSCSI devices disappear before every container process exits, so a process
+  such as `multus-daemon` can block on I/O and `qm shutdown --timeout 300` fails
+  with `VM quit/powerdown failed` while the guest already sits at
+  `poweroff.target`. Check the console (`screendump` via `qm monitor 101`), send
+  `sendkey alt-sysrq-s` then `sendkey alt-sysrq-u` to sync and remount read-only,
+  and wait for QEMU to exit before `qm start 101`. Take an etcd snapshot first.
+  After the node is back, check two things a cold boot breaks:
+  - A Traefik pod that starts before egress works cannot download the CrowdSec
+    plugin (`Plugins are disabled`), so every `websecure` route on that pod
+    returns 404 while the other replica serves normally. Look for
+    `middleware does not exist` in each Traefik pod's log and delete the
+    affected pod.
+  - The `crowdsec-agent` DaemonSet pod keeps its name across the reboot and its
+    init container fails with `user already exist`. Delete the pod, then remove
+    the stale entry with `cscli machines delete <old-pod-name>`.
 
 ## CNI migration
 
