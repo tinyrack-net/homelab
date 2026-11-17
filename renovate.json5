@@ -136,5 +136,10 @@
       matchPackageNames: ['rancher/system-upgrade-controller'],
       enabled: false,
     },
+    {
+      description: 'The K3s Plan upgrade.image must stay untagged: the Plan version picks the tag',
+      matchPackageNames: ['rancher/k3s-upgrade'],
+      enabled: false,
+    },
   ],
 }
