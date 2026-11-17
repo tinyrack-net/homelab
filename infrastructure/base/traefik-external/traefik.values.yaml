@@ -103,4 +103,5 @@ service:
     lbipam.cilium.io/sharing-cross-namespace: forgejo-system
   additionalServices:
     cloudflare:
-      type: ClusterIP
+      spec:
+        type: ClusterIP
