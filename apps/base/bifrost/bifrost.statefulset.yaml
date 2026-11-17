@@ -40,7 +40,7 @@ spec:
               mountPath: /app/data
         # Official Node.js Alpine image provides node and npx
         - name: init-tools-node
-          image: docker.io/library/node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+          image: docker.io/library/node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a
           command:
             - sh
             - -c
@@ -57,7 +57,7 @@ spec:
               mountPath: /tools
         # Official Astral uv Alpine image provides uv and uvx
         - name: init-tools-uv
-          image: ghcr.io/astral-sh/uv:alpine@sha256:95f501aef734a5aaf167ff0640e02f215dcc7043ff48685de70328e5c55a57b0
+          image: ghcr.io/astral-sh/uv:alpine@sha256:788c243c482a0b16ef0e05c6e5bf7e4c2ba7f2e7ec04f05eb758a28607cfb652
           command:
             - sh
             - -c
@@ -69,7 +69,7 @@ spec:
               mountPath: /tools
       containers:
         - name: bifrost
-          image: docker.io/maximhq/bifrost:v2.4.0@sha256:a1c90607dcfd13c1fb2f9476ceb3bb24407a50ade7fdf3e61a59fb42b09e5c57
+          image: docker.io/maximhq/bifrost:v2.5.1@sha256:5ec9873acaf1687556b6e4dd854b92b539d9debf87a5a683b66338648b84d3c8
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
