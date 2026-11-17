@@ -105,3 +105,12 @@ spec:
             # immich microservices /metrics.
             - port: "8082"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: crowdsec-system
+            k8s-app: crowdsec
+      toPorts:
+        - ports:
+            # CrowdSec LAPI and agent Prometheus metrics.
+            - port: "6060"
+              protocol: TCP
