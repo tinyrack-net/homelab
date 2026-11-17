@@ -40,7 +40,7 @@ spec:
               mountPath: /app/data
         # Official Node.js Alpine image provides node and npx
         - name: init-tools-node
-          image: docker.io/library/node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a
+          image: docker.io/library/node:26-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5
           command:
             - sh
             - -c
@@ -50,8 +50,10 @@ spec:
               cp -r /usr/local/lib/node_modules/npm /tools/lib/node_modules/
               ln -sf ../lib/node_modules/npm/bin/npm-cli.js /tools/bin/npm
               ln -sf ../lib/node_modules/npm/bin/npx-cli.js /tools/bin/npx
-              cp /usr/lib/libstdc++.so.6 /tools/lib/
-              cp /usr/lib/libgcc_s.so.1 /tools/lib/
+              cp -L /usr/lib/libstdc++.so.6 /tools/lib/
+              cp -L /usr/lib/libgcc_s.so.1 /tools/lib/
+              # node 26+ also links libatomic.
+              cp -L /usr/lib/libatomic.so.1 /tools/lib/
           volumeMounts:
             - name: tools
               mountPath: /tools
