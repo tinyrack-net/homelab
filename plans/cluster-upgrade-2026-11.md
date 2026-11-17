@@ -1,6 +1,6 @@
 # Plan: Full cluster upgrade sweep (2026-11)
 
-Status: **executed 2026-11-17** (phases 0–5 and 7). Phase 6 majors remain open, see
+Status: **executed 2026-11-17/18** (all phases; n8n 3.x deferred until it is stable), see
 [Execution log](#execution-log-2026-11-17). Inventory taken 2026-11-17 from the repo,
 `kubectl --context homelab`, the Renovate Dependency Dashboard (#76), and upstream releases.
 Re-check every target version at execution time.
@@ -164,18 +164,35 @@ Delete the Phase 0 Longhorn snapshots once everything is verified; add a Renovat
 | 5 | `e39d3ce`, `8254a36` | CNPG operand 18.7 on all 16 clusters, bifrost v2.5.1. |
 | 7 | this commit | Renovate rule disabling `rancher/k3s-upgrade` pinning. |
 
-### Findings
+### Findings and follow-ups (2026-11-17/18)
+- Policy: updates go to the **latest stable release only**. Every bump in this sweep was checked
+  against the upstream release `prerelease` flag (all `false`).
 - README digest table was wrong in two places: `multus-cni` is pinned by **amd64** digest,
   `eceasy/cli-proxy-api` by **index** digest. Fixed.
-- `crowdsec-system` scrape targets `crowdsec-service` and `crowdsec-agent-service` report `up=0`;
-  this predates the sweep (seen 1d earlier). Not fixed here.
-- Manual bifrost base backups still fail with `NoSuchUpload` at CompleteMultipartUpload
-  (22GB database). Commit `4d3032a` (2GB archives) landed earlier the same day; the scheduled
-  backup afterwards completed. Watch the next scheduled runs.
-- One `nextcloud-cron` job pod failed while its database restarted for 18.7; the next run succeeded.
+- **CrowdSec metrics** (`0126f27`): Alloy's egress policy never allowed port 6060 to
+  `crowdsec-system`, so both targets were down since CrowdSec was deployed. Fixed; no `up==0`
+  targets remain on homelab.
+- **bifrost base backups** (`886b241`): the 2GB split was not enough, two manual backups still
+  failed with `NoSuchUpload`. Added `--read-timeout=300`; a 52-minute verification backup completed.
+  The two FAILED backup directories in S3 and their `Backup` CRs were removed.
+- **Garage** stalled for ~7 minutes (13:47–13:54 UTC) during the sweep and recovered by itself.
+- **Node 26** (`dd82a34`): the first attempt crashed gcp-mcp and broke bifrost's stdio MCP clients
+  (exit 127) because node 26 on Alpine also links `libatomic.so.1`. Reverted within minutes, then
+  fixed by copying libatomic (with `cp -L`) and verified in both runtime images before re-rolling.
+- Postgres 18.7 for the guacamole schema-init job, `actions/checkout` v7.0.1,
+  `renovatebot/github-action` v46.3.14 (`a225656`).
 
-### Still open (Phase 6)
-- n8n / runners 3.x (still `prerelease: true` upstream on 2026-11-17).
-- node 22 → 26 for bifrost/gcp-mcp init images.
-- postgres 17 → 18 for `guacamole.database-init.yaml`.
-- `actions/checkout` v7 (CI only).
+### Removed unused resources
+- PVC `monitoring-system/alloy-data` (unmounted since 2026-09-08), its Longhorn volume, snapshot
+  and two Longhorn backups.
+- Completed Helm hook job `monitoring-victoria-metrics-operator-cleanup-hook` (2026-09-08).
+- Five unused pre-PG18 `ObjectStore`s for cliproxyapi, davinci-resolve, guacamole, issuary, n8n
+  (`9a50576`).
+- S3 (`tinyrack-homelab`, Garage), approved by the user: backups of retired apps (authentik,
+  joplin, ghost, ghost-tinyrack, netbird, test-database, tinyauth, mcpjungle), pre-PG18 backups
+  (`database-17`/`database-13`), and Loki leftovers (`fake/`, `index/`). Purged locally on the NAS
+  with `rclone purge` (`~/s3purge/run.sh`, log `~/s3purge/log.txt`).
+
+### Not updated
+- n8n / runners 3.x: every 3.x release is still `prerelease: true` upstream; stays on 2.48.4
+  (latest stable).
