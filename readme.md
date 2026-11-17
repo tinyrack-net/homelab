@@ -232,7 +232,7 @@ the file** rather than picking one:
 
 | Convention | Files |
 |---|---|
-| **amd64** platform digest | `eceasy/cli-proxy-api`, `nginx-unprivileged`, `nextcloud-mcp-server` (postRenderer) |
+| **amd64** platform digest | `eceasy/cli-proxy-api`, `nginx-unprivileged`, `nextcloud-mcp-server` (postRenderer), `multus-cni` |
 | **index** (multi-arch) digest | everything else, including `n8nio/n8n`, `n8nio/runners`, `searxng/searxng`, `cloudflared`, `open-webui`, `immich`, `nextcloud`, the CloudNativePG operands and `quay.io/opstree/redis` |
 
 Getting this backwards pins the wrong image without any error from Kubernetes.
