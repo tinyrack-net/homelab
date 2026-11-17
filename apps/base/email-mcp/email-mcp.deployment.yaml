@@ -28,7 +28,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: email-mcp
-          image: ghcr.io/codefuturist/email-mcp:0.6.0@sha256:67f5ec017897ee321d010f877cd4b4486d7febbb61143930ccf380e27d79196b
+          image: ghcr.io/codefuturist/email-mcp:0.6.0@sha256:d9afefaa47ba70bd1fc95cb400fcec3a1529465e60556e508abe04be9965149d
           imagePullPolicy: IfNotPresent
           args:
             - http

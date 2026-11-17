@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: nextcloud-mcp-server
-      version: "0.105.16"
+      version: "0.105.23"
       sourceRef:
         kind: HelmRepository
         name: nextcloud-mcp-repository
@@ -21,8 +21,8 @@ spec:
     - kustomize:
         images:
           - name: ghcr.io/cbcoutinho/nextcloud-mcp-server
-            newTag: 0.203.0
-            digest: sha256:af1034fe7c330b873d75527f78f5654cbf68700851b47862c281664d8610046c
+            newTag: 0.210.0
+            digest: sha256:99d856383ec23dca9bf25923b9621ae067b5e2b12829780dfa47c630afd4ab6d
   valuesFrom:
     - kind: ConfigMap
       name: nextcloud-mcp-values
