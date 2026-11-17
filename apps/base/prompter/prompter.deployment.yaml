@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: prompter
-          image: ghcr.io/tinyrack-net/prompter:latest@sha256:9b2972edc7206c2b54f7cda0046f3fd7e46cda0f3bac81641a42270eb0b17581 # {"$imagepolicy": "flux-system:prompter"}
+          image: ghcr.io/tinyrack-net/prompter:latest@sha256:8a6e1a54afdb8591e4c8195ece45a8abb2caf87306d118ac33eb6c1fc18c30e7 # {"$imagepolicy": "flux-system:prompter"}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
