@@ -370,10 +370,9 @@ clients:
       users:
         - 37afd734-f0f7-459a-a301-5876334bb20d # leesol9491@gmail.com
 
-users:
-  - sub: ee304e2b-2ede-46c5-bea8-a25305f8df86
-    email: shared@winetree94.com
-    password: ${ISSUARY_USER_PASSWORD_SHARED}
-    role: user
+# No config-managed accounts. Every user, including shared@winetree94.com (a
+# database user exempted from required 2FA in the admin console), is managed
+# in the Issuary admin console.
+users: []
 
 identity_providers: []
