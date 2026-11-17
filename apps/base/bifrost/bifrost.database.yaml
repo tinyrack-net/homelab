@@ -24,8 +24,12 @@ spec:
       # CompleteMultipartUpload; past ~11GB that exceeded botocore's 60s read
       # timeout, the automatic retry hit NoSuchUpload, and every backup was
       # marked failed even though data.tar.gz had been stored.
+      # The split alone was not enough: two 2026-11-17 backups still failed
+      # with NoSuchUpload while Garage was busy. Give CompleteMultipartUpload
+      # 5 minutes before botocore retries it.
       additionalCommandArgs:
         - "--max-archive-size=2GB"
+        - "--read-timeout=300"
     wal:
       compression: gzip
       maxParallel: 8
