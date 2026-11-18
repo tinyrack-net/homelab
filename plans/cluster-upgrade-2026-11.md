@@ -191,7 +191,9 @@ Delete the Phase 0 Longhorn snapshots once everything is verified; add a Renovat
 - S3 (`tinyrack-homelab`, Garage), approved by the user: backups of retired apps (authentik,
   joplin, ghost, ghost-tinyrack, netbird, test-database, tinyauth, mcpjungle), pre-PG18 backups
   (`database-17`/`database-13`), and Loki leftovers (`fake/`, `index/`). Purged locally on the NAS
-  with `rclone purge` (`~/s3purge/run.sh`, log `~/s3purge/log.txt`).
+  with `rclone purge`, finished 2026-11-18 10:35 KST. Bucket went from 911.8 GB / 327,807 objects
+  to 807.2 GB / 241,803 objects. The stray root object `loki_cluster_seed.json` was removed too.
+  The temporary rclone credentials on the NAS were shredded.
 
 ### Not updated
 - n8n / runners 3.x: every 3.x release is still `prerelease: true` upstream; stays on 2.48.4
