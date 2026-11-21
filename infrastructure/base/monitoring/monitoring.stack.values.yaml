@@ -681,7 +681,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (time() - max by(cluster) (timestamp(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"})) > bool 180) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}))
+                  expr: ((time() - 600) - max by(cluster) (timestamp(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"} offset 10m)) > bool 180) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"} offset 10m))
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -716,9 +716,12 @@ grafana:
                   expression: A
               noDataState: OK
               execErrState: Error
-              # 30s scrape interval: 180s is six missed scrapes. 14d of history
-              # shows 0 minutes above 90s, so the old threshold only ever fired
-              # through the absent() fallback on a single dropped scrape.
+              # Evaluated at `offset 10m` because telemetry arrives late: Alloy's
+              # export queue is non-empty 34% of the time on tinyrack and 12% on
+              # mail-server, so the newest 5m window is routinely still in flight
+              # and looks empty at evaluation time even though nothing was lost.
+              # `time() - 600` keeps the staleness arithmetic aligned with the
+              # offset. 180s is six missed scrapes at scrapeInterval=30s.
               for: 5m
               keep_firing_for: 10m
               annotations:
@@ -740,7 +743,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (max by(cluster) (count_over_time(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}[5m])) < bool 5) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (count_over_time(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}[5m])))
+                  expr: (max by(cluster) (count_over_time(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}[5m] offset 10m)) < bool 5) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (count_over_time(node_time_seconds{cluster=~"homelab|mail-server|tinyrack",job="node-exporter"}[5m] offset 10m)))
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -775,9 +778,10 @@ grafana:
                   expression: A
               noDataState: OK
               execErrState: Error
-              # 30s scrape interval yields 10 samples per 5m, so `< 8` left under
-              # one scrape of slack and fired alongside node-telemetry-stale on
-              # every single dropped scrape. `< 5` tolerates half the window.
+              # Evaluated at `offset 10m` for the same late-arrival reason as
+              # node-telemetry-stale: the two rules fired as a pair on every
+              # queue-drain episode while the stored data showed a full 10
+              # samples per 5m throughout. `< 5` tolerates half the window.
               for: 5m
               keep_firing_for: 10m
               annotations:
@@ -975,7 +979,7 @@ grafana:
                     type: prometheus
                     uid: VictoriaMetrics
                   editorMode: code
-                  expr: (max by(cluster) (up{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"}) == bool 0) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (up{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"}))
+                  expr: (max by(cluster) (up{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"} offset 10m) == bool 0) or ((label_replace(vector(1), "cluster", "homelab", "", "") or label_replace(vector(1), "cluster", "mail-server", "", "") or label_replace(vector(1), "cluster", "tinyrack", "", "")) unless on(cluster) max by(cluster) (up{cluster=~"homelab|mail-server|tinyrack",job="kubelet",metrics_path="/metrics"} offset 10m))
                   instant: true
                   intervalMs: 1000
                   maxDataPoints: 43200
@@ -1010,6 +1014,8 @@ grafana:
                   expression: A
               noDataState: OK
               execErrState: Error
+              # Offset for late arrival, as with the node-telemetry rules: the
+              # absent() fallback otherwise trips while a scrape is still queued.
               for: 5m
               keep_firing_for: 10m
               annotations:
