@@ -4,6 +4,7 @@ Session.vim
 .idea
 .opencode
 .hermes/
+.worktrees
 
 # Local Cloudflare CLI cache
 .cloudflare/
