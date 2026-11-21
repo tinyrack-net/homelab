@@ -416,6 +416,13 @@ grafana:
           # dominated by rules re-notifying on every threshold crossing.
           group_interval: 15m
           repeat_interval: 12h
+    # NOTE: `keep_firing_for` below is accepted by the Grafana alerting HTTP API
+    # but is NOT parsed by the file provisioner in Grafana v13.2.3 - every
+    # provisioned rule reports keep_firing_for=0s after reconciliation. The
+    # values are kept because they document the intended hysteresis and will
+    # take effect once the provisioner supports the field. Noise suppression
+    # therefore relies on the thresholds, the `for` pending periods and the
+    # notification policy's group_interval, all of which do apply.
     rules.yaml:
       apiVersion: 1
       groups:
