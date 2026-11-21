@@ -209,7 +209,9 @@ gitea:
       SHOW_REGISTRATION_BUTTON: false
       # Sign in through Issuary only. The local password form is hidden and
       # rejected (403); Git/API accept tokens (PAT, git-credential-oauth) but
-      # not account passwords. Emergency access: see plans/forgejo.md.
+      # not account passwords. Emergency access (Issuary down): mint a token with
+      #   kubectl -n forgejo-system exec deploy/forgejo -c forgejo -- forgejo admin \n      #     user generate-access-token --username me --token-name emergency --scopes all
+      # and use the API; for the web UI, set ENABLE_INTERNAL_SIGNIN to true temporarily.
       ENABLE_INTERNAL_SIGNIN: false
       ENABLE_BASIC_AUTHENTICATION: false
       REQUIRE_SIGNIN_VIEW: false

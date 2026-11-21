@@ -1,4 +1,4 @@
-# Converted from ~/.config/himalaya/config.toml (see plans/bifrost-email-rclone-mcp.md).
+# Converted from ~/.config/himalaya/config.toml.
 # Account names match the himalaya account names. Passwords resolve from the
 # MAIL_*_PASSWORD env vars of email-mcp-secrets (Bitwarden item ids are the
 # ones referenced by the himalaya password commands).
