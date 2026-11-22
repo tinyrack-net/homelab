@@ -291,6 +291,11 @@ clients:
   # the BookOrbit admin UI with the slug "issuary". The Android/iOS apps use
   # the fixed private-use scheme bookorbit://oauth2-callback (Issuary >=
   # 0.36.0 only returns S256 PKCE-bound codes to it).
+  #
+  # offline_access is required by Lagrange Reader (the Android app): it always
+  # appends offline_access to the provider scopes it discovers, so without it
+  # Issuary rejects the authorize request with invalid_scope and the app's SSO
+  # sign-in fails before the login page. It also gives the app a refresh token.
   - id: bookorbit
     name: BookOrbit
     client_id: bookorbit
@@ -303,7 +308,7 @@ clients:
     grant_types:
       - authorization_code
       - refresh_token
-    scope: openid profile email
+    scope: openid profile email offline_access
     skip_consent: true
   # devenv console (https://devenv.intranet.winetree94.com). Confidential
   # client with PKCE; devenv creates its users on first login.
