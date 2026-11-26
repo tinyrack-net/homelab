@@ -106,6 +106,14 @@ spec:
         - name: s3-proxy-service
           kind: Service
           port: 13900
+    # tinyrack-homelab-bookorbit-storage
+    - match: Host(`tinyrack-homelab-bookorbit-storage.storage.intranet.winetree94.com`) || (Host(`storage.intranet.winetree94.com`) && PathRegexp(`^/tinyrack-homelab-bookorbit-storage(/|$)`))
+      kind: Rule
+      priority: 100
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 13900
   tls:
     secretName: letsencrypt-cert
 ---
