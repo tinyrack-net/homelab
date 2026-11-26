@@ -31,7 +31,7 @@ strategy:
     maxSurge: 0
     maxUnavailable: 100%
 image:
-  tag: v0.13.4@sha256:d5168bfbc28609eff5bea1b438dd864cf64d185cf6582c02244865e18385b901
+  tag: v0.13.5@sha256:e0dc5a8bf5c71cadf339d1e7b9408b357da75fb2854f82cad57a1609fadf2a22
 startupProbe:
   httpGet:
     path: /health
@@ -91,7 +91,7 @@ extraEnvVars:
   - name: OTEL_SERVICE_NAME
     value: open-webui
   - name: OTEL_RESOURCE_ATTRIBUTES
-    value: deployment.environment.name=production,service.version=0.12.4
+    value: deployment.environment.name=production,service.version=0.13.5
   - name: OTEL_TRACES_SAMPLER
     value: parentbased_always_on
   - name: OTEL_SDK_DISABLED
