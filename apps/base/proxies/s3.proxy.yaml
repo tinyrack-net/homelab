@@ -1,0 +1,104 @@
+# S3 storage on OpenMediaVault (Docker), being migrated from Garage to VersityGW.
+# - storage.intranet and <bucket>.storage.intranet: S3 API. Buckets listed in
+#   s3-api-versitygw-ingress-route already live on VersityGW (13900); every
+#   other bucket still goes to Garage (3900).
+# - s3.intranet: VersityGW web UI (13909) and its admin API under /admin (13903).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: s3-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: s3-proxy-service
+  namespace: s3-proxy
+spec:
+  type: ExternalName
+  ports:
+    - port: 3900
+      name: garage-api
+    - port: 3909
+      name: garage-console
+    - port: 13900
+      name: api
+    - port: 13903
+      name: admin
+    - port: 13909
+      name: console
+  externalName: 10.132.245.8
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: s3-api-ingress-route
+  namespace: s3-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostRegexp(`^(.+\.)?storage\.intranet\.winetree94\.com$`)
+      kind: Rule
+      priority: 10
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 3900
+  tls:
+    secretName: letsencrypt-cert
+---
+# Requests from the VersityGW web UI (browser on s3.intranet) always go to VersityGW.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: s3-api-webui-ingress-route
+  namespace: s3-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostRegexp(`^(.+\.)?storage\.intranet\.winetree94\.com$`) && Header(`Origin`, `https://s3.intranet.winetree94.com`)
+      kind: Rule
+      priority: 200
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 13900
+  tls:
+    secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: s3-console-ingress-route
+  namespace: s3-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`s3.intranet.winetree94.com`) && PathPrefix(`/admin`)
+      kind: Rule
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 13903
+    - match: Host(`s3.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 13909
+    - match: Host(`garage.intranet.winetree94.com`)
+      kind: Rule
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 3909
+  tls:
+    secretName: letsencrypt-cert
