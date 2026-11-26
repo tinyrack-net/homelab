@@ -74,6 +74,28 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
+  name: s3-api-versitygw-ingress-route
+  namespace: s3-proxy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # tinyrack-homelab-openwebui-storage
+    - match: Host(`tinyrack-homelab-openwebui-storage.storage.intranet.winetree94.com`) || (Host(`storage.intranet.winetree94.com`) && PathRegexp(`^/tinyrack-homelab-openwebui-storage(/|$)`))
+      kind: Rule
+      priority: 100
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 13900
+  tls:
+    secretName: letsencrypt-cert
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
   name: s3-console-ingress-route
   namespace: s3-proxy
   annotations:
