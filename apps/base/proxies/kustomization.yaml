@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - router.proxy.yaml
-  - garage.proxy.yaml
+  - s3.proxy.yaml
   - openmediavault.proxy.yaml
   - main-proxmox.proxy.yaml
   - xeon-proxmox.proxy.yaml
@@ -11,7 +11,7 @@ resources:
   - openmediavault-nanokvm.proxy.yaml
   - photos.proxy.yaml
   - slzb-ultima3.proxy.yaml
-  - garage.traefik.cilium-network-policy.yaml
+  - s3.traefik.cilium-network-policy.yaml
   - macmini-nanokvm.traefik.cilium-network-policy.yaml
   - main-proxmox.traefik.cilium-network-policy.yaml
   - openmediavault.traefik.cilium-network-policy.yaml
