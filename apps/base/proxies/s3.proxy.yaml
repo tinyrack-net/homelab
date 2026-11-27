@@ -125,7 +125,7 @@ spec:
       services:
         - name: s3-proxy-service
           kind: Service
-          port: 19999
+          port: 13900
   tls:
     secretName: letsencrypt-cert
 ---
