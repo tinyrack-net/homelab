@@ -126,6 +126,14 @@ spec:
         - name: s3-proxy-service
           kind: Service
           port: 13900
+    # tinyrack-homelab-nextcloud-storage
+    - match: Host(`tinyrack-homelab-nextcloud-storage.storage.intranet.winetree94.com`) || (Host(`storage.intranet.winetree94.com`) && PathRegexp(`^/tinyrack-homelab-nextcloud-storage(/|$)`))
+      kind: Rule
+      priority: 100
+      services:
+        - name: s3-proxy-service
+          kind: Service
+          port: 13900
   tls:
     secretName: letsencrypt-cert
 ---
