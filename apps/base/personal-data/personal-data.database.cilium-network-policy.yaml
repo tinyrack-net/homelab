@@ -54,7 +54,7 @@ specs:
                 protocol: TCP
               - port: "8000"
                 protocol: TCP
-      # Barman object storage backups go through internal Traefik (Garage S3).
+      # Barman object storage backups go through internal Traefik (VersityGW S3).
       - toEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-system
@@ -74,7 +74,7 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: storage.intranet.winetree94.com
 spec:
-  description: Allow personal-data database backups to reach Garage S3
+  description: Allow personal-data database backups to reach VersityGW S3
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

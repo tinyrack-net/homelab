@@ -53,7 +53,7 @@ spec:
       annotations:
         lbipam.cilium.io/ips: "10.132.246.6"
     # State in CloudNativePG (devenv.database.yaml, barman backups to
-    # Garage); home volumes are backed up by Longhorn (class labels below).
+    # VersityGW); home volumes are backed up by Longhorn (class labels below).
     database:
       driver: postgres
       postgres:

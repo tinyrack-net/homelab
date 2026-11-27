@@ -50,7 +50,7 @@ spec:
         - ports:
             - port: "5432"
               protocol: TCP
-    # Garage S3 (LFS, attachments, packages) through internal Traefik.
+    # VersityGW S3 (LFS, attachments, packages) through internal Traefik.
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: traefik-system

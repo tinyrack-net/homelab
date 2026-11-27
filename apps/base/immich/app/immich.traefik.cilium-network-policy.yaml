@@ -8,7 +8,7 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: immich.intranet.winetree94.com
 spec:
-  description: Allow the internal Immich route and Garage access
+  description: Allow the internal Immich route and VersityGW access
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

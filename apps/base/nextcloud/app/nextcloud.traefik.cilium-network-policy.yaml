@@ -52,7 +52,7 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: cloud.winetree94.com
 spec:
-  description: Allow Nextcloud pods to reach Garage S3 through internal Traefik
+  description: Allow Nextcloud pods to reach VersityGW S3 through internal Traefik
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

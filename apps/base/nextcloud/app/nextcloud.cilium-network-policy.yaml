@@ -62,7 +62,7 @@ specs:
           - ports:
               - port: "6379"
                 protocol: TCP
-      # Garage S3 primary object storage via internal Traefik.
+      # VersityGW S3 primary object storage via internal Traefik.
       - toEndpoints:
           - matchLabels:
               k8s:io.kubernetes.pod.namespace: traefik-system

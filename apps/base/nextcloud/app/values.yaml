@@ -1,5 +1,5 @@
 # Nextcloud 9.4.5 (appVersion 35.0.3) - Apache flavor
-# Files live in Garage S3 (primary object storage); the PVC keeps app code,
+# Files live in VersityGW S3 (primary object storage); the PVC keeps app code,
 # config.php, instanceid, apps and themes only.
 
 replicaCount: 1
@@ -143,7 +143,7 @@ nextcloud:
   strategy:
     type: Recreate
 
-  # Primary object storage: Garage S3.
+  # Primary object storage: VersityGW S3.
   objectStore:
     s3:
       enabled: true

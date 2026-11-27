@@ -1,8 +1,8 @@
 # BookOrbit has no object storage backend; it only reads and writes local
 # paths. The /books library is a JuiceFS volume whose data chunks live in the
-# Garage bucket tinyrack-homelab-bookorbit-storage (reached only through the
+# VersityGW bucket tinyrack-homelab-bookorbit-storage (reached only through the
 # internal storage.intranet endpoint) and whose metadata lives in the juicefs
-# schema of the BookOrbit database. Browsers never talk to Garage directly.
+# schema of the BookOrbit database. Browsers never talk to VersityGW directly.
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -46,7 +46,7 @@ spec:
 # App data (/data): covers, author images, fonts, KEPUB cache and the Book
 # Dock drop folder. Also on JuiceFS: the node's Longhorn disk is at its
 # scheduling limit (over-provisioning and minimal-available), and this keeps
-# all BookOrbit files in Garage with the index in the database backups.
+# all BookOrbit files in VersityGW with the index in the database backups.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

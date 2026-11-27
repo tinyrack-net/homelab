@@ -42,7 +42,7 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: storage.intranet.winetree94.com
 spec:
-  description: Allow Outline's JuiceFS mounts and database backups to reach Garage S3
+  description: Allow Outline's JuiceFS mounts and database backups to reach VersityGW S3
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

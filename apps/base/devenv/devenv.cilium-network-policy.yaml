@@ -75,7 +75,7 @@ metadata:
   name: app-devenv-database
   namespace: devenv-system
 spec:
-  description: devenv database - clients, CNPG operator, replication and backups to Garage
+  description: devenv database - clients, CNPG operator, replication and backups to VersityGW
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -120,7 +120,7 @@ spec:
               protocol: TCP
             - port: "8000"
               protocol: TCP
-    # Base backups and WAL to Garage through the internal Traefik.
+    # Base backups and WAL to VersityGW through the internal Traefik.
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: traefik-system

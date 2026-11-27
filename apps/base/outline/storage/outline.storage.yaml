@@ -1,8 +1,8 @@
 # Outline keeps attachments with FILE_STORAGE=local. The local directory is a
-# JuiceFS volume whose data chunks live in the Garage bucket
+# JuiceFS volume whose data chunks live in the VersityGW bucket
 # tinyrack-homelab-outline-storage (reached only through the internal
 # storage.intranet endpoint) and whose metadata lives in the juicefs schema of
-# the Outline database. Browsers never talk to Garage directly.
+# the Outline database. Browsers never talk to VersityGW directly.
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:

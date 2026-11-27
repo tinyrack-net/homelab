@@ -1,5 +1,5 @@
 # Deletes in-volume Longhorn snapshots whose data is already in the backup
-# target (Garage). Each recurring backup leaves its snapshot in the volume
+# target (VersityGW). Each recurring backup leaves its snapshot in the volume
 # (retain 14), and those snapshots kept ~60G of old blocks on the single node
 # disk until the node fell below Longhorn's minimal-available threshold and new
 # volumes could not be scheduled.

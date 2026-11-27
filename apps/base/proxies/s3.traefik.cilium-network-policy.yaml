@@ -6,9 +6,9 @@ metadata:
   labels:
     networking.tinyrack.net/owner: s3
   annotations:
-    networking.tinyrack.net/hosts: s3.intranet.winetree94.com,storage.intranet.winetree94.com,garage.intranet.winetree94.com
+    networking.tinyrack.net/hosts: s3.intranet.winetree94.com,storage.intranet.winetree94.com
 spec:
-  description: Allow the internal S3 API (Garage and VersityGW), web UI, and admin API routes
+  description: Allow the internal VersityGW S3 API, web UI, and admin API routes
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled
@@ -18,15 +18,9 @@ spec:
         - cidrGroupRef: openmediavault
       toPorts:
         - ports:
-            - port: "3900"
-              protocol: TCP
-            - port: "3909"
-              protocol: TCP
             - port: "13900"
               protocol: TCP
             - port: "13903"
               protocol: TCP
             - port: "13909"
-              protocol: TCP
-            - port: "19999"
               protocol: TCP

@@ -8,7 +8,7 @@ metadata:
   annotations:
     networking.tinyrack.net/hosts: tables.intranet.winetree94.com,storage.intranet.winetree94.com
 spec:
-  description: Allow the tables.intranet.winetree94.com route and Mathesar database backups to Garage S3
+  description: Allow the tables.intranet.winetree94.com route and Mathesar database backups to VersityGW S3
   endpointSelector:
     matchLabels:
       io.cilium.k8s.namespace.labels.networking.tinyrack.net/isolation: enabled

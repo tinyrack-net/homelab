@@ -16,7 +16,7 @@ metadata:
   labels:
     networking.tinyrack.net/cidr-scope: host
 spec:
-  # OpenMediaVault NAS host (SMB, NFS, Garage S3).
+  # OpenMediaVault NAS host (SMB, NFS, VersityGW S3).
   externalCIDRs:
     - 10.132.245.8/32
 ---
