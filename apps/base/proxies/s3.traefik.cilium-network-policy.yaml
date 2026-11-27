@@ -18,9 +18,9 @@ spec:
         - cidrGroupRef: openmediavault
       toPorts:
         - ports:
-            - port: "13900"
+            - port: "3900"
               protocol: TCP
-            - port: "13903"
+            - port: "3903"
               protocol: TCP
-            - port: "13909"
+            - port: "3909"
               protocol: TCP

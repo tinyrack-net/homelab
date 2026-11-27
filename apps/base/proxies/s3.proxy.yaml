@@ -1,6 +1,6 @@
 # VersityGW S3 gateway running in Docker on OpenMediaVault.
-# - storage.intranet and <bucket>.storage.intranet: S3 API (13900)
-# - s3.intranet: VersityGW web UI (13909) and its admin API under /admin (13903)
+# - storage.intranet and <bucket>.storage.intranet: S3 API (3900)
+# - s3.intranet: VersityGW web UI (3909) and its admin API under /admin (3903)
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -14,11 +14,11 @@ metadata:
 spec:
   type: ExternalName
   ports:
-    - port: 13900
+    - port: 3900
       name: api
-    - port: 13903
+    - port: 3903
       name: admin
-    - port: 13909
+    - port: 3909
       name: console
   externalName: 10.132.245.8
 ---
@@ -38,7 +38,7 @@ spec:
       services:
         - name: s3-proxy-service
           kind: Service
-          port: 13900
+          port: 3900
   tls:
     secretName: letsencrypt-cert
 ---
@@ -58,12 +58,12 @@ spec:
       services:
         - name: s3-proxy-service
           kind: Service
-          port: 13903
+          port: 3903
     - match: Host(`s3.intranet.winetree94.com`)
       kind: Rule
       services:
         - name: s3-proxy-service
           kind: Service
-          port: 13909
+          port: 3909
   tls:
     secretName: letsencrypt-cert
