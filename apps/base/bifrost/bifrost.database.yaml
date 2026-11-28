@@ -56,7 +56,10 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 40Gi
+          # Bifrost's PostgreSQL log store keeps growing (no retention); a single
+          # relation filled the 40Gi volume on 2026-11-28 and CNPG refused to
+          # start PostgreSQL for lack of WAL space.
+          storage: 80Gi
       storageClassName: longhorn-strict-local
       volumeMode: Filesystem
   enableSuperuserAccess: true
